@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hjt-shuai · Agent Skills</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg-elevated: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f6feb;
+    --tag-bg: #1a2332;
+    --tag-text: #79c0ff;
+    --card-hover: #1c2128;
+    --red: #f85149;
+    --green: #3fb950;
+    --yellow: #d2991d;
+    --purple: #a371f7;
+    --code-bg: #0d1117;
+    --codex-bg: #1a2332;
+    --codex-text: #79c0ff;
+    --general-bg: #1a2e1a;
+    --general-text: #7ee787;
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  header .sub {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  .search-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .search-inner {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .filter-tab {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .filter-tab:hover { color: var(--text); border-color: var(--text-dim); }
+  .filter-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
+  .stats {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  .stats strong { color: var(--text); }
+
+  .category { margin: 32px 0; }
+  .category-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .category-title .count {
+    font-weight: 400;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+  .skill-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    transition: background 0.15s;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+  }
+  .skill-card:hover { background: var(--card-hover); }
+  .skill-card.hidden { display: none; }
+
+  .skill-card .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .skill-card .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .skill-card .platform-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .platform-badge.codex { background: var(--codex-bg); color: var(--codex-text); }
+  .platform-badge.general { background: var(--general-bg); color: var(--general-text); }
+  .platform-badge.claude { background: #2a1a1a; color: #f77878; }
+
+  .skill-card .eng {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    margin-bottom: 8px;
+  }
+  .skill-card .desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    flex: 1;
+  }
+  .skill-card .triggers {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .skill-card .trigger-tag {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .skill-card .usage-block {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .skill-card .usage-cmd {
+    flex: 1;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    color: var(--green);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .skill-card .copy-btn {
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .skill-card .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .skill-card .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  footer {
+    padding: 40px 0 32px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: #0d1117;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 0.72rem;
+  }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .legend .dot.codex { background: var(--codex-text); }
+  .legend .dot.general { background: var(--general-text); }
+  .legend .dot.claude { background: #f77878; }
+
+  @media (max-width: 600px) {
+    .skill-grid { grid-template-columns: 1fr; }
+    header { padding: 32px 0 24px; }
+    .search-inner { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>hjt-shuai · Agent Skills</h1>
+    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">32</span> 项技能，点击复制即可执行</p>
+    <div class="legend">
+      <span><span class="dot codex"></span> Codex 专属</span>
+      <span><span class="dot general"></span> 通用（所有 Agent）</span>
+      <span><span class="dot claude"></span> Claude Code 专属</span>
+    </div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="container">
+    <div class="search-inner">
+      <input type="text" class="search-input" id="search" placeholder="搜索技能名称、描述、触发词…" autocomplete="off">
+    </div>
+    <div class="filter-tabs" id="filter-tabs">
+      <span class="filter-tab active" data-cat="all">全部</span>
+      <span class="filter-tab" data-cat="communication">通信协作</span>
+      <span class="filter-tab" data-cat="diagnosis">调试诊断</span>
+      <span class="filter-tab" data-cat="design">设计规划</span>
+      <span class="filter-tab" data-cat="engineering">工程开发</span>
+      <span class="filter-tab" data-cat="project">项目管理</span>
+      <span class="filter-tab" data-cat="ecosystem">技能生态</span>
+      <span class="filter-tab" data-cat="codex-system">Codex 系统</span>
+      <span class="filter-tab" data-cat="codex-plugins">Codex 插件</span>
+      <span class="filter-tab" data-cat="opencli">OpenCLI</span>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<main class="container" id="skills-container"></main>
+
+<footer>
+  <div class="container">
+    <div>通用技能：<code>C:\Users\hujiangtao\.agents\skills\</code></div>
+    <div style="margin-top:4px">Codex 系统技能：<code>C:\Users\hujiangtao\.codex\skills\.system\</code></div>
+    <div style="margin-top:4px">Codex 插件：<code>C:\Users\hujiangtao\.codex\plugins\</code></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+const skills = [
+  // ═══════════════════════════ 通信协作 ═══════════════════════════
+  { id:"caveman", zh:"超压缩通信", en:"caveman", cat:"communication", platform:"general", usage:"用 caveman 模式", desc:"切换为极简通信模式，去除填充词和客套语，token 消耗降低约 75%，技术准确性不变。", triggers:["token 优化","精简模式"] },
+  { id:"handoff", zh:"对话交接", en:"handoff", cat:"communication", platform:"general", usage:"handoff — 把当前对话交接给另一个 agent", desc:"将当前对话上下文压缩为一份结构化交接文档，供另一个 Agent 无缝接续工作。", triggers:["交接","换 agent"] },
+
+  // ═══════════════════════════ 调试诊断 ═══════════════════════════
+  { id:"diagnose", zh:"纪律化诊断", en:"diagnose", cat:"diagnosis", platform:"general", usage:"diagnose this — 帮我诊断这个 bug", desc:"面向棘手 bug 和性能回退的结构化诊断循环：复现→缩小范围→假设→插桩→修复→回归测试。", triggers:["bug","报错","debug","性能问题"] },
+  { id:"zoom-out", zh:"高层视角", en:"zoom-out", cat:"diagnosis", platform:"general", usage:"zoom out — 帮我看一下整体架构", desc:"跳出当前代码段，给出更广泛的上下文和更高层视角，帮你理解代码在整体架构中的位置。", triggers:["不熟悉代码","全局视角"] },
+
+  // ═══════════════════════════ 设计规划 ═══════════════════════════
+  { id:"grill-me", zh:"设计追问", en:"grill-me", cat:"design", platform:"general", usage:"grill my plan — 帮我把这个方案追问到底", desc:"围绕你的 plan 或 design 持续 interview，直到达成 shared understanding，逐一解决 decision tree 的每个分支。", triggers:["grill me","评审方案","推敲设计"] },
+  { id:"grill-with-docs", zh:"文档化追问", en:"grill-with-docs", cat:"design", platform:"general", usage:"grill with docs — 结合项目文档评审这个方案", desc:"在 grill-me 基础上结合 CONTEXT.md 和 ADR，挑战方案与现有领域模型的一致性，决策明朗时同步更新文档。", triggers:["结合文档评审","ADR","CONTEXT.md"] },
+  { id:"prototype", zh:"快速原型", en:"prototype", cat:"design", platform:"general", usage:"prototype this — 帮我搭个原型验证这个想法", desc:"搭建可丢弃的原型验证设计，支持终端 App（状态/业务逻辑）或多风格 UI 变体切换两种路线。", triggers:["原型","试试看","验证设计"] },
+
+  // ═══════════════════════════ 工程开发 ═══════════════════════════
+  { id:"improve-codebase-architecture", zh:"架构改进", en:"improve-codebase-architecture", cat:"engineering", platform:"general", usage:"improve the architecture — 分析这个项目的架构改进空间", desc:"基于 CONTEXT.md 领域语言和 ADR 决策，寻找代码库深化机会——重构、解耦、提升可测试性和 AI 可导航性。", triggers:["架构","重构","代码质量"] },
+  { id:"tdd", zh:"测试驱动开发", en:"tdd", cat:"engineering", platform:"general", usage:"用 TDD 方式开发 — red-green-refactor 循环", desc:"使用 red-green-refactor 循环进行测试驱动开发，覆盖单元测试和集成测试。", triggers:["TDD","测试驱动","先写测试"] },
+  { id:"setup-pre-commit", zh:"Pre-commit 配置", en:"setup-pre-commit", cat:"engineering", platform:"general", usage:"setup pre-commit — 给这个项目加上提交前检查", desc:"设置 Husky pre-commit hooks，集成 lint-staged（Prettier）、type checking 和自动化测试。", triggers:["pre-commit","husky","提交检查"] },
+  { id:"git-guardrails-claude-code", zh:"Git 安全护栏", en:"git-guardrails-claude-code", cat:"engineering", platform:"claude", usage:"add git guardrails — 给项目加上 git 安全 hooks（仅限 Claude Code）", desc:"配置 hooks 阻止危险的 git 操作（push、reset --hard、clean、branch -D 等），防止误操作。仅限 Claude Code 环境。", triggers:["git 安全","阻止 push"] },
+
+  // ═══════════════════════════ 项目管理 ═══════════════════════════
+  { id:"to-issues", zh:"任务拆解", en:"to-issues", cat:"project", platform:"general", usage:"convert to issues — 把当前 plan 拆成可领取的 issues", desc:"使用 tracer-bullet vertical slices 方式，将 plan/spec/PRD 拆解为可独立领取的 issues 并发布到项目 issue tracker。", triggers:["拆 issues","任务拆分","分解任务"] },
+  { id:"to-prd", zh:"生成 PRD", en:"to-prd", cat:"project", platform:"general", usage:"create a PRD — 把当前对话转成产品需求文档", desc:"将当前对话上下文转化为结构化 PRD 文档并发布到项目 issue tracker。", triggers:["PRD","产品需求","写需求文档"] },
+  { id:"triage", zh:"Issue 分类", en:"triage", cat:"project", platform:"general", usage:"triage — 帮我分类和管理这些 issues", desc:"通过状态机驱动的 triage 角色对 issues 进行分类和管理，适用于 bug 审查、功能请求评审和 AFK agent 准备工作。", triggers:["triage","issue 管理","bug 分类"] },
+
+  // ═══════════════════════════ 技能生态 ═══════════════════════════
+  { id:"write-a-skill", zh:"创建技能", en:"write-a-skill", cat:"ecosystem", platform:"general", usage:"write a skill — 帮我创建一个新的 agent 技能", desc:"创建结构正确、支持渐进式披露并带 bundled resources 的新 Agent 技能。", triggers:["创建技能","新技能"] },
+  { id:"find-skills", zh:"发现技能", en:"find-skills", cat:"ecosystem", platform:"general", usage:"find a skill for X — 帮我找有没有能做 X 的技能", desc:"帮助用户发现和安装 Agent 技能，适用于「怎么做到 X」「有没有能做 Y 的技能」等场景。", triggers:["找技能","安装技能"] },
+  { id:"cli-hub-meta-skill", zh:"CLI 工具目录", en:"cli-hub-meta-skill", cat:"ecosystem", platform:"general", usage:"show me CLI tools for X — 查一下有哪些 CLI 工具可用", desc:"发现 agent-native CLI 工具，访问实时目录查找创意工作流、生产力工具、AI 工具等。", triggers:["CLI 工具","工具发现"] },
+  { id:"scaffold-exercises", zh:"练习脚手架", en:"scaffold-exercises", cat:"ecosystem", platform:"general", usage:"scaffold exercises — 帮我搭建练习目录结构", desc:"创建包含 sections、problems、solutions 和 explainers 的练习目录结构，并通过 linting 验证。", triggers:["练习题","scaffold","课程结构"] },
+  { id:"migrate-to-shoehorn", zh:"Shoehorn 迁移", en:"migrate-to-shoehorn", cat:"ecosystem", platform:"general", usage:"migrate to shoehorn — 把测试中的 as 断言迁移到 shoehorn", desc:"将测试文件中的 `as` type assertions 迁移到 @total-typescript/shoehorn 模式。TypeScript 项目专用。", triggers:["shoohorn","as 迁移","测试迁移"] },
+  { id:"setup-matt-pocock-skills", zh:"工程技能初始化", en:"setup-matt-pocock-skills", cat:"ecosystem", platform:"general", usage:"setup agent skills context — 给项目配置 skills 上下文", desc:"在 AGENTS.md/CLAUDE.md 中配置 Agent skills 块，让工程技能获知项目 issue tracker、triage 标签和文档布局。", triggers:["初始化技能","配置 agent"] },
+
+  // ═══════════════════════════ Codex 系统技能 ═══════════════════════════
+  { id:"imagegen", zh:"图像生成", en:"imagegen", cat:"codex-system", platform:"codex", usage:"generate an image of X — 生成一张 X 的图像", desc:"生成或编辑位图图像：照片、插图、纹理、sprites、mockup、透明背景 cutout。适用于需要创建新图像或变换现有图像的场景。", triggers:["生成图片","插图","纹理","mockup"] },
+  { id:"openai-docs", zh:"OpenAI 文档", en:"openai-docs", cat:"codex-system", platform:"codex", usage:"查 OpenAI 文档 — X API 怎么用？", desc:"查询 OpenAI 官方文档，获取最新 API 使用方法、模型选型建议和 prompt 升级指导。", triggers:["OpenAI","API 文档","模型推荐"] },
+  { id:"plugin-creator", zh:"插件创建器", en:"plugin-creator", cat:"codex-system", platform:"codex", usage:"create a Codex plugin — 帮我创建一个插件", desc:"创建和 scaffold Codex 插件目录，含必需的 .codex-plugin/plugin.json、可选目录和 manifest 默认值。", triggers:["创建插件","plugin"] },
+  { id:"skill-creator", zh:"技能创建向导", en:"skill-creator", cat:"codex-system", platform:"codex", usage:"create a skill — 帮我创建一个 Codex 技能", desc:"创建或更新 Codex 技能的指导工具，帮助扩展 Codex 的专业知识、工作流和工具集成能力。", triggers:["创建 Codex 技能","skill creator"] },
+  { id:"skill-installer", zh:"技能安装器", en:"skill-installer", cat:"codex-system", platform:"codex", usage:"install a skill — 从目录安装一个技能", desc:"从精选列表或 GitHub 仓库安装 Codex 技能到 $CODEX_HOME/skills。", triggers:["安装技能","skill install"] },
+  { id:"cli-anything", zh:"CLI-Anything 构建器", en:"cli-anything", cat:"codex-system", platform:"codex", usage:"build a CLI harness for X — 给软件 X 构建命令行接口", desc:"为 GUI 应用或源码仓库构建 CLI harness，支持 Build/Refine/Test/Validate 四种模式，让 Agent 能命令行操控 GUI 软件。", triggers:["CLI harness","GUI 命令行","cli-anything"] },
+
+  // ═══════════════════════════ Codex 插件技能 ═══════════════════════════
+  { id:"documents", zh:"文档处理", en:"documents", cat:"codex-plugins", platform:"codex", usage:"create a Word document — 帮我生成一个 .docx 文件", desc:"创建、编辑、标注 .docx/Word/Google Docs 文档，支持渲染→截图验证→迭代修正的完整工作流。", triggers:["Word","docx","文档"] },
+  { id:"presentations", zh:"演示文稿", en:"presentations", cat:"codex-plugins", platform:"codex", usage:"create a presentation — 帮我做一个 PPT", desc:"创建、编辑、渲染和导出 PPTX 演示文稿（PowerPoint/Google Slides），含 slide deck 完整工作流。", triggers:["PPT","幻灯片","演示"] },
+  { id:"spreadsheets", zh:"电子表格", en:"spreadsheets", cat:"codex-plugins", platform:"codex", usage:"create a spreadsheet — 帮我做一个 Excel 表格", desc:"创建、修改、分析和可视化 .xlsx/.csv 电子表格，支持公式、格式化、图表和 Google Sheets。", triggers:["Excel","表格","CSV"] }
+
+  // ═══════════════════════════ OpenCLI ═══════════════════════════
+  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式、以及下一步该加载哪个专项 skill。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
+  { id:"opencli-browser", zh:"OpenCLI 浏览器驱动", en:"opencli-browser", cat:"opencli", platform:"general", usage:"用 opencli 打开 X 网站 — 帮我操作网页", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素、填表单、点击、截图、抓包。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
+  { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
+  { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
+];
+
+// ── Render ──
+const container = document.getElementById('skills-container');
+const searchInput = document.getElementById('search');
+const statsEl = document.getElementById('stats');
+const totalCountEl = document.getElementById('total-count');
+const toast = document.getElementById('toast');
+
+const categoryMeta = {
+  communication:  { label: "通信协作",   color: "var(--green)" },
+  diagnosis:      { label: "调试诊断",   color: "var(--red)" },
+  design:         { label: "设计规划",   color: "var(--purple)" },
+  engineering:    { label: "工程开发",   color: "var(--yellow)" },
+  project:        { label: "项目管理",   color: "var(--accent)" },
+  ecosystem:      { label: "技能生态",   color: "var(--text-dim)" },
+  "codex-system": { label: "Codex 系统", color: "var(--codex-text)" },
+  "codex-plugins":{ label: "Codex 插件", color: "#d2a8ff" },
+  opencli:        { label: "OpenCLI",        color: "#ffa657" }
+};
+
+const platformLabels = {
+  codex: "Codex",
+  general: "通用",
+  claude: "Claude Code"
+};
+
+function renderSkills(filtered) {
+  const byCat = {};
+  filtered.forEach(s => {
+    if (!byCat[s.cat]) byCat[s.cat] = [];
+    byCat[s.cat].push(s);
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="no-results" style="display:block;text-align:center;padding:48px 0;color:var(--text-dim);grid-column:1/-1">没有匹配的技能</div>';
+    return;
+  }
+
+  let html = '';
+  const catOrder = ["communication","diagnosis","design","engineering","project","ecosystem","codex-system","codex-plugins","opencli"];
+  catOrder.forEach(cat => {
+    const list = byCat[cat];
+    if (!list || list.length === 0) return;
+    const meta = categoryMeta[cat];
+    html += `<section class="category">
+      <h2 class="category-title" style="color:${meta.color}">${meta.label} <span class="count">${list.length}</span></h2>
+      <div class="skill-grid">`;
+    list.forEach(s => {
+      html += `<div class="skill-card" data-id="${s.id}" data-cat="${s.cat}">
+        <div class="card-top">
+          <div class="name">${s.zh}</div>
+          <span class="platform-badge ${s.platform}">${platformLabels[s.platform]}</span>
+        </div>
+        <div class="eng">${s.en}</div>
+        <div class="desc">${s.desc}</div>
+        <div class="usage-block">
+          <span class="usage-cmd" title="${s.usage.replace(/"/g,'&quot;')}">${s.usage}</span>
+          <button class="copy-btn" data-cmd="${s.usage.replace(/"/g,'&quot;')}">复制</button>
+        </div>
+        <div class="triggers">${s.triggers.map(t => `<span class="trigger-tag">${t}</span>`).join('')}</div>
+      </div>`;
+    });
+    html += '</div></section>';
+  });
+  container.innerHTML = html;
+}
+
+function filterAndRender() {
+  const query = searchInput.value.toLowerCase().trim();
+  const activeTab = document.querySelector('.filter-tab.active');
+  const activeCat = activeTab ? activeTab.dataset.cat : 'all';
+
+  let filtered = skills;
+  if (activeCat !== 'all') {
+    filtered = filtered.filter(s => s.cat === activeCat);
+  }
+  if (query) {
+    filtered = filtered.filter(s =>
+      s.zh.includes(query) || s.en.includes(query) || s.desc.includes(query) || s.usage.includes(query) || s.triggers.some(t => t.includes(query))
+    );
+  }
+
+  renderSkills(filtered);
+  totalCountEl.textContent = filtered.length;
+  statsEl.innerHTML = query || activeCat !== 'all'
+    ? `显示 <strong>${filtered.length}</strong> / ${skills.length} 项`
+    : '';
+}
+
+// ── Copy ──
+document.getElementById('skills-container').addEventListener('click', e => {
+  const btn = e.target.closest('.copy-btn');
+  if (!btn) return;
+  const cmd = btn.dataset.cmd;
+  navigator.clipboard.writeText(cmd).then(() => {
+    btn.textContent = '✓ 已复制';
+    btn.classList.add('copied');
+    toast.classList.add('show');
+    setTimeout(() => {
+      btn.textContent = '复制';
+      btn.classList.remove('copied');
+      toast.classList.remove('show');
+    }, 1500);
+  });
+});
+
+// ── Events ──
+searchInput.addEventListener('input', filterAndRender);
+
+document.getElementById('filter-tabs').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-tab')) return;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  filterAndRender();
+});
+
+// ── Init ──
+filterAndRender();
+</script>
+</body>
+</html>
