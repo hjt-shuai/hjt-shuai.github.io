@@ -434,6 +434,22 @@ const platformLabels = {
   claude: "Claude Code"
 };
 
+const siteNames = {
+  "36kr":"36氪","12306":"12306","1688":"1688","aibase":"AIbase","baidu-scholar":"百度学术",
+  "bilibili":"B站","boss":"Boss直聘","chaoxing":"超星","cnki":"知网","ctrip":"携程",
+  "dianping":"大众点评","douban":"豆瓣","doubao":"豆包","doubao-app":"豆包桌面","douyin":"抖音",
+  "eastmoney":"东方财富","flomo":"flomo","gitee":"Gitee","hupu":"虎扑","jd":"京东",
+  "jianyu":"简悦","jike":"即刻","jimeng":"即梦","ke":"可颂","maimai":"脉脉","mubu":"幕布",
+  "nowcoder":"牛客","ones":"ONES","powerchina":"中国电建","quark":"夸克","rednote":"小红书",
+  "sinablog":"新浪博客","sinafinance":"新浪财经","smzdm":"什么值得买","taobao":"淘宝",
+  "tdx":"通达信","ths":"同花顺","tieba":"贴吧","toutiao":"今日头条","uisdc":"优设",
+  "v2ex":"V2EX","wanfang":"万方","weibo":"微博","weixin":"微信","weread":"微信读书",
+  "weread-official":"微信读书官版","xianyu":"闲鱼","xiaoe":"小鹅通","xiaohongshu":"小红书",
+  "xiaoyuzhou":"小宇宙","xueqiu":"雪球","youdao":"有道","yuanbao":"元宝","zhihu":"知乎",
+  "zsxq":"知识星球","51job":"51job","linux-do":"Linux DO","deepseek":"DeepSeek",
+  "qwen":"通义千问","codex":"Codex"
+};
+
 const sites = [
   {cat:"国内社交",sites:["douyin","bilibili","xiaohongshu","zhihu","weibo","toutiao","douban","tieba","hupu","jike","v2ex","linux-do","weread","rednote","sinablog"]},
   {cat:"电商",sites:["taobao","jd","1688","xianyu","amazon","coupang","smzdm"]},
@@ -455,7 +471,7 @@ const sites = [
 function renderSites() {
   let html = '';
   sites.forEach(g => {
-    const tags = g.sites.map(s => '<span class="site-tag">' + s + '</span>').join('');
+    const tags = g.sites.map(s => '<span class="site-tag">' + (siteNames[s] || s) + '</span>').join('');
     html += '<div class="site-section"><div class="site-section-title">' + g.cat + ' <span style="color:var(--text-dim);font-weight:400">(' + g.sites.length + ')</span></div><div class="site-grid">' + tags + '</div></div>';
   });
   document.getElementById('sites-list').innerHTML = html;
