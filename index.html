@@ -115,6 +115,7 @@
   .site-section-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
   .site-grid { display: flex; flex-wrap: wrap; gap: 6px; }
   .site-tag { background: var(--tag-bg); color: var(--tag-text); padding: 3px 10px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
+  .site-tag { text-decoration: none; }
   .site-tag:hover { background: var(--accent-dim); color: #fff; }
 
   .filter-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
@@ -450,6 +451,66 @@ const siteNames = {
   "qwen":"通义千问","codex":"Codex"
 };
 
+const siteUrls = {
+  "36kr":"https://36kr.com","12306":"https://kyfw.12306.cn","1688":"https://www.1688.com",
+  "1point3acres":"https://www.1point3acres.com","51job":"https://www.51job.com",
+  "aibase":"https://www.aibase.com","amazon":"https://www.amazon.com","antigravity":"https://antigravity.google",
+  "apple-podcasts":"https://podcasts.apple.com","arxiv":"https://arxiv.org",
+  "baidu-scholar":"https://xueshu.baidu.com","band":"https://band.us","barchart":"https://www.barchart.com",
+  "bbc":"https://www.bbc.com","bilibili":"https://www.bilibili.com","binance":"https://www.binance.com",
+  "bloomberg":"https://www.bloomberg.com","bluesky":"https://bsky.app","booking":"https://www.booking.com",
+  "boss":"https://www.zhipin.com","brave":"https://search.brave.com","chaoxing":"https://www.chaoxing.com",
+  "chatgpt":"https://chatgpt.com","chatgpt-app":"https://chatgpt.com","chatwise":"https://chatwise.app",
+  "chess":"https://www.chess.com","claude":"https://claude.ai","cnki":"https://www.cnki.net",
+  "codex":"https://codex.openai.com","coingecko":"https://www.coingecko.com",
+  "confluence":"https://www.atlassian.com/confluence","coupang":"https://www.coupang.com",
+  "crates":"https://crates.io","ctrip":"https://www.ctrip.com","cursor":"https://cursor.com",
+  "dblp":"https://dblp.org","deepseek":"https://chat.deepseek.com","defillama":"https://defillama.com",
+  "devto":"https://dev.to","dianping":"https://www.dianping.com","dictionary":"https://www.dictionary.com",
+  "discord-app":"https://discord.com","dockerhub":"https://hub.docker.com","douban":"https://www.douban.com",
+  "doubao":"https://www.doubao.com","doubao-app":"https://www.doubao.com","douyin":"https://www.douyin.com",
+  "duckduckgo":"https://duckduckgo.com","eastmoney":"https://www.eastmoney.com",
+  "endoflife":"https://endoflife.date","facebook":"https://www.facebook.com","flathub":"https://flathub.org",
+  "flomo":"https://flomoapp.com","gemini":"https://gemini.google.com","geogebra":"https://www.geogebra.org",
+  "gitee":"https://gitee.com","google":"https://www.google.com","google-scholar":"https://scholar.google.com",
+  "goproxy":"https://goproxy.cn","gov-law":"https://flk.npc.gov.cn","gov-policy":"https://www.gov.cn",
+  "grok":"https://grok.com","hackernews":"https://news.ycombinator.com","hf":"https://huggingface.co",
+  "homebrew":"https://brew.sh","hupu":"https://www.hupu.com","imdb":"https://www.imdb.com",
+  "indeed":"https://www.indeed.com","instagram":"https://www.instagram.com","jd":"https://www.jd.com",
+  "jianyu":"https://jianyu.io","jike":"https://web.okjike.com","jimeng":"https://jimeng.jianying.com",
+  "jira":"https://www.atlassian.com/jira","ke":"https://www.kechenggezi.com","lesswrong":"https://www.lesswrong.com",
+  "lichess":"https://lichess.org","linkedin":"https://www.linkedin.com",
+  "linkedin-learning":"https://www.linkedin.com/learning","linux-do":"https://linux.do",
+  "lobsters":"https://lobste.rs","maimai":"https://maimai.cn","maven":"https://mvnrepository.com",
+  "mdn":"https://developer.mozilla.org","medium":"https://medium.com","mubu":"https://mubu.com",
+  "notebooklm":"https://notebooklm.google.com","nowcoder":"https://www.nowcoder.com","npm":"https://www.npmjs.com",
+  "nuget":"https://www.nuget.org","nvd":"https://nvd.nist.gov","oeis":"https://oeis.org",
+  "ones":"https://ones.ai","openalex":"https://openalex.org","openfda":"https://open.fda.gov",
+  "openreview":"https://openreview.net","osv":"https://osv.dev","packagist":"https://packagist.org",
+  "paperreview":"https://paperreview.com","pixiv":"https://www.pixiv.net","powerchina":"https://www.powerchina.cn",
+  "producthunt":"https://www.producthunt.com","pubmed":"https://pubmed.ncbi.nlm.nih.gov","pypi":"https://pypi.org",
+  "qwen":"https://tongyi.aliyun.com","quark":"https://www.quark.cn","reddit":"https://www.reddit.com",
+  "rednote":"https://www.xiaohongshu.com","rest-countries":"https://restcountries.com",
+  "reuters":"https://www.reuters.com","rfc":"https://www.rfc-editor.org","rubygems":"https://rubygems.org",
+  "sinablog":"https://blog.sina.com.cn","sinafinance":"https://finance.sina.com.cn",
+  "smzdm":"https://www.smzdm.com","spotify":"https://open.spotify.com",
+  "stackoverflow":"https://stackoverflow.com","steam":"https://store.steampowered.com",
+  "substack":"https://substack.com","suno":"https://suno.com","taobao":"https://www.taobao.com",
+  "tdx":"https://www.tdx.com.cn","ths":"https://www.10jqka.com.cn","tieba":"https://tieba.baidu.com",
+  "tiktok":"https://www.tiktok.com","toutiao":"https://www.toutiao.com","tvmaze":"https://www.tvmaze.com",
+  "twitter":"https://x.com","uisdc":"https://www.uisdc.com","uiverse":"https://uiverse.io",
+  "upwork":"https://www.upwork.com","v2ex":"https://www.v2ex.com","wanfang":"https://www.wanfangdata.com.cn",
+  "web":"https://www.example.com","weibo":"https://weibo.com","weixin":"https://weixin.qq.com",
+  "weread":"https://weread.qq.com","weread-official":"https://weread.qq.com",
+  "wikidata":"https://www.wikidata.org","wikipedia":"https://www.wikipedia.org","wttr":"https://wttr.in",
+  "xianyu":"https://www.goofish.com","xiaoe":"https://www.xiaoe-tech.com",
+  "xiaohongshu":"https://www.xiaohongshu.com","xiaoyuzhou":"https://www.xiaoyuzhou.com",
+  "xueqiu":"https://xueqiu.com","yahoo":"https://www.yahoo.com","yahoo-finance":"https://finance.yahoo.com",
+  "yollomi":"https://www.yollomi.com","youdao":"https://www.youdao.com","youtube":"https://www.youtube.com",
+  "yuanbao":"https://yuanbao.tencent.com","zhihu":"https://www.zhihu.com","zlibrary":"https://z-library.sk",
+  "zsxq":"https://wx.zsxq.com"
+};
+
 const sites = [
   {cat:"国内社交",sites:["douyin","bilibili","xiaohongshu","zhihu","weibo","toutiao","douban","tieba","hupu","jike","v2ex","linux-do","weread","rednote","sinablog"]},
   {cat:"电商",sites:["taobao","jd","1688","xianyu","amazon","coupang","smzdm"]},
@@ -471,7 +532,11 @@ const sites = [
 function renderSites() {
   let html = '';
   sites.forEach(g => {
-    const tags = g.sites.map(s => '<span class="site-tag">' + (siteNames[s] || s) + '</span>').join('');
+    const tags = g.sites.map(s => {
+      const name = siteNames[s] || s;
+      const url = siteUrls[s] || ('https://www.' + s + '.com');
+      return '<a href="' + url + '" target="_blank" class="site-tag" title="' + s + '">' + name + '</a>';
+    }).join('');
     html += '<div class="site-section"><div class="site-section-title">' + g.cat + ' <span style="color:var(--text-dim);font-weight:400">(' + g.sites.length + ')</span></div><div class="site-grid">' + tags + '</div></div>';
   });
   document.getElementById('sites-list').innerHTML = html;
