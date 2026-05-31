@@ -101,7 +101,10 @@
     user-select: none;
   }
   .filter-tab:hover { color: var(--text); border-color: var(--text-dim); }
-  .view-toggle { display: flex; gap: 2px; margin-bottom: 8px; }
+  .view-toggle { display: flex; gap: 2px; }
+  .view-bar { padding: 16px 24px 0; }
+  .view-bar.sites-mode { background: var(--bg-elevated); border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+
   .view-btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 18px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
   .view-btn:first-child { border-radius: 6px 0 0 6px; }
   .view-btn:last-child { border-radius: 0 6px 6px 0; }
@@ -305,11 +308,16 @@
   </div>
 </header>
 
-<div class="search-wrap">
+<div class="view-bar" id="view-bar">
+  <div class="container">
     <div class="view-toggle" id="view-toggle">
       <button class="view-btn active" data-view="skills">技能</button>
       <button class="view-btn" data-view="sites">网站</button>
     </div>
+  </div>
+</div>
+
+<div class="search-wrap">
   <div class="container">
     <div class="search-inner">
       <input type="text" class="search-input" id="search" placeholder="搜索技能名称、描述、触发词…" autocomplete="off">
@@ -548,6 +556,7 @@ document.getElementById('filter-tabs').addEventListener('click', e => {
 const skillsContainer = document.getElementById('skills-container');
 const sitesContainer = document.getElementById('sites-container');
 const searchWrap = document.querySelector('.search-wrap');
+const viewBar = document.getElementById('view-bar');
 
 document.getElementById('view-toggle').addEventListener('click', e => {
   if (!e.target.classList.contains('view-btn')) return;
@@ -559,10 +568,12 @@ document.getElementById('view-toggle').addEventListener('click', e => {
     searchWrap.style.display = 'none';
     sitesContainer.style.display = 'block';
     if (!document.getElementById('sites-list').innerHTML) renderSites();
+    viewBar.classList.add('sites-mode');
   } else {
     skillsContainer.style.display = 'block';
     searchWrap.style.display = 'block';
     sitesContainer.style.display = 'none';
+    viewBar.classList.remove('sites-mode');
   }
 });
 
