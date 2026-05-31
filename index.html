@@ -105,7 +105,7 @@
   .view-btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 18px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
   .view-btn:first-child { border-radius: 6px 0 0 6px; }
   .view-btn:last-child { border-radius: 0 6px 6px 0; }
-  .view-btn.active { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+  .view-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
   .view-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
 
   .site-section { margin-bottom: 28px; }
@@ -558,7 +558,7 @@ document.getElementById('view-toggle').addEventListener('click', e => {
     skillsContainer.style.display = 'none';
     searchWrap.style.display = 'none';
     sitesContainer.style.display = 'block';
-    if (!sitesContainer.innerHTML) renderSites();
+    if (!document.getElementById('sites-list').innerHTML) renderSites();
   } else {
     skillsContainer.style.display = 'block';
     searchWrap.style.display = 'block';
