@@ -89,25 +89,6 @@
     margin-top: 10px;
     flex-wrap: wrap;
   }
-
-  .view-toggle {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 8px;
-  }
-  .view-btn {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 6px 18px;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .view-btn:first-child { border-radius: 6px 0 0 6px; }
-  .view-btn:last-child { border-radius: 0 6px 6px 0; }
-  .view-btn.active { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
-  .view-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
   .filter-tab {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -120,6 +101,19 @@
     user-select: none;
   }
   .filter-tab:hover { color: var(--text); border-color: var(--text-dim); }
+
+  .view-toggle { display: flex; gap: 2px; margin-bottom: 8px; }
+  .view-btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 18px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
+  .view-btn:first-child { border-radius: 6px 0 0 6px; }
+  .view-btn:last-child { border-radius: 0 6px 6px 0; }
+  .view-btn.active { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+  .view-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+  .site-section { margin-bottom: 28px; }
+  .site-section-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .site-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .site-tag { background: var(--tag-bg); color: var(--tag-text); padding: 3px 10px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
+  .site-tag:hover { background: var(--accent-dim); color: #fff; }
   .filter-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
 
   .stats {
@@ -261,13 +255,6 @@
   }
 
   .toast {
-
-  /* ── Sites grid ── */
-  .site-section { margin-bottom: 28px; }
-  .site-section-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
-  .site-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-  .site-tag { background: var(--tag-bg); color: var(--tag-text); padding: 3px 10px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
-  .site-tag:hover { background: var(--accent-dim); color: #fff; }
     position: fixed;
     bottom: 24px;
     left: 50%;
@@ -411,6 +398,15 @@ const skills = [
   { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
 ];
 
+function renderSites() {
+  let html = '';
+  sites.forEach(g => {
+    const tags = g.sites.map(s => '<span class="site-tag">' + s + '</span>').join('');
+    html += '<div class="site-section"><div class="site-section-title">' + g.cat + ' <span style="color:var(--text-dim);font-weight:400">(' + g.sites.length + ')</span></div><div class="site-grid">' + tags + '</div></div>';
+  });
+  document.getElementById('sites-container').innerHTML = html;
+}
+
 // ── Render ──
 const container = document.getElementById('skills-container');
 const searchInput = document.getElementById('search');
@@ -437,42 +433,23 @@ const platformLabels = {
 };
 
 const sites = [
-  // 国内社交/内容
-  {cat:"国内社交/内容",sites:["douyin","bilibili","xiaohongshu","zhihu","weibo","toutiao","douban","tieba","hupu","jike","v2ex","linux-do","weread","rednote","sinablog"]},
-  // 电商/购物
-  {cat:"电商/购物",sites:["taobao","jd","1688","xianyu","amazon","coupang","smzdm"]},
-  // 招聘/职场
-  {cat:"招聘/职场",sites:["boss","maimai","51job","upwork","indeed","linkedin"]},
-  // 金融/数据
-  {cat:"金融/数据",sites:["eastmoney","tdx","ths","sinafinance","xueqiu","binance","coingecko","defillama","barchart","bloomberg","yahoo-finance"]},
-  // AI/大模型
-  {cat:"AI/大模型",sites:["chatgpt","claude","deepseek","qwen","grok","gemini","yuanbao","doubao","codex","cursor","chatwise","antigravity","notebooklm","suno","jimeng","yollomi"]},
-  // 国际社交
-  {cat:"国际社交",sites:["twitter","reddit","bluesky","instagram","facebook","band","weixin"]},
-  // 视频/音乐
-  {cat:"视频/音乐",sites:["youtube","bilibili","douyin","tiktok","spotify","apple-podcasts","xiaoyuzhou","pixiv"]},
-  // 开发者
+  {cat:"国内社交",sites:["douyin","bilibili","xiaohongshu","zhihu","weibo","toutiao","douban","tieba","hupu","jike","v2ex","linux-do","weread","rednote","sinablog"]},
+  {cat:"电商",sites:["taobao","jd","1688","xianyu","amazon","coupang","smzdm"]},
+  {cat:"招聘",sites:["boss","maimai","51job","upwork","indeed","linkedin"]},
+  {cat:"金融",sites:["eastmoney","tdx","ths","sinafinance","xueqiu","binance","coingecko","defillama","barchart","bloomberg","yahoo-finance"]},
+  {cat:"AI",sites:["chatgpt","claude","deepseek","qwen","grok","gemini","yuanbao","doubao","codex","cursor","chatwise","antigravity","notebooklm","suno","jimeng","yollomi"]},
+  {cat:"国际社交",sites:["twitter","reddit","bluesky","instagram","facebook","band"]},
+  {cat:"视频音乐",sites:["youtube","tiktok","spotify","apple-podcasts","xiaoyuzhou","pixiv"]},
   {cat:"开发者",sites:["google","stackoverflow","mdn","hackernews","devto","npm","pypi","crates","dockerhub","nuget","packagist","rubygems","maven","homebrew","gitee","flathub","rfc"]},
-  // 学术/知识
-  {cat:"学术/知识",sites:["arxiv","pubmed","google-scholar","baidu-scholar","dblp","openreview","cnki","wanfang","openalex","wikidata","wikipedia","nvd","osv","openfda","rest-countries","oeis","endoflife"]},
-  // 媒体/新闻
-  {cat:"媒体/新闻",sites:["36kr","bbc","reuters","producthunt","substack","medium","aibase","lesswrong","lobsters"]},
-  // 生活/工具
-  {cat:"生活/工具",sites:["ctrip","booking","12306","dianping","wttr","dictionary","flomo","mubu","youdao","xiaoe"]},
-  // 游戏
+  {cat:"学术",sites:["arxiv","pubmed","google-scholar","baidu-scholar","dblp","openreview","cnki","wanfang","openalex","wikidata","wikipedia","nvd","osv","openfda","rest-countries","oeis","endoflife"]},
+  {cat:"新闻",sites:["36kr","bbc","reuters","producthunt","substack","medium","aibase","lesswrong","lobsters"]},
+  {cat:"生活工具",sites:["ctrip","booking","12306","dianping","wttr","dictionary","flomo","mubu","youdao","xiaoe"]},
   {cat:"游戏",sites:["steam","lichess","chess"]},
-  // 其他
   {cat:"其他",sites:["duckduckgo","brave","imdb","tvmaze","jira","confluence","ones","linkedin-learning","nowcoder","goproxy","gov-law","gov-policy","hf","jianyu","ke","paperreview","quark","uisdc","uiverse","web","zlibrary","zsxq","chaoxing","powerchina","yahoo","weread-official"]}
 ];
 
 function renderSkills(filtered) {
 
-function renderSites() {
-  let html = '';
-  sites.forEach(g => {
-    const tags = g.sites.map(s => `<span class="site-tag">${s}</span>`).join('');
-    html += `<div class="site-section"><div class="site-section-title">${g.cat} <span style="color:var(--text-dim);font-weight:400">(${g.sites.length})</span></div><div class="site-grid">${tags}</div></div>`;
-  });
   document.getElementById('sites-container').innerHTML = html;
 }
   const byCat = {};
