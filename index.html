@@ -332,7 +332,10 @@
 
 <main class="container" id="skills-container"></main>
 
-<main class="container" id="sites-container" style="display:none"></main>
+<main class="container" id="sites-container" style="display:none">
+  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:20px">以下站点均通过 <code style="background:var(--codex-bg);color:var(--codex-text);padding:1px 6px;border-radius:3px;font-size:0.82rem">opencli &lt;site&gt; &lt;command&gt;</code> 命令访问，共206个。<a href="https://github.com/jackwener/OpenCLI" target="_blank" style="color:var(--accent);margin-left:8px">OpenCLI ↗</a></p>
+  <div id="sites-list"></div>
+</main>
 
 <footer>
   <div class="container">
@@ -447,7 +450,7 @@ function renderSites() {
     const tags = g.sites.map(s => '<span class="site-tag">' + s + '</span>').join('');
     html += '<div class="site-section"><div class="site-section-title">' + g.cat + ' <span style="color:var(--text-dim);font-weight:400">(' + g.sites.length + ')</span></div><div class="site-grid">' + tags + '</div></div>';
   });
-  document.getElementById('sites-container').innerHTML = html;
+  document.getElementById('sites-list').innerHTML = html;
 }
 
 function renderSkills(filtered) {
