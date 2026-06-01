@@ -418,6 +418,8 @@ const skills = [
   { id:"opencli-browser", zh:"OpenCLI 浏览器驱动", en:"opencli-browser", cat:"opencli", platform:"general", usage:"用 opencli 打开 X 网站 — 帮我操作网页", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素、填表单、点击、截图、抓包。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
   { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
   { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
+  // rtk — CLI proxy that reduces LLM token consumption by 60-90%
+  { id:"rtk", zh:"RTK  Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理工具，在命令输出到达 LLM 之前自动过滤和压缩，减少 60-90% token 消耗。单个 Rust 二进制文件，零依赖，支持 ls、cat、grep、git、docker、pytest、cargo test 等 100+ 开发命令，<10ms 开销。配合 Claude Code / Codex 等 AI 编程工具使用可大幅降低 API 费用。安装：brew install rtk 或 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh。官网：https://www.rtk-ai.app", triggers:["token 优化","省 token","压缩输出","rtk","降低费用","节省 API"] },
 ];
 
 // ── Render ──
@@ -535,6 +537,8 @@ const sites = [
   {cat:"生活工具",sites:["ctrip","booking","12306","dianping","wttr","dictionary","flomo","mubu","youdao","xiaoe"]},
   {cat:"游戏",sites:["steam","lichess","chess"]},
   {cat:"其他",sites:["duckduckgo","brave","imdb","tvmaze","jira","confluence","ones","linkedin-learning","nowcoder","goproxy","gov-law","gov-policy","hf","jianyu","ke","paperreview","quark","uisdc","uiverse","web","zlibrary","zsxq","chaoxing","powerchina","yahoo","weread-official"]}
+  // rtk — CLI proxy that reduces LLM token consumption by 60-90%
+  { id:"rtk", zh:"RTK  Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理工具，在命令输出到达 LLM 之前自动过滤和压缩，减少 60-90% token 消耗。单个 Rust 二进制文件，零依赖，支持 ls、cat、grep、git、docker、pytest、cargo test 等 100+ 开发命令，<10ms 开销。配合 Claude Code / Codex 等 AI 编程工具使用可大幅降低 API 费用。安装：brew install rtk 或 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh。官网：https://www.rtk-ai.app", triggers:["token 优化","省 token","压缩输出","rtk","降低费用","节省 API"] },
 ];
 
 
