@@ -539,8 +539,6 @@ const sites = [
   {cat:"游戏",sites:["steam","lichess","chess"]},
   {cat:"其他",sites:["duckduckgo","brave","imdb","tvmaze","jira","confluence","ones","linkedin-learning","nowcoder","goproxy","gov-law","gov-policy","hf","jianyu","ke","paperreview","quark","uisdc","uiverse","web","zlibrary","zsxq","chaoxing","powerchina","yahoo","weread-official"]},
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
-  { id:"rtk", zh:"RTK  Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理工具，在命令输出到达 LLM 之前自动过滤和压缩，减少 60-90% token 消耗。单个 Rust 二进制文件，零依赖，支持 ls、cat、grep、git、docker、pytest、cargo test 等 100+ 开发命令，<10ms 开销。配合 Claude Code / Codex 等 AI 编程工具使用可大幅降低 API 费用。安装：brew install rtk 或 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh。官网：https://www.rtk-ai.app", triggers:["token 优化","省 token","压缩输出","rtk","降低费用","节省 API"] },
-  { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
 ];
 
 
