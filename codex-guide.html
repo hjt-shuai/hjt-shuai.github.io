@@ -138,7 +138,6 @@
   <p>不要说 "用 grep 搜" 或 "用 sed 改"。Agent 有完整的工具集，它知道该用什么。你只需描述结果。</p>
 </div>
 
-<!-- ============================== -->
 <h2>2.1 Agent 的"手感"——高质量协作模式</h2>
 
 <p>Codex 自带工程品味：它会自动尊重现有代码风格、避免过度抽象、在合适的尺度插入注释。理解这些特质，你能更快进入 flow。</p>
@@ -155,6 +154,78 @@
 </table>
 </div>
 
+<!-- ============================== -->
+<h2>2.2 Agent 的记忆机制——为什么它会「忘」</h2>
+
+<p>Agent 的记忆不是你想的那样。它不是硬盘，更像一块 <strong>黑板</strong>——能写的东西有限，写满了就得擦掉旧的。</p>
+
+<h3>记忆怎么工作的</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>记忆类型</th><th>存什么</th><th>存活时间</th><th>容量</th></tr>
+  <tr><td>对话上下文</td><td>本次会话的全部对话、代码、文件内容</td><td>仅当前会话</td><td>有限（token 上限）</td></tr>
+  <tr><td>文件系统</td><td>项目代码、文档、AGENTS.md、ADR</td><td>永久</td><td>无上限</td></tr>
+  <tr><td>Skills / Plugins</td><td>固化在 <span class="inline-code">.codex/skills/</span> 的专项能力</td><td>跨会话持久</td><td>无上限</td></tr>
+</table>
+</div>
+
+<p>关键在于：<strong>对话上下文是最活跃但最脆弱的记忆</strong>。Agent 每轮决策都依赖它，但它有严格的容量限制。超限时系统会自动压缩旧内容成摘要——压缩过程中细节会丢失。</p>
+
+<h3>记忆混乱的典型场景</h3>
+
+<div class="principle">
+  <strong class="dont">场景一：上下文溢出</strong>
+  <p>你在一轮对话里给了太多文件、太长代码、太多不相关的指令。Agent 的上下文窗口被填满，早期指令被压缩或丢失，导致「忘了你最初要干嘛」。</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">场景二：任务干扰</strong>
+  <p>Agent 正在做任务 A，你突然插入任务 B 的指令。上下文里同时存在两个目标，Agent 可能混淆优先级，同时处理两个任务或干脆搞错目标。</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">场景三：幻觉递归</strong>
+  <p>Agent 在某一步做出了错误判断，这个错误被写入上下文，然后 Agent 基于这个错误继续推理——错误自我强化，越来越离谱。</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">场景四：跨会话断裂</strong>
+  <p>你在上次会话让 Agent 改了一个模块，下次开新会话让它继续优化同一个模块。但它完全不记得上次干了什么——因为没有文件系统的变更记录可读。</p>
+</div>
+
+<h3>怎么避免记忆问题</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>策略</th><th>具体做法</th><th>解决什么问题</th></tr>
+  <tr><td>一个会话一件事</td><td>搞完一个完整功能再开下一个。别边改 A 模块边让 Agent 修 B 模块的 bug</td><td>任务干扰</td></tr>
+  <tr><td>写项目记忆文件</td><td>创建 <span class="inline-code">AGENTS.md</span>（架构/约定）和 <span class="inline-code">CONTEXT.md</span>（领域术语/决策记录）。Agent 每轮自动读取</td><td>跨会话断裂</td></tr>
+  <tr><td>用 ADR 记录决策</td><td>每次架构决策写一条 ADR 放 <span class="inline-code">docs/adr/</span>。新会话读了就理解历史决策</td><td>跨会话断裂</td></tr>
+  <tr><td>用 Handoff 交接</td><td>复杂任务跨多轮时，说 <span class="inline-code">handoff</span> 生成结构化交接文档。下一轮 Agent 读文档续上</td><td>上下文溢出 + 跨会话断裂</td></tr>
+  <tr><td>精简指令</td><td>别贴大段无关代码、别同时提 5 个需求。需要文件时给路径让 Agent 自己读</td><td>上下文溢出</td></tr>
+  <tr><td>用 Caveman Mode</td><td>说 <span class="inline-code">caveman mode</span>，Agent 回复极短省 token ~75%，留给上下文的可用空间更多</td><td>上下文溢出</td></tr>
+  <tr><td>及时纠正</td><td>发现 Agent 逻辑跑偏，立刻纠正，别等它自己「想通」。说 <span class="inline-code">停，方向错了：[正确方向]</span></td><td>幻觉递归</td></tr>
+  <tr><td>定期检查上下文</td><td>对话长了就回头看 Agent 前面的理解对不对。不对就重新描述目标</td><td>上下文溢出 + 幻觉递归</td></tr>
+</table>
+</div>
+
+<h3>记忆机制的优缺点</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th class="do">优点</th><th class="dont">缺点</th></tr>
+  <tr><td class="do">即开即用：新会话不需要初始化配置</td><td class="dont">无跨会话记忆：每轮是「新人」</td></tr>
+  <tr><td class="do">上下文内推理强：窗口内的信息能精确关联</td><td class="dont">容量有限：超出 token 上限就丢信息</td></tr>
+  <tr><td class="do">文件系统补偿：读代码 = 读项目历史</td><td class="dont">压缩失真：自动摘要会丢关键细节</td></tr>
+  <tr><td class="do">Skills 可迁移：写好一次到处用</td><td class="dont">需人工维护：AGENTS.md/ADR 要人写</td></tr>
+  <tr><td class="do">隐私安全：会话结束记忆消失</td><td class="dont">长对话成本高：token 消耗随对话长度线性增长</td></tr>
+</table>
+</div>
+
+<div class="tip">终极建议：把 Agent 当成一个 <strong>极其聪明但每次醒来都失忆的工程师</strong>。你给它留的 AGENTS.md 就是它的笔记本，代码就是它的记忆。依赖文件系统而非对话上下文做长期记忆。</div>
+
+<!-- ============================== -->
 <!-- ============================== -->
 <h2>3. 典型工作流</h2>
 
