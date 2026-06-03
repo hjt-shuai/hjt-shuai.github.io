@@ -373,24 +373,116 @@
 </div>
 
 <!-- ============================== -->
-<h2>10. Agent 技术学习路径</h2>
+<h2>10. Agent 技术学习路径（详细版）</h2>
 
-<p>如果你不只是想用好 Agent，还想自己开发 Agent 系统：</p>
+<p>如果你不只是想用好 Agent，还想自己开发 Agent 系统——以下是从零到一的完整 roadmap，每个阶段都包含 <strong>学什么、怎么学、免费资源、动手练习</strong>。</p>
 
 <div class="flow">
   <span>L1 基础</span> <span class="arrow">→</span> <span>L2 跑起来</span> <span class="arrow">→</span> <span>L3 理解框架</span> <span class="arrow">→</span> <span>L4 工程化</span> <span class="arrow">→</span> <span>L5 前沿</span>
 </div>
 
+<!-- ===== L1 ===== -->
+<h3>L1 基础 · 2-4 周</h3>
+
+<p><strong>学什么：</strong>Python（或 TypeScript）熟练到能独立写脚本、调包；理解 HTTP/REST 请求与响应、JSON 序列化；LLM 核心概念——token、context window、system prompt、temperature、tool calling 的请求格式。</p>
+
+<p><strong>怎么学：</strong>不要只看教程，边看边写。Python 的话先把官方 Tutorial 过一遍（2-3 天），然后直接去 LeetCode 刷 20 道 Easy 题熟悉语法。LLM 概念不要死记，直接注册 OpenAI 账号，在 Playground 里调 temperature、改 system prompt、用不同的 model，看输出怎么变——10 分钟比读一小时文档有效。</p>
+
 <div class="table-wrap">
 <table>
-  <tr><th>阶段</th><th>内容</th><th>周期</th></tr>
-  <tr><td>L1 基础</td><td>Python/TS 熟练，HTTP/REST，LLM 基础概念（token / context window / system prompt / tool calling）</td><td>2-4 周</td></tr>
-  <tr><td>L2 动手</td><td>调 OpenAI API 写最简 agent loop；手写 RAG pipeline（embedding → vector store → retrieval）</td><td>1-2 周</td></tr>
-  <tr><td>L3 框架</td><td>读 LangChain 源码理解 AgentExecutor/Memory/Chain；对比 ReAct / Plan-execute / multi-agent 范式</td><td>2-4 周</td></tr>
-  <tr><td>L4 工程化</td><td>Tool design（description / error 传递 / idempotency）；Eval 体系；Prompt engineering；Guardrails</td><td>持续</td></tr>
-  <tr><td>L5 前沿</td><td>论文：ReAct / Tree of Thoughts / Reflexion / SWE-bench；协议：MCP / A2A；自己写一个</td><td>持续</td></tr>
+  <tr><th>免费资源</th><th>链接</th><th>推荐理由</th></tr>
+  <tr><td>Python 官方教程</td><td><a href="https://docs.python.org/zh-cn/3/tutorial/" target="_blank" style="color:var(--accent)">docs.python.org</a></td><td>最权威，中文版完整</td></tr>
+  <tr><td>TypeScript Handbook</td><td><a href="https://www.typescriptlang.org/docs/handbook/intro.html" target="_blank" style="color:var(--accent)">typescriptlang.org</a></td><td>官方手册，示例清晰</td></tr>
+  <tr><td>DeepLearning.AI 短课</td><td><a href="https://www.deeplearning.ai/short-courses/" target="_blank" style="color:var(--accent)">deeplearning.ai</a></td><td>ChatGPT Prompt Engineering 免费课，1.5 小时上手</td></tr>
+  <tr><td>OpenAI Playground</td><td><a href="https://platform.openai.com/playground" target="_blank" style="color:var(--accent)">platform.openai.com</a></td><td>不写一行代码就能调模型参数，理解 temperature/top_p/max_tokens</td></tr>
+  <tr><td>MDN HTTP 指南</td><td><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP" target="_blank" style="color:var(--accent)">developer.mozilla.org</a></td><td>HTTP 请求/响应、状态码、Header，前端/后端都必看</td></tr>
+  <tr><td>LeetCode</td><td><a href="https://leetcode.cn/problemset/all/?difficulty=EASY" target="_blank" style="color:var(--accent)">leetcode.cn</a></td><td>Easy 题刷 20 道，语法就够用了</td></tr>
 </table>
 </div>
+
+<div class="tip">动手练习：用 Python 调 OpenAI Chat Completions API，写一个命令行问答脚本。要求：支持多轮对话（用 messages 数组维护上下文），传 temperature 参数，出错时 retry。</div>
+
+<!-- ===== L2 ===== -->
+<h3>L2 动手 · 1-2 周</h3>
+
+<p><strong>学什么：</strong>从零实现一个最简单的 Agent Loop——while 循环 + LLM 调用 + 工具执行 + 结果拼回 prompt。再手写一个 RAG Pipeline：文档切 chunk → embedding → 存入向量数据库 → 检索 → 拼接 prompt → 生成回答。</p>
+
+<p><strong>怎么学：</strong>先手写，别用框架。Agent loop 本质就四步：发 prompt → 解析响应（判断是调工具还是最终回答）→ 执行工具 → 结果塞回上下文，循环。RAG 也一样，自己调 embedding API + chromadb/chroma 搭一遍，比看十篇博客都管用。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>免费资源</th><th>链接</th><th>推荐理由</th></tr>
+  <tr><td>OpenAI Cookbook</td><td><a href="https://cookbook.openai.com/" target="_blank" style="color:var(--accent)">cookbook.openai.com</a></td><td>官方示例，function calling / embeddings 即开即用</td></tr>
+  <tr><td>Lilian Weng 博客</td><td><a href="https://lilianweng.github.io/posts/2023-06-23-agent/" target="_blank" style="color:var(--accent)">lilianweng.github.io</a></td><td>「LLM Powered Autonomous Agents」——Agent 架构的经典入门文章</td></tr>
+  <tr><td>Anthropic Tool Use 文档</td><td><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank" style="color:var(--accent)">docs.anthropic.com</a></td><td>理解 tool use 协议的另一套实现，与 OpenAI 对比</td></tr>
+  <tr><td>Chroma 向量数据库</td><td><a href="https://www.trychroma.com/" target="_blank" style="color:var(--accent)">trychroma.com</a></td><td>Python 本地运行，5 行代码搭向量检索，RAG 入门首选</td></tr>
+  <tr><td>ollama</td><td><a href="https://ollama.com/" target="_blank" style="color:var(--accent)">ollama.com</a></td><td>本地跑开源模型（Llama/Mistral/Qwen），免费无限调</td></tr>
+</table>
+</div>
+
+<div class="tip">动手练习：① 写一个能调用天气 API + 计算器的 Agent（至少两个 tool）；② 写一个本地文档问答系统——丢进去 10 篇 Markdown 文档，能检索并回答内容相关问题。</div>
+
+<!-- ===== L3 ===== -->
+<h3>L3 理解框架 · 2-4 周</h3>
+
+<p><strong>学什么：</strong>深入理解成熟的 Agent 框架——LangChain 的 AgentExecutor、Memory、Chain 机制；AutoGPT 的任务分解和自循环；CrewAI 的多 Agent 角色协作。对比 ReAct、Plan-Execute、Multi-Agent 三种范式的适用场景和优劣。</p>
+
+<p><strong>怎么学：</strong>核心方法是「读源码 + 自己实现」。LangChain 的 AgentExecutor 就几百行核心代码，逐行读懂它怎么 parse tool call、怎么 decide next action。然后不用 LangChain，用你在 L2 写的裸 Agent loop 复现相同效果。三种范式各写一个 demo 对比，你会发现差异非常大。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>免费资源</th><th>链接</th><th>推荐理由</th></tr>
+  <tr><td>LangChain 源码</td><td><a href="https://github.com/langchain-ai/langchain" target="_blank" style="color:var(--accent)">github.com/langchain-ai</a></td><td>AgentExecutor 在 <span class="inline-code">langchain/agents/</span> 下，核心逻辑不超过 500 行</td></tr>
+  <tr><td>AutoGPT 源码</td><td><a href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" style="color:var(--accent)">github.com/Significant-Gravitas</a></td><td>看它怎么拆任务、管理 memory、循环决策</td></tr>
+  <tr><td>CrewAI 文档</td><td><a href="https://docs.crewai.com/" target="_blank" style="color:var(--accent)">docs.crewai.com</a></td><td>Multi-Agent 协作的最佳入门框架</td></tr>
+  <tr><td>ReAct 论文</td><td><a href="https://arxiv.org/abs/2210.03629" target="_blank" style="color:var(--accent)">arxiv.org</a></td><td>ReAct: Synergizing Reasoning and Acting in Language Models</td></tr>
+  <tr><td>Plan-Execute 论文</td><td><a href="https://arxiv.org/abs/2305.04091" target="_blank" style="color:var(--accent)">arxiv.org</a></td><td>Plan-and-Solve Prompting，理解计划执行范式</td></tr>
+</table>
+</div>
+
+<div class="tip">动手练习：① 读 LangChain AgentExecutor 源码并写注释博客；② 分别用 ReAct 和 Plan-Execute 实现同一个任务（例如「分析一个 GitHub repo 并生成 report」），对比两者的 token 消耗和执行质量。</div>
+
+<!-- ===== L4 ===== -->
+<h3>L4 工程化 · 持续</h3>
+
+<p><strong>学什么：</strong>Tool 设计最佳实践（description 怎么写才能让 LLM 正确调用、错误信息如何向上传递、幂等性如何保证）；Eval 评估体系（怎么量化 Agent 表现——准确率、延迟、token 消耗、tool call 正确率）；Prompt Engineering 进阶（few-shot、chain-of-thought、structured output）；Guardrails 安全护栏（输入/输出校验、PII 脱敏、越狱防护）。</p>
+
+<p><strong>怎么学：</strong>工程化不是学出来的，是「踩坑踩出来的」。把你 L3 的项目丢进真实场景，用户用着用着就出问题——tool 选错了、prompt 被绕过、延迟太高——每个问题都是一个学习点。建立自己的 eval set：收集 50-100 个真实用例，每次改动后跑一遍，这才是工程化的核心。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>免费资源</th><th>链接</th><th>推荐理由</th></tr>
+  <tr><td>Prompt Engineering Guide</td><td><a href="https://www.promptingguide.ai/zh" target="_blank" style="color:var(--accent)">promptingguide.ai</a></td><td>最全面的 prompt 工程指南，有中文版，涵盖 CoT/ToT/RAG/Agents</td></tr>
+  <tr><td>OpenAI 结构化输出</td><td><a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" style="color:var(--accent)">platform.openai.com</a></td><td>JSON mode / function calling 的最佳实践</td></tr>
+  <tr><td>Guardrails AI</td><td><a href="https://github.com/guardrails-ai/guardrails" target="_blank" style="color:var(--accent)">github.com/guardrails-ai</a></td><td>开源输出校验框架，支持 Pydantic 校验</td></tr>
+  <tr><td>Braintrust</td><td><a href="https://www.braintrust.dev/" target="_blank" style="color:var(--accent)">braintrust.dev</a></td><td>免费层足够用，做 eval、log、对比实验</td></tr>
+  <tr><td>Langfuse</td><td><a href="https://langfuse.com/" target="_blank" style="color:var(--accent)">langfuse.com</a></td><td>开源的 LLM 可观测性平台，自部署免费</td></tr>
+  <tr><td>Anthropic Cookbook</td><td><a href="https://github.com/anthropics/anthropic-cookbook" target="_blank" style="color:var(--accent)">github.com/anthropics</a></td><td>Prompt 工程、tool use、eval 的实战示例</td></tr>
+</table>
+</div>
+
+<div class="tip">动手练习：① 给你 L3 的 Agent 建一个 eval set（至少 20 条），记录每次改 prompt 后的 accuracy；② 接入 Guardrails AI 做输出校验，确保 Agent 不会返回格式错误或越界内容；③ 用 Braintrust 或 Langfuse 搭一个可观测面板，能看到每次调用的 token、延迟、tool call 详情。</div>
+
+<!-- ===== L5 ===== -->
+<h3>L5 前沿 · 持续</h3>
+
+<p><strong>学什么：</strong>跟踪前沿论文——ReAct、Tree of Thoughts、Reflexion、SWE-bench 系列。理解 Agent 协议标准——MCP（Model Context Protocol）让 Agent 统一访问工具和数据源，A2A（Agent-to-Agent）让多个 Agent 互相发现和协作。最终目标：自己设计并实现一个完整的 Agent 系统。</p>
+
+<p><strong>怎么学：</strong>论文不是用来「读」的，是用来「复现」的。选一篇你感兴趣的（推荐从 ReAct 开始），读懂算法后用自己的代码实现核心逻辑。协议类的最好上手试——给 MCP 写一个 server，或者搭两个 Agent 走 A2A 互相调用。读论文的节奏：每周 1-2 篇，精读而非泛读。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>免费资源</th><th>链接</th><th>推荐理由</th></tr>
+  <tr><td>arXiv</td><td><a href="https://arxiv.org/list/cs.CL/recent" target="_blank" style="color:var(--accent)">arxiv.org</a></td><td>每日最新论文，关注 cs.CL / cs.AI 分类</td></tr>
+  <tr><td>Papers With Code</td><td><a href="https://paperswithcode.com/" target="_blank" style="color:var(--accent)">paperswithcode.com</a></td><td>论文 + 代码 + 排行榜，搜「Agent」看 SOTA</td></tr>
+  <tr><td>MCP 官方规范</td><td><a href="https://modelcontextprotocol.io/" target="_blank" style="color:var(--accent)">modelcontextprotocol.io</a></td><td>Anthropic 主导的 Agent 工具协议，有 Python/TS SDK</td></tr>
+  <tr><td>A2A 协议</td><td><a href="https://github.com/google/A2A" target="_blank" style="color:var(--accent)">github.com/google/A2A</a></td><td>Google 开源的 Agent-to-Agent 协议</td></tr>
+  <tr><td>SWE-bench</td><td><a href="https://www.swebench.com/" target="_blank" style="color:var(--accent)">swebench.com</a></td><td>代码级 Agent 评测基准，了解最前沿 Agent 能力瓶颈在哪</td></tr>
+  <tr><td>Hugging Face Daily Papers</td><td><a href="https://huggingface.co/papers" target="_blank" style="color:var(--accent)">huggingface.co/papers</a></td><td>社区精选每日论文，带讨论和投票</td></tr>
+</table>
+</div>
+
+<div class="tip">动手练习：① 复现 ReAct 论文的核心算法；② 写一个 MCP Server 封装你常用的 API（天气/数据库/文件系统）；③ 搭两个 Agent 通过 A2A 协作完成一个任务（例如：一个 Agent 搜索信息，另一个 Agent 整理成报告）。</div>
 
 </div>
 </body>
