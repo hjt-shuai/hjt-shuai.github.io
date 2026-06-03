@@ -464,7 +464,7 @@ const categoryMeta = {
   ecosystem:      { label: "技能生态",   color: "var(--text-dim)" },
   "codex-system": { label: "Codex 系统", color: "var(--codex-text)" },
   "codex-plugins":{ label: "Codex 插件", color: "#d2a8ff" },
-  opencli:        { label: "OpenCLI",        color: "#ffa657" }
+  opencli:        { label: "OpenCLI",        color: "#ffa657" },
   business:       { label: "商业工具",      color: "#f0883e" },
 };
 
@@ -634,7 +634,7 @@ function filterAndRender() {
   }
   if (query) {
     filtered = filtered.filter(s =>
-      s.zh.includes(query) || s.en.includes(query) || s.desc.includes(query) || s.usage.includes(query) || s.triggers.some(t => t.includes(query))
+      s.zh.toLowerCase().includes(query) || s.en.toLowerCase().includes(query) || s.desc.toLowerCase().includes(query) || s.usage.toLowerCase().includes(query) || s.triggers.some(t => t.toLowerCase().includes(query))
     );
   }
 
