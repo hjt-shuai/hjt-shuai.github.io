@@ -300,7 +300,7 @@
 <header>
   <div class="container">
     <h1>Agent Skills</h1>
-    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">63</span> 项技能，点击复制即可执行</p>
+    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">64</span> 项技能，点击复制即可执行</p>
     <p class="sub"><a href="codex-guide.html" style="color:#58a6ff;">📖 Codex Agent 使用指南 →</a></p>
     <div class="legend">
       <span><span class="dot codex"></span> Codex 专属</span>
@@ -443,6 +443,7 @@ const skills = [
   { id:"dbs-save", zh:"诊断状态存档", en:"dbs-save", cat:"business", platform:"general", usage:"/dbs-save — 保存这次诊断", desc:"把当前诊断的关键状态存到本地，下次回来可以接着用。配合 dbs-restore 实现跨会话的诊断连续性。", triggers:["/存档","保存诊断","记下来"] },
   { id:"dbs-restore", zh:"诊断状态恢复", en:"dbs-restore", cat:"business", platform:"general", usage:"/dbs-restore — 接着上次的诊断继续", desc:"把上次 dbs-save 保存的诊断状态拉出来，接着用。实现跨会话的诊断工作流。", triggers:["/续上","接着上次","之前的结论"] },
   { id:"dbs-report", zh:"诊断报告生成", en:"dbs-report", cat:"business", platform:"general", usage:"/dbs-report — 把所有诊断打包成报告", desc:"把多次 dbs-save 攒下来的诊断状态合并成一份可交付的 markdown 报告，适合给合伙人看或存档。", triggers:["/出报告","打包","整理一份"] },
+  { id:"career-ops", zh:"求职指挥中心", en:"career-ops", cat:"business", platform:"general", usage:"/career-ops — AI 求职全流程自动化", desc:"AI 求职指挥中心：评估职位（A-F 评分）、生成 ATS 优化简历 PDF、扫描 45+ 招聘门户、跟踪申请状态、面试准备（STAR+R）。16 种模式覆盖求职全流程，实战评估 740+ 职位。", triggers:["/career-ops","求职","简历","面试准备","ATS"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
