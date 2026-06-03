@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>子技能详情 - Agent Skills</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg-elevated: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f6feb;
+    --tag-bg: #1a2332;
+    --tag-text: #79c0ff;
+    --card-hover: #1c2128;
+    --red: #f85149;
+    --green: #3fb950;
+    --yellow: #d2991d;
+    --purple: #a371f7;
+    --code-bg: #0d1117;
+    --codex-bg: #1a2332;
+    --codex-text: #79c0ff;
+    --general-bg: #1a2e1a;
+    --general-text: #7ee787;
+    --business-color: #f0883e;
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  header .back {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+  header .back:hover { color: var(--accent); }
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  header .family-desc {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+    max-width: 640px;
+  }
+  header .family-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  header .family-meta strong { color: var(--text); }
+
+  .skill-list { margin: 32px 0; }
+
+  .skill-detail-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: background 0.15s;
+  }
+  .skill-detail-card:hover { background: var(--card-hover); }
+
+  .skill-detail-card .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .skill-detail-card .name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .skill-detail-card .en-name {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    margin-bottom: 8px;
+  }
+  .skill-detail-card .desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .skill-detail-card .section-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .skill-detail-card .usage-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    color: var(--green);
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .skill-detail-card .triggers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .skill-detail-card .trigger-tag {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .skill-detail-card .copy-btn {
+    display: inline-block;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .skill-detail-card .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .skill-detail-card .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  .platform-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .platform-badge.codex { background: var(--codex-bg); color: var(--codex-text); }
+  .platform-badge.general { background: var(--general-bg); color: var(--general-text); }
+  .platform-badge.claude { background: #2a1a1a; color: #f77878; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: #0d1117;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  .not-found {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--text-dim);
+  }
+  .not-found h2 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text); }
+
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 0 16px; }
+    .skill-detail-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <a href="index.html" class="back">← 返回技能列表</a>
+    <h1 id="family-name">子技能详情</h1>
+    <p class="family-desc" id="family-desc"></p>
+    <div class="family-meta" id="family-meta"></div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="skill-list" id="skill-list"></div>
+  <div class="not-found" id="not-found" style="display:none">
+    <h2>未找到该家族</h2>
+    <p>请从技能列表页面点击家族卡片进入。</p>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <a href="index.html" style="color:var(--accent);text-decoration:none">← 返回技能速查表</a>
+  </div>
+</footer>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+// ── Family data ──
+const families = {
+  dbs: {
+    name: "dontbesilent 商业工具箱",
+    desc: "一套完整的商业诊断工具集，覆盖商业模式分析、执行力诊断、内容创作、对标研究、概念拆解等场景。由 dontbesilent 方法论驱动，结合维特根斯坦语言哲学、阿德勒心理学和奥派经济学。",
+    skills: [
+      { zh:"商业工具箱", en:"dbs", platform:"general", usage:"/dbs — 帮我看看商业模式问题", desc:"dontbesilent 商业工具箱主入口。根据你的问题自动路由到最合适的诊断工具，覆盖商业模式、执行力、内容创作、对标分析等场景。这是你进入整个工具集的起点。", triggers:["/dbs","/商业","帮我看看"] },
+      { zh:"商业模式诊断", en:"dbs-diagnosis", platform:"general", usage:"/dbs-diagnosis — 帮我诊断商业模式", desc:"两种诊断模式：问诊（消解你的具体问题）和体检（系统性拆解你的商业模式）。用本体论框架找出结构性问题，而不是头痛医头。", triggers:["/问诊","商业模式","诊断业务"] },
+      { zh:"目标清晰化", en:"dbs-goal", platform:"general", usage:"/dbs-goal — 帮我把目标说清楚", desc:"用维特根斯坦的语言哲学把模糊目标审计成可检查的交付物。解决「我想做个人 IP」「我想变得更…」这类模糊愿望——把感觉翻译成可执行的动作。", triggers:["/目标","搞清楚目标","个人 IP"] },
+      { zh:"执行力诊断", en:"dbs-action", platform:"general", usage:"/dbs-action — 为什么我一直在拖延？", desc:"用阿德勒心理学框架诊断「知道该做什么但就是不做」的真正原因。不是激励你，是帮你找到执行阻碍的心理根源。", triggers:["/action","拖延","知道但做不到"] },
+      { zh:"对标分析", en:"dbs-benchmark", platform:"general", usage:"/dbs-benchmark — 帮我找到值得模仿的对标", desc:"用五重过滤法帮你找到值得模仿的对标对象。排除一切关于「我」的噪音，聚焦真正可学的标杆——不是找羡慕的对象，是找可复制的路径。", triggers:["/对标","找对标","模仿谁"] },
+      { zh:"内容创作诊断", en:"dbs-content", platform:"general", usage:"/dbs-content — 这个选题怎么做成好内容？", desc:"选题通过后，诊断怎么把这个选题做成好内容。覆盖结构、角度、表达方式三个维度，每一步都有明确的创作指导。", triggers:["/内容诊断","这个内容怎么做","文案"] },
+      { zh:"内容结构化系统", en:"dbs-content-system", platform:"general", usage:"/dbs-content-system — 把我的内容搭成可复用的资产", desc:"审计本地内容规模与边界，建立可生长的内容知识工程。核心流程：素材抽取 → 主题地图 → 选题装配稿，把旧内容变成可复用资产。", triggers:["/内容结构化","内容资产","可复用资产"] },
+      { zh:"短视频开头优化", en:"dbs-hook", platform:"general", usage:"/dbs-hook — 帮我优化短视频开头", desc:"诊断短视频开头的问题并生成优化方案。解决「开头怎么写」「为什么没人看」——开头不是吸引眼球，是建立承诺。", triggers:["/hook","优化开头","开头怎么写"] },
+      { zh:"小红书标题公式", en:"dbs-xhs-title", platform:"general", usage:"/dbs-xhs-title — 帮我起个小红书标题", desc:"从 75 个验证过的爆款公式中帮你挑选、使用并理解原理。不只是给标题，而是教你方法让你以后自己能决策。", triggers:["/小红书标题","标题公式","起标题"] },
+      { zh:"AI 写作检测", en:"dbs-ai-check", platform:"general", usage:"/dbs-ai-check — 帮我看看有没有 AI 味", desc:"扫描文案中的 AI 生成痕迹，输出检测报告。默认只诊断不改——先把问题看清楚再决定改不改。", triggers:["/AI检测","AI 味","检测 AI 特征"] },
+      { zh:"概念拆解", en:"dbs-deconstruct", platform:"general", usage:"/dbs-deconstruct — 把这个概念拆到原子级别", desc:"用维特根斯坦 + 奥派经济学的方法，把模糊的商业概念拆到原子级别。搞清楚你真正在说什么——大多数争论源于概念没拆干净。", triggers:["/拆概念","这个词什么意思","概念拆解"] },
+      { zh:"个人决策系统", en:"dbs-decision", platform:"general", usage:"/dbs-decision — 帮我在这个领域建立决策系统", desc:"把任何一个需要长期跟踪的领域（业务、关系、健康、职业、学习、投资）做成一个本地知识工程。四层结构 + 来源标签 + 不可变快照 + 概念库。", triggers:["/决策系统","决策立案","结果回填","状态画像"] },
+      { zh:"交互式学习", en:"dbs-learning", platform:"general", usage:"/dbs-learning — 带我学一个课题", desc:"把一个课题拆成连续学习文章。根据你在上一篇中的反馈调整下一篇的深度、角度和节奏——不是填鸭，是对话式学习。", triggers:["/dbs-learn","/交互式学习","继续下一篇"] },
+      { zh:"好问题生成器", en:"dbs-good-question", platform:"general", usage:"/dbs-good-question — 帮我把问题说清楚", desc:"把模糊问题改写成 Agent 可推理、可批评、可验证的问题说明书，并判断它能被自动化解决到什么程度。", triggers:["/好问题","/问题说明书","自动化解决"] },
+      { zh:"定向聊天室", en:"dbs-chatroom", platform:"general", usage:"/dbs-chatroom — 开一个多角色对话", desc:"根据话题推荐或接受用户指定的专家，模拟多角色对话。让不同视角碰撞出新的洞见——一个人想不清楚的事，多角色辩论可以。", triggers:["/定向聊天室","多角色对话"] },
+      { zh:"奥派聊天室", en:"dbs-chatroom-austrian", platform:"general", usage:"/dbs-chatroom-austrian — 哈耶克 × 米塞斯对话", desc:"哈耶克 × 米塞斯 × Claude 三人对话。从奥派经济学视角讨论你的商业问题，给你不同寻常的思考框架。", triggers:["/chatroom-austrian","/奥派","奥派聊天室"] },
+      { zh:"慢就是快", en:"dbs-slowisfast", platform:"general", usage:"/dbs-slowisfast — 有没有更慢但更好的方法？", desc:"帮创业者找到看起来更慢但长期更快的方法。用摩擦建造资产——不是所有加速都是好的，有些慢是在积累不可替代的东西。", triggers:["/慢就是快","更慢的方法","是不是太快了"] },
+      { zh:"Agent 工作台迁移", en:"dbs-agent-migration", platform:"general", usage:"/dbs-agent-migration — 统一我的 Agent 工作台", desc:"把任意项目整理成 Claude Code / Codex / Grok 三端一致、可长期维护的 Agent 工作台。审计规则文件 → 识别真源 → 统一命名 → 生成 bridge。", triggers:["/agent迁移","统一 AGENTS.md","整理 skill bridge"] },
+      { zh:"诊断状态存档", en:"dbs-save", platform:"general", usage:"/dbs-save — 保存这次诊断", desc:"把当前诊断的关键状态存到本地。配合 dbs-restore 实现跨会话的诊断连续性——今天没诊完的，下次来接着诊。", triggers:["/存档","保存诊断","记下来"] },
+      { zh:"诊断状态恢复", en:"dbs-restore", platform:"general", usage:"/dbs-restore — 接着上次的诊断继续", desc:"把上次 dbs-save 保存的诊断状态拉出来接着用。实现跨会话的诊断工作流。", triggers:["/续上","接着上次","之前的结论"] },
+      { zh:"诊断报告生成", en:"dbs-report", platform:"general", usage:"/dbs-report — 把所有诊断打包成报告", desc:"把多次 dbs-save 攒下来的诊断状态合并成一份可交付的 markdown 报告。适合给合伙人看、存档或作为决策依据。", triggers:["/出报告","打包","整理一份"] }
+    ]
+  },
+  gsap: {
+    name: "GSAP 动画引擎（GreenSock Animation Platform）",
+    desc: "GSAP 是业界最高性能的 JavaScript 动画库。这套技能覆盖核心 tween API、时间线编排、ScrollTrigger 滚动动画、React/Vue 框架集成、插件生态和性能优化最佳实践。",
+    skills: [
+      { zh:"GSAP 核心动画", en:"gsap-core", platform:"general", usage:"gsap.to('.box', { x: 100, duration: 1, ease: 'power2.out' });", desc:"GSAP 核心 API：gsap.to() / from() / fromTo()、缓动函数（easing）、stagger 交错动画、gsap.matchMedia() 响应式动画、prefers-reduced-motion 无障碍支持。这是所有 GSAP 动画的起点。", triggers:["GSAP","动画","tween","缓动","easing"] },
+      { zh:"GSAP 时间线", en:"gsap-timeline", platform:"general", usage:"const tl = gsap.timeline(); tl.to('.a', {x:100}).to('.b', {y:50}, '-=0.3');", desc:"GSAP Timeline：timeline() 创建时间线、位置参数（+= / -= / < / >）控制动画顺序、嵌套时间线、play/reverse/seek 播放控制。编排复杂动画序列的核心工具。", triggers:["timeline","动画序列","编排动画","时间线"] },
+      { zh:"GSAP 滚动触发", en:"gsap-scrolltrigger", platform:"general", usage:"gsap.to('.panel', { scrollTrigger: '.panel', x: 500 });", desc:"GSAP ScrollTrigger：滚动联动动画、pin 固定元素、scrub 滚动擦洗、triggers 触发点、视差效果。将滚动位置与动画进度精确绑定。", triggers:["ScrollTrigger","滚动动画","视差","pin","滚动触发"] },
+      { zh:"GSAP 插件集", en:"gsap-plugins", platform:"general", usage:"ScrollToPlugin, Flip, Draggable, SplitText, MorphSVG", desc:"GSAP 插件生态：ScrollToPlugin（滚动到指定位置）、Flip（布局动画）、Draggable（拖拽）、SplitText（文字拆分动画）、SVG 绘制和 morph 插件、物理引擎插件、GSDevTools 调试工具。", triggers:["GSAP插件","ScrollTo","Flip","Draggable","SplitText"] },
+      { zh:"GSAP React 集成", en:"gsap-react", platform:"general", usage:"useGSAP(() => { gsap.to(ref.current, { opacity:1 }) }, { scope: container });", desc:"GSAP React：useGSAP() hook、refs 引用、gsap.context() 上下文管理、cleanup 清理函数。React/Next.js 中 GSAP 动画的最佳实践——解决生命周期冲突和内存泄漏。", triggers:["useGSAP","React动画","GSAP React","Next.js动画"] },
+      { zh:"GSAP 框架集成", en:"gsap-frameworks", platform:"general", usage:"onMounted / onMount + gsap.context() for Vue/Svelte", desc:"GSAP 框架集成：Vue/Nuxt 中使用 onMounted 生命周期、Svelte/SvelteKit 中使用 onMount、选择器作用域限制、组件卸载时的 cleanup。非 React 框架的标准做法。", triggers:["Vue动画","Svelte动画","Nuxt动画"] },
+      { zh:"GSAP 性能优化", en:"gsap-performance", platform:"general", usage:"优先操作 transforms（x/y/rotation），避免 left/top/width", desc:"GSAP 性能最佳实践：始终优先使用 transforms（GPU 加速）、避免布局抖动（layout thrashing）、will-change 提示、批量读写操作。确保稳定 60fps 动画体验。", triggers:["动画性能","60fps","jank","优化动画"] },
+      { zh:"GSAP 工具函数", en:"gsap-utils", platform:"general", usage:"gsap.utils.clamp(0, 100, val); gsap.utils.mapRange(-1,1,0,100,val);", desc:"GSAP 工具集：clamp（值范围限制）、mapRange（区间映射）、random（随机值）、snap（值吸附）、toArray（类数组转换）、wrap（循环取值）、pipe（函数管道）。不需要 GSAP 核心也可独立使用。", triggers:["gsap.utils","clamp","mapRange","random","snap"] }
+    ]
+  },
+  opencli: {
+    name: "OpenCLI 浏览器自动化工具集",
+    desc: "OpenCLI 是一个命令行工具，让 AI Agent 能够操控真实 Chrome 浏览器。这套技能覆盖使用指南、浏览器驱动、Adapter 编写和自动修复四个层次，从零到完全掌握。",
+    skills: [
+      { zh:"OpenCLI 使用指南", en:"opencli-usage", platform:"general", usage:"opencli <site> <command> [flags]", desc:"OpenCLI 顶层导航：解释 opencli 能做什么（操控 200+ 网站）、如何发现 adapter、通用 flag（--json / --browser / --headless）和输出格式。所有 OpenCLI 操作的起点。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
+      { zh:"OpenCLI 浏览器驱动", en:"opencli-browser", platform:"general", usage:"opencli browser <site> — 打开页面、填表单、点击、截图", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素（selector-first 契约）、填表单（含复合字段）、点击登录态页面、截图验证。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
+      { zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", platform:"general", usage:"opencli adapter create <site> — 从零给网站写 adapter", desc:"从零为网站编写 OpenCLI adapter 的完整工作流：站点侦察 → API 发现 → endpoint 验证 → 字段解码 → 写 adapter → verify 验证。约 30 分钟可完成一个新站点的适配。", triggers:["写 adapter","opencli adapter","站点适配"] },
+      { zh:"OpenCLI 自动修复", en:"opencli-autofix", platform:"general", usage:"opencli autofix <command> — 自动诊断并修复失败的 adapter", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、对比差异、修复 adapter 并重试。最多 3 轮自动修复，修不好则生成 GitHub issue。", triggers:["opencli 报错","adapter 坏了","autofix"] }
+    ]
+  }
+};
+
+const platformLabels = { codex: "Codex", general: "通用", claude: "Claude Code" };
+
+// ── Parse family from URL ──
+const params = new URLSearchParams(window.location.search);
+const familyKey = params.get('family');
+
+const family = families[familyKey];
+const notFound = document.getElementById('not-found');
+const skillList = document.getElementById('skill-list');
+
+if (!family) {
+  notFound.style.display = 'block';
+  document.getElementById('family-name').textContent = '未找到该技能家族';
+} else {
+  document.getElementById('family-name').textContent = family.name;
+  document.getElementById('family-desc').textContent = family.desc;
+  document.getElementById('family-meta').innerHTML = 
+    `共 <strong>${family.skills.length}</strong> 项子技能 · <a href="index.html" style="color:var(--accent)">返回全部技能</a>`;
+  document.title = family.name + ' - Agent Skills';
+
+  let html = '';
+  family.skills.forEach((s, i) => {
+    html += `
+    <div class="skill-detail-card">
+      <div class="card-header">
+        <div>
+          <div class="name">${i + 1}. ${s.zh}</div>
+          <div class="en-name">${s.en}</div>
+        </div>
+        <span class="platform-badge ${s.platform}">${platformLabels[s.platform]}</span>
+      </div>
+      <div class="desc">${s.desc}</div>
+      <div class="section-title">用法</div>
+      <div class="usage-box">${s.usage.replace(/"/g, '&quot;')}</div>
+      <div class="section-title">触发方式</div>
+      <div class="triggers">${s.triggers.map(t => `<span class="trigger-tag">${t}</span>`).join('')}</div>
+      <button class="copy-btn" data-cmd="${s.usage.replace(/"/g, '&quot;')}">复制命令</button>
+    </div>`;
+  });
+  skillList.innerHTML = html;
+}
+
+// ── Copy handler ──
+const toast = document.getElementById('toast');
+skillList.addEventListener('click', e => {
+  const btn = e.target.closest('.copy-btn');
+  if (!btn) return;
+  navigator.clipboard.writeText(btn.dataset.cmd).then(() => {
+    btn.textContent = '✓ 已复制';
+    btn.classList.add('copied');
+    toast.classList.add('show');
+    setTimeout(() => {
+      btn.textContent = '复制命令';
+      btn.classList.remove('copied');
+      toast.classList.remove('show');
+    }, 1500);
+  });
+});
+</script>
+</body>
+</html>
