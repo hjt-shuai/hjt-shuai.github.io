@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -300,7 +300,7 @@
 <header>
   <div class="container">
     <h1>Agent Skills</h1>
-    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">40</span> 项技能，点击复制即可执行</p>
+    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">63</span> 项技能，点击复制即可执行</p>
     <p class="sub"><a href="codex-guide.html" style="color:#58a6ff;">📖 Codex Agent 使用指南 →</a></p>
     <div class="legend">
       <span><span class="dot codex"></span> Codex 专属</span>
@@ -335,6 +335,7 @@
       <span class="filter-tab" data-cat="codex-system">Codex 系统</span>
       <span class="filter-tab" data-cat="codex-plugins">Codex 插件</span>
       <span class="filter-tab" data-cat="opencli">OpenCLI</span>
+      <span class="filter-tab" data-cat="business">商业工具</span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -419,6 +420,29 @@ const skills = [
   { id:"opencli-browser", zh:"OpenCLI 浏览器驱动", en:"opencli-browser", cat:"opencli", platform:"general", usage:"用 opencli 打开 X 网站 — 帮我操作网页", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素、填表单、点击、截图、抓包。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
   { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
   { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
+
+  // ═══════════════════════════ 商业工具 ═══════════════════════════
+  { id:"dbs", zh:"商业工具箱", en:"dbs", cat:"business", platform:"general", usage:"/dbs — 帮我看看商业模式问题", desc:"dontbesilent 商业工具箱主入口。根据你的问题自动路由到最合适的诊断工具，覆盖商业模式、执行力、内容创作、对标分析等场景。", triggers:["/dbs","/商业","帮我看看"] },
+  { id:"dbs-diagnosis", zh:"商业模式诊断", en:"dbs-diagnosis", cat:"business", platform:"general", usage:"/dbs-diagnosis — 帮我诊断商业模式", desc:"两种诊断模式：问诊（消解你的具体问题）和体检（系统性拆解你的商业模式），用本体论框架找出结构性问题。", triggers:["/问诊","商业模式","诊断业务"] },
+  { id:"dbs-goal", zh:"目标清晰化", en:"dbs-goal", cat:"business", platform:"general", usage:"/dbs-goal — 帮我把目标说清楚", desc:"用维特根斯坦的语言哲学把模糊目标审计成可检查的交付物，解决「我想做个人 IP」「我想变得更…」类模糊愿望。", triggers:["/目标","搞清楚目标","个人 IP"] },
+  { id:"dbs-action", zh:"执行力诊断", en:"dbs-action", cat:"business", platform:"general", usage:"/dbs-action — 为什么我一直在拖延？", desc:"用阿德勒心理学框架诊断「知道该做什么但就是不做」的真正原因，找到执行阻碍的根源。", triggers:["/action","拖延","知道但做不到"] },
+  { id:"dbs-benchmark", zh:"对标分析", en:"dbs-benchmark", cat:"business", platform:"general", usage:"/dbs-benchmark — 帮我找到值得模仿的对标", desc:"用五重过滤法帮你找到值得模仿的对标对象，排除一切关于「我」的噪音，聚焦真正可学的标杆。", triggers:["/对标","找对标","模仿谁"] },
+  { id:"dbs-content", zh:"内容创作诊断", en:"dbs-content", cat:"business", platform:"general", usage:"/dbs-content — 这个选题怎么做成好内容？", desc:"选题通过后，诊断怎么把这个选题做成好内容：结构、角度、表达方式，每一步都有明确的创作指导。", triggers:["/内容诊断","这个内容怎么做","文案"] },
+  { id:"dbs-content-system", zh:"内容结构化系统", en:"dbs-content-system", cat:"business", platform:"general", usage:"/dbs-content-system — 把我的内容搭成可复用的资产", desc:"审计本地内容规模与边界，建立可生长的内容知识工程：素材抽取、主题地图、选题装配稿，把旧内容变成可复用资产。", triggers:["/内容结构化","内容资产","可复用资产"] },
+  { id:"dbs-hook", zh:"短视频开头优化", en:"dbs-hook", cat:"business", platform:"general", usage:"/dbs-hook — 帮我优化短视频开头", desc:"诊断短视频开头的问题并生成优化方案，解决「开头怎么写」「为什么没人看」的困境。", triggers:["/hook","优化开头","开头怎么写"] },
+  { id:"dbs-xhs-title", zh:"小红书标题公式", en:"dbs-xhs-title", cat:"business", platform:"general", usage:"/dbs-xhs-title — 帮我起个小红书标题", desc:"从 75 个验证过的爆款公式中，帮你挑对的、用对的、理解为什么用这个，不只是给标题而是教方法。", triggers:["/小红书标题","标题公式","起标题"] },
+  { id:"dbs-ai-check", zh:"AI 写作检测", en:"dbs-ai-check", cat:"business", platform:"general", usage:"/dbs-ai-check — 帮我看看有没有 AI 味", desc:"扫描文案中的 AI 生成痕迹，输出检测报告。默认只诊断不改，让你了解内容的人工感得分。", triggers:["/AI检测","AI 味","检测 AI 特征"] },
+  { id:"dbs-deconstruct", zh:"概念拆解", en:"dbs-deconstruct", cat:"business", platform:"general", usage:"/dbs-deconstruct — 把这个概念拆到原子级别", desc:"用维特根斯坦 + 奥派经济学的方法，把模糊的商业概念拆到原子级别，搞清楚你真正在说什么。", triggers:["/拆概念","这个词什么意思","概念拆解"] },
+  { id:"dbs-decision", zh:"个人决策系统", en:"dbs-decision", cat:"business", platform:"general", usage:"/dbs-decision — 帮我在这个领域建立决策系统", desc:"把任何一个需要长期跟踪的领域（业务、关系、健康、职业、学习、投资）做成一个本地知识工程：四层结构、来源标签、快照和概念库。", triggers:["/决策系统","决策立案","结果回填","状态画像"] },
+  { id:"dbs-learning", zh:"交互式学习", en:"dbs-learning", cat:"business", platform:"general", usage:"/dbs-learning — 带我学一个课题", desc:"把一个课题拆成连续学习文章，根据你在上一篇中的反馈调整下一篇的深度、角度和节奏，实现适应性学习。", triggers:["/dbs-learn","/交互式学习","继续下一篇"] },
+  { id:"dbs-good-question", zh:"好问题生成器", en:"dbs-good-question", cat:"business", platform:"general", usage:"/dbs-good-question — 帮我把问题说清楚", desc:"把模糊问题改写成 Agent 可推理、可批评、可验证的问题说明书，并判断它能被自动化解决到什么程度。", triggers:["/好问题","/问题说明书","自动化解决"] },
+  { id:"dbs-chatroom", zh:"定向聊天室", en:"dbs-chatroom", cat:"business", platform:"general", usage:"/dbs-chatroom — 开一个多角色对话", desc:"根据话题推荐或接受用户指定的专家，模拟多角色对话，让不同视角碰撞出新的洞见。", triggers:["/定向聊天室","多角色对话"] },
+  { id:"dbs-chatroom-austrian", zh:"奥派聊天室", en:"dbs-chatroom-austrian", cat:"business", platform:"general", usage:"/dbs-chatroom-austrian — 哈耶克 × 米塞斯对话", desc:"哈耶克 × 米塞斯 × Claude 三人对话，从奥派经济学视角讨论你的商业问题，给你不同寻常的思考框架。", triggers:["/chatroom-austrian","/奥派","奥派聊天室"] },
+  { id:"dbs-slowisfast", zh:"慢就是快", en:"dbs-slowisfast", cat:"business", platform:"general", usage:"/dbs-slowisfast — 有没有更慢但更好的方法？", desc:"帮创业者找到看起来更慢但长期更快的方法，用摩擦建造资产，拒绝「快就是好」的思维惯性。", triggers:["/慢就是快","更慢的方法","是不是太快了"] },
+  { id:"dbs-agent-migration", zh:"Agent 工作台迁移", en:"dbs-agent-migration", cat:"business", platform:"general", usage:"/dbs-agent-migration — 统一我的 Agent 工作台", desc:"把任意项目整理成 Claude Code / Codex / Grok 三端一致、可长期维护的 Agent 工作台：审计规则文件、识别真源、统一命名并生成 bridge。", triggers:["/agent迁移","统一 AGENTS.md","整理 skill bridge"] },
+  { id:"dbs-save", zh:"诊断状态存档", en:"dbs-save", cat:"business", platform:"general", usage:"/dbs-save — 保存这次诊断", desc:"把当前诊断的关键状态存到本地，下次回来可以接着用。配合 dbs-restore 实现跨会话的诊断连续性。", triggers:["/存档","保存诊断","记下来"] },
+  { id:"dbs-restore", zh:"诊断状态恢复", en:"dbs-restore", cat:"business", platform:"general", usage:"/dbs-restore — 接着上次的诊断继续", desc:"把上次 dbs-save 保存的诊断状态拉出来，接着用。实现跨会话的诊断工作流。", triggers:["/续上","接着上次","之前的结论"] },
+  { id:"dbs-report", zh:"诊断报告生成", en:"dbs-report", cat:"business", platform:"general", usage:"/dbs-report — 把所有诊断打包成报告", desc:"把多次 dbs-save 攒下来的诊断状态合并成一份可交付的 markdown 报告，适合给合伙人看或存档。", triggers:["/出报告","打包","整理一份"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
@@ -441,6 +465,7 @@ const categoryMeta = {
   "codex-system": { label: "Codex 系统", color: "var(--codex-text)" },
   "codex-plugins":{ label: "Codex 插件", color: "#d2a8ff" },
   opencli:        { label: "OpenCLI",        color: "#ffa657" }
+  business:       { label: "商业工具",      color: "#f0883e" },
 };
 
 const platformLabels = {
@@ -570,7 +595,7 @@ function renderSkills(filtered) {
   }
 
   let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","ecosystem","codex-system","codex-plugins","opencli"];
+  const catOrder = ["communication","diagnosis","design","engineering","project","business","ecosystem","codex-system","codex-plugins","opencli"];
   catOrder.forEach(cat => {
     const list = byCat[cat];
     if (!list || list.length === 0) return;
