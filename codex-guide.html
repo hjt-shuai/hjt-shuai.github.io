@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex Agent 使用指南 — 如何榨干你的 AI 编程助手</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d2991d;
+    --red: #f85149;
+    --code-bg: #1c2128;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 2rem; margin-bottom: 6px; color: #f0f6fc; }
+  h2 {
+    font-size: 1.25rem; margin: 48px 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border); color: #f0f6fc;
+  }
+  h3 { font-size: 1.05rem; margin: 28px 0 8px; color: var(--accent); }
+  p { margin-bottom: 14px; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 32px; }
+
+  .principle {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 18px 22px; margin-bottom: 16px;
+  }
+  .principle strong { color: var(--green); }
+
+  .bad, .good {
+    padding: 10px 16px; border-radius: 4px; margin: 8px 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.88rem;
+  }
+  .bad { background: #2d1517; border-left: 3px solid var(--red); color: #fdaeb7; }
+  .good { background: #14282c; border-left: 3px solid var(--green); color: #7ee787; }
+
+  .inline-code {
+    background: var(--code-bg); padding: 1px 6px; border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.88em; border: 1px solid var(--border);
+  }
+
+  .tip {
+    background: #1b201d; border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+    font-size: 0.92rem;
+  }
+  .tip::before { content: "💡 "; }
+
+  .flow {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--bg2); padding: 16px 20px; border-radius: 6px;
+    border: 1px solid var(--border); margin: 12px 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85rem;
+  }
+  .flow span { color: var(--accent); }
+  .flow .arrow { color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); font-weight: 600; white-space: nowrap; }
+  td:first-child { white-space: nowrap; }
+  tr:hover { background: var(--bg2); }
+
+  .do { color: var(--green); }
+  .dont { color: var(--red); }
+
+  .nav { margin-bottom: 40px; }
+  .nav a { color: var(--accent); text-decoration: none; font-size: 0.92rem; }
+  .nav a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="nav"><a href="index.html">← 回首页</a></div>
+
+  <h1>Codex Agent 使用指南</h1>
+  <p class="subtitle">以 Codex 为例，教你把 AI 编程助手用到极致</p>
+
+<!-- ============================== -->
+<h2>1. 核心心智模型</h2>
+
+<p>Codex 不是搜索引擎，不是代码补全工具——它是<strong>一个有工具、能执行命令、可编辑文件的自主 Agent</strong>。</p>
+
+<div class="flow">
+  你发指令 <span class="arrow">→</span> <span>理解意图</span> <span class="arrow">→</span> <span>搜索代码</span> <span class="arrow">→</span> <span>读文件</span> <span class="arrow">→</span> <span>分析</span> <span class="arrow">→</span> <span>执行命令</span> <span class="arrow">→</span> <span>编辑文件</span> <span class="arrow">→</span> <span>验证</span> <span class="arrow">→</span> 回报结果
+</div>
+
+<p>关键点：Agent <strong>自己决定工具调用顺序</strong>。你不需要告诉它每一步怎么做，你只需要说清楚目标。</p>
+
+<!-- ============================== -->
+<h2>2. 五条黄金法则</h2>
+
+<div class="principle">
+  <strong>法则一：说目标，不说步骤</strong>
+  <p>Agent 需要知道你要什么，不需要知道怎么做。</p>
+  <div class="bad">坏："用 grep 搜 auth 相关代码，然后把找到的文件都读一遍，分析中间件逻辑……"</div>
+  <div class="good">好："重构 auth 模块，把 token 校验逻辑从路由层抽到独立 middleware"</div>
+</div>
+
+<div class="principle">
+  <strong>法则二：给上下文，别让我猜</strong>
+  <p>文件路径、行号、错误信息、环境信息——一次性给全，Agent 不需要追问。</p>
+  <div class="bad">坏："报错了，帮我看看"</div>
+  <div class="good">好："<span class="inline-code">app.py:42</span> TypeError: 'NoneType' object is not subscriptable。Python 3.12, FastAPI 项目"</div>
+</div>
+
+<div class="principle">
+  <strong>法则三：一回合说完</strong>
+  <p>多个相关需求放一起，Agent 能并行处理。分开说 → 每次重新加载上下文 → 浪费 token。</p>
+  <div class="bad">坏：第一轮 "加个 API"，第二轮 "补测试"，第三轮 "改下文档"</div>
+  <div class="good">好："加 /api/user 接口，写单元测试，更新 README"</div>
+</div>
+
+<div class="principle">
+  <strong>法则四：复杂任务先计划</strong>
+  <p>涉及多文件、大重构、架构变更时，说 <span class="inline-code">plan mode</span> 或 <span class="inline-code">先出方案</span>。Agent 会先出完整计划，你确认后再执行，避免走错路。</p>
+</div>
+
+<div class="principle">
+  <strong>法则五：让 Agent 自己决定工具</strong>
+  <p>不要说 "用 grep 搜" 或 "用 sed 改"。Agent 有完整的工具集，它知道该用什么。你只需描述结果。</p>
+</div>
+
+<!-- ============================== -->
+<h2>2.1 Agent 的"手感"——高质量协作模式</h2>
+
+<p>Codex 自带工程品味：它会自动尊重现有代码风格、避免过度抽象、在合适的尺度插入注释。理解这些特质，你能更快进入 flow。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Codex 会做什么</th><th>你无需担心</th></tr>
+  <tr><td>读取代码库找已有模式</td><td>不用教它用哪个框架</td></tr>
+  <tr><td>并行搜索、读文件、执行命令</td><td>不用等它一步步回复</td></tr>
+  <tr><td>添加注释只在代码不够自解释时</td><td>不会塞满无意义注释</td></tr>
+  <tr><td>编辑保持最小范围</td><td>不会顺手重构无关代码</td></tr>
+  <tr><td>报错时主动搜索、分析、修复</td><td>不用你 debug</td></tr>
+  <tr><td>工作时持续给状态更新</td><td>不用猜测它在干嘛</td></tr>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>3. 典型工作流</h2>
+
+<h3>3.1 加新功能</h3>
+<div class="flow">
+  描述功能 <span class="arrow">→</span> <span>Agent 读代码</span> <span class="arrow">→</span> <span>出方案</span> <span class="arrow">→</span> <span>你确认</span> <span class="arrow">→</span> <span>实现</span> <span class="arrow">→</span> <span>测试</span> <span class="arrow">→</span> <span>跑验证</span>
+</div>
+<div class="tip">大功能先用 plan mode。Codex 会读完相关文件再动手，不会盲改。</div>
+
+<h3>3.2 修 Bug</h3>
+<div class="flow">
+  描述现象 + 错误信息 <span class="arrow">→</span> <span>Agent 定位代码</span> <span class="arrow">→</span> <span>修复</span> <span class="arrow">→</span> <span>验证</span>
+</div>
+<div class="tip">给堆栈跟踪、复现步骤。Codex 自带 diagnosis skill（diagnose），说 "diagnose this" 会启动系统化排查。</div>
+
+<h3>3.3 重构</h3>
+<div class="flow">
+  说目标 <span class="arrow">→</span> <span>Agent 分析依赖</span> <span class="arrow">→</span> <span>逐模块实施</span> <span class="arrow">→</span> <span>跑测试</span>
+</div>
+<div class="tip">说清楚重构边界和约束。"拆 auth 模块但不改 API 签名"。</div>
+
+<h3>3.4 测试驱动开发 (TDD)</h3>
+<div class="flow">
+  说 "tdd" <span class="arrow">→</span> <span>Agent 写测试</span> <span class="arrow">→</span> <span>写实现</span> <span class="arrow">→</span> <span>重构</span> <span class="arrow">→</span> <span>循环</span>
+</div>
+<div class="tip">Codex 内置 tdd skill。说 "用 TDD 加这个功能"，它会自动走 red-green-refactor 循环。</div>
+
+<!-- ============================== -->
+<h2>4. 进阶技巧</h2>
+
+<h3>4.1 使用 Skills</h3>
+<p>Codex 有大量内置 skill，每个都是专项能力包。常见：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Skill</th><th>作用</th><th>触发方式</th></tr>
+  <tr><td><span class="inline-code">diagnose</span></td><td>系统化 debug 循环</td><td>"diagnose this" / "debug 一下"</td></tr>
+  <tr><td><span class="inline-code">tdd</span></td><td>测试驱动开发 red-green-refactor</td><td>"用 TDD 实现"</td></tr>
+  <tr><td><span class="inline-code">caveman</span></td><td>回复极简，省 token ~75%</td><td>"caveman mode"</td></tr>
+  <tr><td><span class="inline-code">grill-me</span></td><td>质询你的方案设计</td><td>"grill me" / "帮我审方案"</td></tr>
+  <tr><td><span class="inline-code">to-issues</span></td><td>方案拆成可执行 issue</td><td>"拆成 issues"</td></tr>
+  <tr><td><span class="inline-code">prototype</span></td><td>快速建原型验证想法</td><td>"prototype 这个"</td></tr>
+  <tr><td><span class="inline-code">opencli-*</span></td><td>浏览器自动化操作</td><td>浏览器相关操作</td></tr>
+  <tr><td><span class="inline-code">zoom-out</span></td><td>从更高层级理解代码</td><td>"zoom out" / "帮我看整体架构"</td></tr>
+</table>
+</div>
+
+<h3>4.2 多 Agent 协作</h3>
+<p>复杂项目可以串多个 Agent：第一个出方案，第二个实现，第三个 review。用 <span class="inline-code">handoff</span> skill 做上下文传递。</p>
+
+<h3>4.3 Token 预算意识</h3>
+<p>Agent 按 token 计费。精简指令 = 省钱。用 <span class="inline-code">caveman mode</span> 降低回复开销。大任务先 plan mode 确认方向再执行，避免浪费。</p>
+
+<h3>4.4 给 Agent 设定约束</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>约束场景</th><th>指令</th></tr>
+  <tr><td>不改某个文件</td><td>"别碰 <span class="inline-code">config.py</span>"</td></tr>
+  <tr><td>限定技术栈</td><td>"用原生 JS 不用框架"</td></tr>
+  <tr><td>测试优先</td><td>"先写测试再实现"</td></tr>
+  <tr><td>保持简洁</td><td>"caveman mode"</td></tr>
+  <tr><td>只分析不动手</td><td>"只出方案" 或 plan mode</td></tr>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>5. 常见反模式</h2>
+
+<div class="principle">
+  <strong class="dont">❌ 一次给一个超模糊的需求</strong>
+  <p>"帮我做个网站" → Agent 要猜框架、设计、功能、部署……必然翻车。</p>
+  <p class="do">✅ 给 scope："用 Vue 做个个人博客，有文章列表和详情页，Markdown 渲染"</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">❌ 在 Agent 工作过程中插入新需求</strong>
+  <p>Agent 正在编辑文件，你突然说 "顺便把 XX 也改下" → 上下文混乱。</p>
+  <p class="do">✅ 等当前任务结束，或说 "停，新需求：……" 让它重新组织</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">❌ 用 Agent 做不需要推理的事</strong>
+  <p>"把这份 JSON 格式化" → 你不如用 Prettier。Agent 贵。</p>
+  <p class="do">✅ 把 Agent 用在需要理解代码、做决策的复杂任务上</p>
+</div>
+
+<div class="principle">
+  <strong class="dont">❌ 让 Agent 自己验证太久</strong>
+  <p>Agent 陷入循环修复 → 反复尝试 → 浪费大量 token。</p>
+  <p class="do">✅ 失败 3 次后暂停，人工审查。说 "停，我来看看"</p>
+</div>
+
+<!-- ============================== -->
+<h2>6. 度量你用得对不对</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>指标</th><th>好</th><th>差</th></tr>
+  <tr><td>追问次数</td><td class="good">0-1</td><td class="dont">3+</td></tr>
+  <tr><td>Agent 搜索次数</td><td class="good">3-10</td><td class="dont">50+（目标不清）</td></tr>
+  <tr><td>每轮文件改动数</td><td class="good">1-5</td><td class="dont">0（没做事）或 20+（盲目铺开）</td></tr>
+  <tr><td>错误重试次数</td><td class="good">1-2</td><td class="dont">5+（需求有矛盾）</td></tr>
+  <tr><td>从指令到完成的轮次</td><td class="good">1-3</td><td class="dont">8+</td></tr>
+</table>
+</div>
+
+<p>回头翻翻 Agent 对话日志。如果你的指令经常触发 50+ 次搜索、8+ 轮对话——不是 Agent 不行，是<strong>你的指令需要改进</strong>。</p>
+
+<!-- ============================== -->
+<h2>7. 总结</h2>
+
+<p>Codex 是一把好刀。好刀没法替代你思考，但能把你的思考执行得飞快。</p>
+
+<div class="principle" style="border-color: var(--accent);">
+  <strong style="color: var(--accent);">一句话</strong><br>
+  说清目标、给够上下文、一回合说完、复杂先计划、信任工具调用。<br>
+  你负责 <strong>What & Why</strong>，Agent 负责 <strong>How</strong>。
+</div>
+
+<!-- ============================== -->
+<h2>8. 按职业角色的最佳实践</h2>
+
+<h3>8.1 如果你是前端开发</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>场景</th><th>最佳指令模板</th></tr>
+  <tr><td>从设计稿到组件</td><td>"用 Tailwind + React 实现这个卡片组件，三个状态：default / hover / loading"</td></tr>
+  <tr><td>调 CSS 布局</td><td>"这个 flex 布局在 Safari 下错位了，帮我改"（附带截图）</td></tr>
+  <tr><td>加动画</td><td>"用 GSAP 给这个 section 加滚动触发动画，触发点在视口 80% 处"</td></tr>
+  <tr><td>写页面</td><td>"做一个仪表盘页面，用现有设计系统的 Card/Table/Chart 组件，数据 mock 就行"</td></tr>
+  <tr><td>做组件库</td><td>"给 Button 加 variant='outline'、loading 状态和 disabled 样式"</td></tr>
+</table>
+</div>
+
+<p>前端关键：<strong>先给 Agent 看现有组件和设计 token</strong>。它自动匹配风格，不会造新的按钮系统。复杂交互优先用 GSAP（Codex 内置完整的 GSAP 技能链）。</p>
+
+<h3>8.2 如果你是后端开发</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>场景</th><th>最佳指令模板</th></tr>
+  <tr><td>加 API</td><td>"加 POST /api/orders，body 字段：user_id, items[]。校验库存，返回 order_id。已有 DB model 在 models/order.py"</td></tr>
+  <tr><td>写 middleware</td><td>"在 auth.py 加 rate limiting middleware，Redis 存储，60req/min per IP"</td></tr>
+  <tr><td>数据库迁移</td><td>"给 users 表加 last_login_at 和 login_count，写 Alembic migration"</td></tr>
+  <tr><td>重构</td><td>"把 payment 模块从单体 service 拆成 payment_gateway + payment_log 两个模块，不改对外接口"</td></tr>
+  <tr><td>写 integration test</td><td>"给这个 CRUD 接口写集成测试，覆盖正常流 + 边界（空 body、超长字段、重复 key）"</td></tr>
+</table>
+</div>
+
+<p>后端关键：<strong>说清楚数据模型、边界条件、SQL/ORM 偏好</strong>。Codex 默认用项目已有框架。批量操作时让它用 <span class="inline-code">apply_patch_batch</span> 一次改多文件。</p>
+
+<h3>8.3 如果你是 AI / ML / 数据分析</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>场景</th><th>最佳指令模板</th></tr>
+  <tr><td>数据处理</td><td>"读 data/raw.csv，清洗空值和异常值，输出 data/clean.csv。用 pandas。"</td></tr>
+  <tr><td>模型训练</td><td>"用 PyTorch 搭一个 LSTM 做时间序列预测，输入 30 天预测 7 天。train.py 和 model.py 分开。"</td></tr>
+  <tr><td>可视化</td><td>"用 matplotlib 画训练 loss 曲线和验证集准确率，两张图并排，保存 PNG"</td></tr>
+  <tr><td>Agent 开发</td><td>"基于 OpenAI function calling 写一个 Python agent loop，含 tool registry 和 retry 机制"</td></tr>
+  <tr><td>调 prompt</td><td>"这个 prompt 输出格式不稳定，帮我加 structured output 约束改用 JSON mode"</td></tr>
+</table>
+</div>
+
+<p>AI/ML 关键：<strong>明确数据文件路径和输出格式</strong>。Codex 能跑 Python 脚本，让它直接执行并验证结果。</p>
+
+<h3>8.4 如果你是 DevOps / SRE</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>场景</th><th>最佳指令模板</th></tr>
+  <tr><td>写 Dockerfile</td><td>"给这个 Python 项目写多阶段 Dockerfile，base python:3.12-slim，用 uv 装依赖"</td></tr>
+  <tr><td>CI/CD</td><td>"写 GitHub Actions workflow：lint → test → build Docker → push ECR"</td></tr>
+  <tr><td>K8s</td><td>"给这个 app 写 deployment + service + ingress yaml，namespace 用 'prod'"</td></tr>
+  <tr><td>脚本</td><td>"写 bash 脚本定时清理 7 天前的日志文件，加 dry-run 模式"</td></tr>
+  <tr><td>监控</td><td>"给 FastAPI 项目加 Prometheus metrics endpoint，统计请求延迟和状态码"</td></tr>
+</table>
+</div>
+
+<p>DevOps 关键：<strong>基础设施细节给全</strong>（镜像、版本、端口、环境变量）。Codex 会匹配项目已有配置风格。</p>
+
+<h3>8.5 如果你是产品经理 / 技术写作</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>场景</th><th>最佳指令模板</th></tr>
+  <tr><td>PRD / Spec</td><td>"把这 conversation 内容整理成 PRD，用 to-prd skill"</td></tr>
+  <tr><td>拆需求</td><td>"把这个方案拆成可独立开发的 GitHub issues，用 to-issues skill"</td></tr>
+  <tr><td>画原型</td><td>"prototype 这个 dashboard 页面，数据 mock，能点击交互"</td></tr>
+  <tr><td>写文档</td><td>"给这个 API 写 OpenAPI 3.0 spec，入口 app.py:30"</td></tr>
+  <tr><td>做幻灯片</td><td>"用 Presentations plugin 做周报 PPT，数据在 sheet.xlsx"</td></tr>
+</table>
+</div>
+
+<p>PM 关键：<strong>善用内置 skill 链</strong>（to-prd → to-issues → 开发）。多轮对话让 Agent 记录上下文，最后一键产出结构化的文档和 issue。</p>
+
+<!-- ============================== -->
+<h2>9. 快速参考卡</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>你想要</th><th>就说</th></tr>
+  <tr><td>加功能</td><td>"加 [功能描述]，在 [文件/模块]"</td></tr>
+  <tr><td>修 bug</td><td>"[现象]，报错 [完整错误信息]"</td></tr>
+  <tr><td>重构</td><td>"重构 [模块]，[约束]，不改 [接口/签名]"</td></tr>
+  <tr><td>查代码</td><td>"[类/函数] 在哪里被调用了"</td></tr>
+  <tr><td>解释代码</td><td>"解释 [文件:行号] 的逻辑"</td></tr>
+  <tr><td>写测试</td><td>"给 [函数/接口] 写测试，覆盖 [场景]"</td></tr>
+  <tr><td>出方案</td><td>"先出方案，plan mode"</td></tr>
+  <tr><td>省 token</td><td>"caveman mode"</td></tr>
+  <tr><td>审方案</td><td>"grill me — 审 [方案]"</td></tr>
+  <tr><td>创建 issue</td><td>"拆成 issues"</td></tr>
+  <tr><td>做原型</td><td>"prototype [想法]"</td></tr>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>10. Agent 技术学习路径</h2>
+
+<p>如果你不只是想用好 Agent，还想自己开发 Agent 系统：</p>
+
+<div class="flow">
+  <span>L1 基础</span> <span class="arrow">→</span> <span>L2 跑起来</span> <span class="arrow">→</span> <span>L3 理解框架</span> <span class="arrow">→</span> <span>L4 工程化</span> <span class="arrow">→</span> <span>L5 前沿</span>
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>阶段</th><th>内容</th><th>周期</th></tr>
+  <tr><td>L1 基础</td><td>Python/TS 熟练，HTTP/REST，LLM 基础概念（token / context window / system prompt / tool calling）</td><td>2-4 周</td></tr>
+  <tr><td>L2 动手</td><td>调 OpenAI API 写最简 agent loop；手写 RAG pipeline（embedding → vector store → retrieval）</td><td>1-2 周</td></tr>
+  <tr><td>L3 框架</td><td>读 LangChain 源码理解 AgentExecutor/Memory/Chain；对比 ReAct / Plan-execute / multi-agent 范式</td><td>2-4 周</td></tr>
+  <tr><td>L4 工程化</td><td>Tool design（description / error 传递 / idempotency）；Eval 体系；Prompt engineering；Guardrails</td><td>持续</td></tr>
+  <tr><td>L5 前沿</td><td>论文：ReAct / Tree of Thoughts / Reflexion / SWE-bench；协议：MCP / A2A；自己写一个</td><td>持续</td></tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>
