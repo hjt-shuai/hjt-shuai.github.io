@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -306,6 +306,21 @@
     header { padding: 32px 0 24px; }
     .search-inner { flex-direction: column; }
   }
+
+.all-skills-btn {
+  background: var(--accent);
+  color: #fff !important;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.all-skills-btn:hover { background: #4090e0; }
+
 </style>
 </head>
 <body>
@@ -322,6 +337,8 @@
     </div>
   </div>
 </header>
+
+<a href="skill-detail.html" class="all-skills-btn" style="display:block;text-align:center;margin:0 auto 12px;padding:10px 24px;max-width:240px">查看全部 585 项技能 →</a>
 
 <div class="view-bar" id="view-bar">
   <div class="container">
