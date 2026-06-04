@@ -248,18 +248,29 @@
   }
   .skill-card .copy-btn:hover { color: var(--text); border-color: var(--accent); }
   .skill-card .copy-btn.copied { color: var(--green); border-color: var(--green); }
-  .skill-card.family-parent { border-color: var(--accent-dim); }
-  .skill-card.family-parent:hover { border-color: var(--accent); }
-  .family-link {
-    display: block;
-    margin-top: 12px;
-    padding: 6px 0;
-    font-size: 0.78rem;
+  .skill-card.family-parent { border-color: var(--accent-dim); cursor: pointer; position: relative; }
+  .skill-card.family-parent:hover { border-color: var(--accent); background: rgba(31,111,235,0.08); }
+  .family-count {
+    font-size: 0.68rem;
+    font-weight: 500;
+    background: var(--accent-dim);
     color: var(--accent);
-    text-decoration: none;
-    border-top: 1px solid var(--border);
+    padding: 1px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
   }
-  .family-link:hover { color: #fff; }
+  .family-arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    color: var(--accent);
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    transform: translateX(-4px);
+    pointer-events: none;
+  }
+  .skill-card.family-parent:hover .family-arrow { opacity: 1; transform: translateX(0); }
 
 
   footer {
@@ -328,7 +339,7 @@
 <header>
   <div class="container">
     <h1>Agent Skills</h1>
-    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">64</span> 项技能，点击复制即可执行</p>
+    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">34</span> 项技能，点击复制即可执行</p>
     <p class="sub"><a href="codex-guide.html" style="color:#58a6ff;">📖 Codex Agent 使用指南 →</a></p>
     <div class="legend">
       <span><span class="dot codex"></span> Codex 专属</span>
@@ -366,6 +377,7 @@
       <span class="filter-tab" data-cat="codex-plugins">Codex 插件</span>
       <span class="filter-tab" data-cat="opencli">OpenCLI</span>
       <span class="filter-tab" data-cat="business">商业工具</span>
+      <span class="filter-tab" data-cat="finance">金融研究</span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -409,7 +421,7 @@ const skills = [
   { id:"setup-pre-commit", zh:"Pre-commit 配置", en:"setup-pre-commit", cat:"engineering", platform:"general", usage:"setup pre-commit — 给这个项目加上提交前检查", desc:"设置 Husky pre-commit hooks，集成 lint-staged（Prettier）、type checking 和自动化测试。", triggers:["pre-commit","husky","提交检查"] },
   { id:"git-guardrails-claude-code", zh:"Git 安全护栏", en:"git-guardrails-claude-code", cat:"engineering", platform:"claude", usage:"add git guardrails — 给项目加上 git 安全 hooks（仅限 Claude Code）", desc:"配置 hooks 阻止危险的 git 操作（push、reset --hard、clean、branch -D 等），防止误操作。仅限 Claude Code 环境。", triggers:["git 安全","阻止 push"] },
   // GSAP 动画引擎
-  { id:"gsap-core", zh:"GSAP 核心动画", en:"gsap-core", cat:"engineering", platform:"general", family:"gsap", familyParent:true, usage:"animate with GSAP — 用 GSAP 做动画", desc:"GSAP 核心 API：gsap.to/from/fromTo、缓动、stagger、matchMedia 响应式动画、prefers-reduced-motion。含 7 项子技能，覆盖时间线、滚动触发、插件、React/Vue 集成和性能优化。", triggers:["GSAP","动画","tween","缓动","easing"] },
+  { id:"gsap-core", zh:"GSAP 核心动画", en:"gsap-core", cat:"engineering", platform:"general", family:"gsap", familyParent:true, familyCount:8, usage:"animate with GSAP — 用 GSAP 做动画", desc:"GSAP 核心 API：gsap.to/from/fromTo、缓动、stagger、matchMedia 响应式动画、prefers-reduced-motion。含 8 项子技能，覆盖时间线、滚动触发、插件、React/Vue 集成和性能优化。", triggers:["GSAP","动画","tween","缓动","easing"] },
   { id:"gsap-timeline", zh:"GSAP 时间线", en:"gsap-timeline", cat:"engineering", platform:"general", usage:"sequence animations — 编排动画序列", desc:"GSAP 时间线：timeline()、位置参数、嵌套、播放控制。编排复杂动画序列。", triggers:["timeline","动画序列","编排动画","时间线"] },
   { id:"gsap-scrolltrigger", zh:"GSAP 滚动触发", en:"gsap-scrolltrigger", cat:"engineering", platform:"general", usage:"scroll animation — 滚动驱动的动画", desc:"GSAP ScrollTrigger：滚动联动动画、pin、scrub、视差、滚动触发。", triggers:["ScrollTrigger","滚动动画","视差","pin","滚动触发"] },
   { id:"gsap-plugins", zh:"GSAP 插件", en:"gsap-plugins", cat:"engineering", platform:"general", usage:"GSAP plugins — Flip、Draggable、SplitText 等", desc:"GSAP 插件集：ScrollTo、Flip、Draggable、SplitText、SVG 绘制、物理插件、GSDevTools。", triggers:["GSAP插件","ScrollTo","Flip","Draggable","SplitText"] },
@@ -446,13 +458,13 @@ const skills = [
   { id:"spreadsheets", zh:"电子表格", en:"spreadsheets", cat:"codex-plugins", platform:"codex", usage:"create a spreadsheet — 帮我做一个 Excel 表格", desc:"创建、修改、分析和可视化 .xlsx/.csv 电子表格，支持公式、格式化、图表和 Google Sheets。", triggers:["Excel","表格","CSV"] },
 
   // ═══════════════════════════ OpenCLI ═══════════════════════════
-  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", family:"opencli", familyParent:true, usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式。含 3 项子技能：浏览器驱动、Adapter 编写、自动修复。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
+  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", family:"opencli", familyParent:true, familyCount:4, usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式。含 4 项子技能：浏览器驱动、Adapter 编写、自动修复。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
   { id:"opencli-browser", zh:"OpenCLI 浏览器驱动", en:"opencli-browser", cat:"opencli", platform:"general", usage:"用 opencli 打开 X 网站 — 帮我操作网页", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素、填表单、点击、截图、抓包。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
   { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
   { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
 
   // ═══════════════════════════ 商业工具 ═══════════════════════════
-  { id:"dbs", zh:"商业工具箱", en:"dbs", cat:"business", platform:"general", family:"dbs", familyParent:true, usage:"/dbs — 帮我看看商业模式问题", desc:"dontbesilent 商业工具箱主入口。根据你的问题自动路由到最合适的诊断工具。含 20 项子技能：商业模式诊断、目标清晰化、执行力诊断、对标分析、内容创作、短视频开头优化、小红书标题公式等。", triggers:["/dbs","/商业","帮我看看"] },
+  { id:"dbs", zh:"商业工具箱", en:"dbs", cat:"business", platform:"general", family:"dbs", familyParent:true, familyCount:21, usage:"/dbs — 帮我看看商业模式问题", desc:"dontbesilent 商业工具箱主入口。根据你的问题自动路由到最合适的诊断工具。含 21 项子技能：商业模式诊断、目标清晰化、执行力诊断、对标分析、内容创作、短视频开头优化、小红书标题公式等。", triggers:["/dbs","/商业","帮我看看"] },
   { id:"dbs-diagnosis", zh:"商业模式诊断", en:"dbs-diagnosis", cat:"business", platform:"general", usage:"/dbs-diagnosis — 帮我诊断商业模式", desc:"两种诊断模式：问诊（消解你的具体问题）和体检（系统性拆解你的商业模式），用本体论框架找出结构性问题。", triggers:["/问诊","商业模式","诊断业务"] },
   { id:"dbs-goal", zh:"目标清晰化", en:"dbs-goal", cat:"business", platform:"general", usage:"/dbs-goal — 帮我把目标说清楚", desc:"用维特根斯坦的语言哲学把模糊目标审计成可检查的交付物，解决「我想做个人 IP」「我想变得更…」类模糊愿望。", triggers:["/目标","搞清楚目标","个人 IP"] },
   { id:"dbs-action", zh:"执行力诊断", en:"dbs-action", cat:"business", platform:"general", usage:"/dbs-action — 为什么我一直在拖延？", desc:"用阿德勒心理学框架诊断「知道该做什么但就是不做」的真正原因，找到执行阻碍的根源。", triggers:["/action","拖延","知道但做不到"] },
@@ -474,6 +486,9 @@ const skills = [
   { id:"dbs-restore", zh:"诊断状态恢复", en:"dbs-restore", cat:"business", platform:"general", usage:"/dbs-restore — 接着上次的诊断继续", desc:"把上次 dbs-save 保存的诊断状态拉出来，接着用。实现跨会话的诊断工作流。", triggers:["/续上","接着上次","之前的结论"] },
   { id:"dbs-report", zh:"诊断报告生成", en:"dbs-report", cat:"business", platform:"general", usage:"/dbs-report — 把所有诊断打包成报告", desc:"把多次 dbs-save 攒下来的诊断状态合并成一份可交付的 markdown 报告，适合给合伙人看或存档。", triggers:["/出报告","打包","整理一份"] },
   { id:"career-ops", zh:"求职指挥中心", en:"career-ops", cat:"business", platform:"general", usage:"/career-ops — AI 求职全流程自动化", desc:"AI 求职指挥中心：评估职位（A-F 评分）、生成 ATS 优化简历 PDF、扫描 45+ 招聘门户、跟踪申请状态、面试准备（STAR+R）。16 种模式覆盖求职全流程，实战评估 740+ 职位。", triggers:["/career-ops","求职","简历","面试准备","ATS"] },
+
+  // ═══════════════════════════ 金融研究 ═══════════════════════════
+  { id:"vibe-trading", zh:"Vibe-Trading 量化研究", en:"vibe-trading", cat:"finance", platform:"general", usage:"vibe-trading — 启动量化研究 / 回测 / 多因子 / 期权 / Alpha Zoo / 影子账户", desc:"专业金融研究工具箱：7 种回测引擎 + 基准对比、多因子分析、Alpha Zoo（452 个预构建 alpha：qlib158/alpha101/gtja191/学术）、期权定价、77 项金融子技能、29 个多 Agent 投研团队、交易日记分析、影子账户（提取→回测→渲染），覆盖 7 大数据源（tushare/yfinance/okx/akshare/mootdx/ccxt/futu）。安装：pip install vibe-trading-ai。", triggers:["回测","因子分析","Alpha Zoo","量化交易","多 Agent 投研","vibe-trading","交易日记","影子账户"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
@@ -497,6 +512,7 @@ const categoryMeta = {
   "codex-plugins":{ label: "Codex 插件", color: "#d2a8ff" },
   opencli:        { label: "OpenCLI",        color: "#ffa657" },
   business:       { label: "商业工具",      color: "#f0883e" },
+  finance:        { label: "金融研究",      color: "#56d4dd" },
 };
 
 const platformLabels = {
@@ -626,7 +642,7 @@ function renderSkills(filtered) {
   }
 
   let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","business","ecosystem","codex-system","codex-plugins","opencli"];
+  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","ecosystem","codex-system","codex-plugins","opencli"];
   catOrder.forEach(cat => {
     const list = byCat[cat];
     if (!list || list.length === 0) return;
@@ -635,11 +651,15 @@ function renderSkills(filtered) {
       <h2 class="category-title" style="color:${meta.color}">${meta.label} <span class="count">${list.length}</span></h2>
       <div class="skill-grid">`;
     list.forEach(s => {
-      const familyLink = s.familyParent ? `<a href="skill-detail.html?family=${s.family}" class="family-link">查看全部子技能 ▸</a>` : '';
-      html += `<div class="skill-card${s.familyParent ? ' family-parent' : ''}" data-id="${s.id}" data-cat="${s.cat}">
+      const familyBadge = s.familyParent ? `<span class="family-count">${s.familyCount} 个子技能</span>` : '';
+      const familyArrow = s.familyParent ? `<span class="family-arrow">▸</span>` : '';
+      html += `<div class="skill-card${s.familyParent ? ' family-parent' : ''}" data-id="${s.id}" data-cat="${s.cat}"${s.familyParent ? ` data-family="${s.family}"` : ''}>
         <div class="card-top">
           <div class="name">${s.zh}</div>
-          <span class="platform-badge ${s.platform}">${platformLabels[s.platform]}</span>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            ${familyBadge}
+            <span class="platform-badge ${s.platform}">${platformLabels[s.platform]}</span>
+          </div>
         </div>
         <div class="eng">${s.en}</div>
         <div class="desc">${s.desc}</div>
@@ -648,7 +668,7 @@ function renderSkills(filtered) {
           <button class="copy-btn" data-cmd="${s.usage.replace(/"/g,'&quot;')}">复制</button>
         </div>
         <div class="triggers">${s.triggers.map(t => `<span class="trigger-tag">${t}</span>`).join('')}</div>
-        ${familyLink}
+        ${familyArrow}
       </div>`;
     });
     html += '</div></section>';
@@ -660,8 +680,10 @@ function filterAndRender() {
   const query = searchInput.value.toLowerCase().trim();
   const activeTab = document.querySelector('.filter-tab.active');
   const activeCat = activeTab ? activeTab.dataset.cat : 'all';
+  const isParent = s => s.familyParent || !["gsap-","opencli-","dbs-"].some(p => s.id !== p.slice(0,-1) && s.id.startsWith(p));
+  const mainSkills = skills.filter(isParent);
 
-  let filtered = skills;
+  let filtered = mainSkills;
   if (activeCat !== 'all') {
     filtered = filtered.filter(s => s.cat === activeCat);
   }
@@ -674,25 +696,32 @@ function filterAndRender() {
   renderSkills(filtered);
   totalCountEl.textContent = filtered.length;
   statsEl.innerHTML = query || activeCat !== 'all'
-    ? `显示 <strong>${filtered.length}</strong> / ${skills.length} 项`
+    ? `显示 <strong>${filtered.length}</strong> / ${mainSkills.length} 项`
     : '';
 }
 
 // ── Copy ──
 document.getElementById('skills-container').addEventListener('click', e => {
   const btn = e.target.closest('.copy-btn');
-  if (!btn) return;
-  const cmd = btn.dataset.cmd;
-  navigator.clipboard.writeText(cmd).then(() => {
-    btn.textContent = '✓ 已复制';
-    btn.classList.add('copied');
-    toast.classList.add('show');
-    setTimeout(() => {
-      btn.textContent = '复制';
-      btn.classList.remove('copied');
-      toast.classList.remove('show');
-    }, 1500);
-  });
+  if (btn) {
+    e.stopPropagation();
+    const cmd = btn.dataset.cmd;
+    navigator.clipboard.writeText(cmd).then(() => {
+      btn.textContent = '✓ 已复制';
+      btn.classList.add('copied');
+      toast.classList.add('show');
+      setTimeout(() => {
+        btn.textContent = '复制';
+        btn.classList.remove('copied');
+        toast.classList.remove('show');
+      }, 1500);
+    });
+    return;
+  }
+  const parentCard = e.target.closest('.family-parent');
+  if (parentCard && parentCard.dataset.family) {
+    window.location.href = 'skill-detail.html?family=' + parentCard.dataset.family;
+  }
 });
 
 // ── Events ──
