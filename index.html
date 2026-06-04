@@ -339,7 +339,7 @@
 <header>
   <div class="container">
     <h1>Agent Skills</h1>
-    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">34</span> 项技能，点击复制即可执行</p>
+    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">35</span> 项技能，点击复制即可执行</p>
     <p class="sub"><a href="codex-guide.html" style="color:#58a6ff;">📖 Codex Agent 使用指南 →</a></p>
     <div class="legend">
       <span><span class="dot codex"></span> Codex 专属</span>
@@ -378,6 +378,7 @@
       <span class="filter-tab" data-cat="opencli">OpenCLI</span>
       <span class="filter-tab" data-cat="business">商业工具</span>
       <span class="filter-tab" data-cat="finance">金融研究</span>
+      <span class="filter-tab" data-cat="minimax">MiniMax</span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -489,6 +490,25 @@ const skills = [
 
   // ═══════════════════════════ 金融研究 ═══════════════════════════
   { id:"vibe-trading", zh:"Vibe-Trading 量化研究", en:"vibe-trading", cat:"finance", platform:"general", usage:"vibe-trading — 启动量化研究 / 回测 / 多因子 / 期权 / Alpha Zoo / 影子账户", desc:"专业金融研究工具箱：7 种回测引擎 + 基准对比、多因子分析、Alpha Zoo（452 个预构建 alpha：qlib158/alpha101/gtja191/学术）、期权定价、77 项金融子技能、29 个多 Agent 投研团队、交易日记分析、影子账户（提取→回测→渲染），覆盖 7 大数据源（tushare/yfinance/okx/akshare/mootdx/ccxt/futu）。安装：pip install vibe-trading-ai。", triggers:["回测","因子分析","Alpha Zoo","量化交易","多 Agent 投研","vibe-trading","交易日记","影子账户"] },
+
+  // ═══════════════════════════ MiniMax ═══════════════════════════
+  { id:"minimax-multimodal-toolkit", zh:"MiniMax 多模态工具箱", en:"mmx-cli", cat:"minimax", platform:"general", family:"minimax", familyParent:true, familyCount:16, usage:"mmx — 用 MiniMax 生成文本/图片/视频/语音/音乐", desc:"MiniMax AI 平台统一入口：通过 mmx 命令生成文本、图片、视频、语音和音乐，支持聊天、搜索和 API 资源管理。含 16 项子技能，覆盖移动开发、文档套件、音乐生成和图像分析。", triggers:["mmx","MiniMax","多模态","生成音乐","生成视频"] },
+  { id:"android-native-dev", zh:"Android 原生开发", en:"android-native-dev", cat:"minimax", platform:"general", usage:"android-native-dev — Material Design 3 / Kotlin Compose", desc:"Android 原生开发指南：Material Design 3、Kotlin/Compose、项目配置、无障碍和构建排错。", triggers:["Android","Kotlin","Compose","Material Design 3"] },
+  { id:"ios-application-dev", zh:"iOS 应用开发", en:"ios-application-dev", cat:"minimax", platform:"general", usage:"ios-application-dev — UIKit / SwiftUI / SnapKit", desc:"iOS 应用开发指南：UIKit、SnapKit、SwiftUI、导航模式、Dynamic Type、Dark Mode、无障碍和 HIG 规范。", triggers:["iOS","SwiftUI","UIKit","Swift","iPhone"] },
+  { id:"flutter-dev", zh:"Flutter 跨平台开发", en:"flutter-dev", cat:"minimax", platform:"general", usage:"flutter-dev — Riverpod / Bloc / GoRouter", desc:"Flutter 跨平台开发：Widget 模式、Riverpod/Bloc 状态管理、GoRouter 导航、性能优化和 DevTools 分析。", triggers:["Flutter","Dart","Riverpod","Bloc","GoRouter"] },
+  { id:"react-native-dev", zh:"React Native 开发", en:"react-native-dev", cat:"minimax", platform:"general", usage:"react-native-dev — Expo / 组件 / 动画 / 导航", desc:"React Native 与 Expo 开发指南：组件、动画、导航、状态管理、表单、网络、性能优化和测试。", triggers:["React Native","Expo","RN","移动端"] },
+  { id:"frontend-dev", zh:"前端全栈开发", en:"frontend-dev", cat:"minimax", platform:"general", usage:"frontend-dev — 高端 UI / 动画 / AI 素材 / 文案", desc:"全栈前端开发：高端 UI 设计、电影级动画、AI 生成素材、营销文案和视觉艺术，构建完整高品质页面。", triggers:["前端","UI 设计","动画","landing page"] },
+  { id:"fullstack-dev", zh:"全栈后端架构", en:"fullstack-dev", cat:"minimax", platform:"general", usage:"fullstack-dev — REST API / CRUD / 实时应用", desc:"全栈后端架构与前后端集成：REST API、CRUD、实时应用、聊天应用搭建。", triggers:["全栈","REST API","后端","CRUD"] },
+  { id:"shader-dev", zh:"GLSL 着色器开发", en:"shader-dev", cat:"minimax", platform:"general", usage:"shader-dev — ray marching / SDF / 流体 / 粒子", desc:"GLSL 着色器技术大全：ray marching、SDF 建模、流体模拟、粒子系统、程序化生成、光照和后处理。", triggers:["GLSL","shader","着色器","ray marching","SDF"] },
+  { id:"minimax-pdf", zh:"MiniMax PDF", en:"minimax-pdf", cat:"minimax", platform:"general", usage:"minimax-pdf — 生成/填充/格式化 PDF", desc:"PDF 创建/编辑/格式化：从零生成专业 PDF（报告、提案、简历），填充已有内容，应用模板格式化。", triggers:["PDF","生成报告","简历","专业文档"] },
+  { id:"minimax-docx", zh:"MiniMax DOCX", en:"minimax-docx", cat:"minimax", platform:"general", usage:"minimax-docx — Word 文档创建/编辑/格式化", desc:"专业 DOCX 文档创建、编辑和格式化：OpenXML SDK (.NET) 驱动，三条流水线（创建/填充/格式化）。", triggers:["Word","docx","OpenXML","文档格式化"] },
+  { id:"minimax-xlsx", zh:"MiniMax Excel", en:"minimax-xlsx", cat:"minimax", platform:"general", usage:"minimax-xlsx — Excel 创建/分析/验证", desc:"Excel 全流程：创建/读取/分析/编辑/验证 .xlsx/.xlsm/.csv，公式计算、数据透视表、金融格式标准。", triggers:["Excel","xlsx","CSV","数据透视表","金融模型"] },
+  { id:"pptx-generator", zh:"PPT 生成器", en:"pptx-generator", cat:"minimax", platform:"general", usage:"pptx-generator — 创建/编辑/读取 PPT", desc:"PPT 生成/编辑/读取：PptxGenJS 从零创建（封面、目录、内容、分隔、总结页），XML 编辑已有 PPTX。", triggers:["PPT","PPTX","PowerPoint","幻灯片","演示"] },
+  { id:"minimax-music-gen", zh:"MiniMax 音乐生成", en:"minimax-music-gen", cat:"minimax", platform:"general", usage:"minimax-music-gen — 生成歌曲/纯音乐/翻唱", desc:"AI 音乐生成：歌曲创作、歌词谱曲、纯音乐制作、翻唱和音频制作，支持多种风格。", triggers:["音乐生成","作曲","歌词","翻唱","音频"] },
+  { id:"minimax-music-playlist", zh:"MiniMax 播放列表", en:"minimax-music-playlist", cat:"minimax", platform:"general", usage:"minimax-music-playlist — 按口味生成播放列表", desc:"分析用户音乐品味和生成反馈历史，生成个性化播放列表和推荐。", triggers:["播放列表","音乐推荐","音乐品味"] },
+  { id:"buddy-sings", zh:"AI 宠物唱歌", en:"buddy-sings", cat:"minimax", platform:"general", usage:"buddy-sings — 让我的 AI 宠物唱首歌", desc:"为你的 AI 宠物（/buddy）生成个性化歌曲，支持多语言触发。", triggers:["buddy","宠物唱歌","AI 宠物"] },
+  { id:"gif-sticker-maker", zh:"GIF 表情包制作", en:"gif-sticker-maker", cat:"minimax", platform:"general", usage:"gif-sticker-maker — 照片转 GIF 表情包", desc:"将照片（人物/宠物/物体/Logo）转化为 4 张带字幕的 GIF 动画贴纸，支持 Funko Pop/盲盒风格。", triggers:["GIF","表情包","贴纸","动画头像","盲盒风格"] },
+  { id:"vision-analysis", zh:"MiniMax 图像分析", en:"vision-analysis", cat:"minimax", platform:"general", usage:"vision-analysis — 分析/描述/提取图像信息", desc:"通过 MiniMax 视觉 MCP 工具分析、描述和提取图像信息，支持 jpg/png/gif/webp/bmp/svg。", triggers:["图像分析","看图","视觉","图片描述"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
@@ -513,6 +533,7 @@ const categoryMeta = {
   opencli:        { label: "OpenCLI",        color: "#ffa657" },
   business:       { label: "商业工具",      color: "#f0883e" },
   finance:        { label: "金融研究",      color: "#56d4dd" },
+  minimax:        { label: "MiniMax",      color: "#f77878" },
 };
 
 const platformLabels = {
@@ -642,7 +663,7 @@ function renderSkills(filtered) {
   }
 
   let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","ecosystem","codex-system","codex-plugins","opencli"];
+  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","ecosystem","codex-system","codex-plugins","opencli"];
   catOrder.forEach(cat => {
     const list = byCat[cat];
     if (!list || list.length === 0) return;
@@ -680,7 +701,13 @@ function filterAndRender() {
   const query = searchInput.value.toLowerCase().trim();
   const activeTab = document.querySelector('.filter-tab.active');
   const activeCat = activeTab ? activeTab.dataset.cat : 'all';
-  const isParent = s => s.familyParent || !["gsap-","opencli-","dbs-"].some(p => s.id !== p.slice(0,-1) && s.id.startsWith(p));
+  const subSkillIds = new Set([
+    "gsap-timeline","gsap-scrolltrigger","gsap-plugins","gsap-react","gsap-frameworks","gsap-performance","gsap-utils",
+    "opencli-browser","opencli-adapter-author","opencli-autofix",
+    "dbs-diagnosis","dbs-goal","dbs-action","dbs-benchmark","dbs-content","dbs-content-system","dbs-hook","dbs-xhs-title","dbs-ai-check","dbs-deconstruct","dbs-decision","dbs-learning","dbs-good-question","dbs-chatroom","dbs-chatroom-austrian","dbs-slowisfast","dbs-agent-migration","dbs-save","dbs-restore","dbs-report",
+    "android-native-dev","ios-application-dev","flutter-dev","react-native-dev","frontend-dev","fullstack-dev","shader-dev","minimax-pdf","minimax-docx","minimax-xlsx","pptx-generator","minimax-music-gen","minimax-music-playlist","buddy-sings","gif-sticker-maker","vision-analysis"
+  ]);
+  const isParent = s => s.familyParent || !subSkillIds.has(s.id);
   const mainSkills = skills.filter(isParent);
 
   let filtered = mainSkills;
