@@ -380,6 +380,7 @@
       <span class="filter-tab" data-cat="finance">金融研究</span>
       <span class="filter-tab" data-cat="minimax">MiniMax</span>
       <span class="filter-tab" data-cat="anthropic">Anthropic</span>
+      <span class="filter-tab" data-cat="vercel">Vercel Labs</span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -530,6 +531,18 @@ const skills = [
   { id:"webapp-testing", zh:"Web 应用测试", en:"webapp-testing", cat:"anthropic", platform:"general", usage:"webapp-testing — 用 Playwright 测试 Web 应用", desc:"使用 Playwright 与本地 Web 应用交互和测试：验证前端功能、调试 UI 行为、截取浏览器截图、查看浏览器日志。", triggers:["Playwright","测试","E2E","浏览器测试","截图"] },
   { id:"skill-creator-anthropic", zh:"技能创建器", en:"skill-creator", cat:"anthropic", platform:"general", usage:"skill-creator — 创建/优化/评估技能", desc:"创建新技能、修改改进现有技能、测量技能性能。支持从头创建、编辑优化、运行 evals 测试和基准性能分析。", triggers:["创建技能","评估技能","优化技能","skill eval"] },
   { id:"slack-gif-creator", zh:"Slack GIF 创建", en:"slack-gif-creator", cat:"anthropic", platform:"general", usage:"slack-gif-creator — 为 Slack 创建 GIF 动画", desc:"创建为 Slack 优化的动画 GIF：提供约束条件、验证工具和动画概念，确保 GIF 符合 Slack 尺寸和帧数要求。", triggers:["Slack GIF","动画 GIF","Slack 表情"] },
+
+  // ═══════════════════════════ Vercel Labs ═══════════════════════════
+  { id:"vercel-labs-skills", zh:"Vercel Labs 技能", en:"vercel-labs/agent-skills", cat:"vercel", platform:"general", family:"vercel", familyParent:true, familyCount:9, usage:"npx skills add vercel-labs/agent-skills@<skill> — 安装 Vercel Labs 技能", desc:"Vercel Labs 官方技能套件，含 9 项子技能：React 最佳实践、组合模式、视图过渡、React Native、Vercel 部署与优化、Web 设计规范、写作规范等。", triggers:["Vercel","Vercel Labs","Next.js","部署","React"] },
+  { id:"composition-patterns", zh:"React 组合模式", en:"composition-patterns", cat:"vercel", platform:"general", usage:"composition-patterns — React 组件组合最佳实践", desc:"React 组件组合模式指南：何时使用组合 vs 继承、插槽模式、高阶组件替代方案、关注点分离。", triggers:["组合模式","composition","React 模式","组件设计"] },
+  { id:"deploy-to-vercel", zh:"Vercel 部署", en:"deploy-to-vercel", cat:"vercel", platform:"general", usage:"deploy to vercel — 部署应用到 Vercel", desc:"部署应用和网站到 Vercel：创建预览部署、生产部署、设置自定义域名和环境变量。", triggers:["部署","Vercel 部署","deploy","上线"] },
+  { id:"react-best-practices", zh:"React 最佳实践", en:"react-best-practices", cat:"vercel", platform:"general", usage:"react best practices — React 开发最佳实践", desc:"React 开发最佳实践：性能优化、状态管理、组件架构、服务端组件、Suspense 边界、数据获取模式。", triggers:["React 最佳实践","React 优化","React 架构"] },
+  { id:"react-native-skills", zh:"React Native 技能", en:"react-native-skills", cat:"vercel", platform:"general", usage:"react-native skills — React Native 开发指南", desc:"React Native 开发指南：Expo 集成、原生模块、导航、动画、性能优化和部署。", triggers:["React Native","Expo","RN 开发","移动端"] },
+  { id:"react-view-transitions", zh:"React 视图过渡", en:"react-view-transitions", cat:"vercel", platform:"general", usage:"react view transitions — React 视图过渡动画", desc:"React 视图过渡动画：View Transitions API、页面切换动画、共享元素过渡、路由动画。", triggers:["视图过渡","页面切换","View Transitions","路由动画"] },
+  { id:"vercel-cli-with-tokens", zh:"Vercel CLI Token", en:"vercel-cli-with-tokens", cat:"vercel", platform:"general", usage:"vercel cli with tokens — 用 Token 认证管理 Vercel 项目", desc:"使用 Token 认证管理 Vercel 项目：非交互式部署、环境变量配置、项目关联，适合 CI/CD 流程。", triggers:["Vercel CLI","Token","CI/CD","自动化部署"] },
+  { id:"vercel-optimize", zh:"Vercel 性能优化", en:"vercel-optimize", cat:"vercel", platform:"general", usage:"vercel optimize — 优化 Vercel 项目性能和成本", desc:"Vercel 成本和性能优化：收集指标、分析用量、检查项目配置和代码，针对 Next.js/SvelteKit/Nuxt/Astro 提供具体优化方案。", triggers:["Vercel 优化","性能","成本","Speed Insights"] },
+  { id:"web-design-guidelines", zh:"Web 设计规范", en:"web-design-guidelines", cat:"vercel", platform:"general", usage:"web design guidelines — 审查 UI 是否符合 Web 设计规范", desc:"审查 UI 代码是否符合 Web Interface Guidelines：可访问性、设计一致性、用户体验、响应式布局。", triggers:["设计审查","UI 规范","可访问性","UX 审计"] },
+  { id:"writing-guidelines", zh:"写作规范", en:"writing-guidelines", cat:"vercel", platform:"general", usage:"writing guidelines — 审查文档是否符合写作规范", desc:"审查文档/文案是否符合 Writing Guidelines：语调、风格、清晰度、一致性、技术写作最佳实践。", triggers:["写作审查","文档风格","语调","技术写作"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
@@ -556,6 +569,7 @@ const categoryMeta = {
   finance:        { label: "金融研究",      color: "#56d4dd" },
   minimax:        { label: "MiniMax",      color: "#f77878" },
   anthropic:      { label: "Anthropic",    color: "#d4a574" },
+  vercel:         { label: "Vercel Labs",  color: "#888" },
 };
 
 const platformLabels = {
@@ -685,7 +699,7 @@ function renderSkills(filtered) {
   }
 
   let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","anthropic","ecosystem","codex-system","codex-plugins","opencli"];
+  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","anthropic","vercel","ecosystem","codex-system","codex-plugins","opencli"];
   catOrder.forEach(cat => {
     const list = byCat[cat];
     if (!list || list.length === 0) return;
@@ -728,7 +742,8 @@ function filterAndRender() {
     "opencli-browser","opencli-adapter-author","opencli-autofix",
     "dbs-diagnosis","dbs-goal","dbs-action","dbs-benchmark","dbs-content","dbs-content-system","dbs-hook","dbs-xhs-title","dbs-ai-check","dbs-deconstruct","dbs-decision","dbs-learning","dbs-good-question","dbs-chatroom","dbs-chatroom-austrian","dbs-slowisfast","dbs-agent-migration","dbs-save","dbs-restore","dbs-report",
     "android-native-dev","ios-application-dev","flutter-dev","react-native-dev","frontend-dev","fullstack-dev","shader-dev","minimax-pdf","minimax-docx","minimax-xlsx","pptx-generator","minimax-music-gen","minimax-music-playlist","buddy-sings","gif-sticker-maker","vision-analysis",
-    "frontend-design","canvas-design","algorithmic-art","brand-guidelines","theme-factory","doc-coauthoring","internal-comms","docx","pdf","pptx","xlsx","mcp-builder","claude-api","web-artifacts-builder","webapp-testing","skill-creator-anthropic","slack-gif-creator"
+    "frontend-design","canvas-design","algorithmic-art","brand-guidelines","theme-factory","doc-coauthoring","internal-comms","docx","pdf","pptx","xlsx","mcp-builder","claude-api","web-artifacts-builder","webapp-testing","skill-creator-anthropic","slack-gif-creator",
+    "composition-patterns","deploy-to-vercel","react-best-practices","react-native-skills","react-view-transitions","vercel-cli-with-tokens","vercel-optimize","web-design-guidelines","writing-guidelines"
   ]);
   const isParent = s => s.familyParent || !subSkillIds.has(s.id);
   const mainSkills = skills.filter(isParent);
