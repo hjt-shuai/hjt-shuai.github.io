@@ -379,6 +379,7 @@
       <span class="filter-tab" data-cat="business">商业工具</span>
       <span class="filter-tab" data-cat="finance">金融研究</span>
       <span class="filter-tab" data-cat="minimax">MiniMax</span>
+      <span class="filter-tab" data-cat="anthropic">Anthropic</span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -509,6 +510,26 @@ const skills = [
   { id:"buddy-sings", zh:"AI 宠物唱歌", en:"buddy-sings", cat:"minimax", platform:"general", usage:"buddy-sings — 让我的 AI 宠物唱首歌", desc:"为你的 AI 宠物（/buddy）生成个性化歌曲，支持多语言触发。", triggers:["buddy","宠物唱歌","AI 宠物"] },
   { id:"gif-sticker-maker", zh:"GIF 表情包制作", en:"gif-sticker-maker", cat:"minimax", platform:"general", usage:"gif-sticker-maker — 照片转 GIF 表情包", desc:"将照片（人物/宠物/物体/Logo）转化为 4 张带字幕的 GIF 动画贴纸，支持 Funko Pop/盲盒风格。", triggers:["GIF","表情包","贴纸","动画头像","盲盒风格"] },
   { id:"vision-analysis", zh:"MiniMax 图像分析", en:"vision-analysis", cat:"minimax", platform:"general", usage:"vision-analysis — 分析/描述/提取图像信息", desc:"通过 MiniMax 视觉 MCP 工具分析、描述和提取图像信息，支持 jpg/png/gif/webp/bmp/svg。", triggers:["图像分析","看图","视觉","图片描述"] },
+
+  // ═══════════════════════════ Anthropic ═══════════════════════════
+  { id:"anthropic-skills", zh:"Anthropic 官方技能", en:"anthropics/skills", cat:"anthropic", platform:"general", family:"anthropic", familyParent:true, familyCount:17, usage:"npx skills add anthropics/skills@<skill> — 安装 Anthropic 官方技能", desc:"Anthropic 官方技能套件，含 17 项子技能：前端设计、视觉艺术、文档协作、文档套件（DOCX/PDF/PPTX/XLSX）、品牌指南、MCP 服务器构建、主题工厂、Web Artifacts、应用测试、内部沟通、算法艺术、Slack GIF、技能创建等。", triggers:["Anthropic","Claude","官方技能","anthropics"] },
+  { id:"frontend-design", zh:"前端设计", en:"frontend-design", cat:"anthropic", platform:"general", usage:"frontend-design — 构建高品质前端界面", desc:"创建独特的、生产级前端界面，高设计质量。适用于构建网页组件、页面、Artifacts、海报或应用。", triggers:["前端设计","UI","landing page","dashboard"] },
+  { id:"canvas-design", zh:"视觉艺术设计", en:"canvas-design", cat:"anthropic", platform:"general", usage:"canvas-design — 创建视觉艺术/海报", desc:"创建精美的视觉艺术作品（.png/.pdf），适用于海报、艺术品或静态设计。原创设计，不复制已有艺术家风格。", triggers:["海报","视觉设计","艺术","poster","art"] },
+  { id:"algorithmic-art", zh:"算法艺术", en:"algorithmic-art", cat:"anthropic", platform:"general", usage:"algorithmic-art — 用 p5.js 创建生成艺术", desc:"使用 p5.js 创建算法艺术，支持种子随机性和交互式参数探索：流场、粒子系统、生成艺术。", triggers:["生成艺术","算法艺术","p5.js","流场","粒子系统"] },
+  { id:"brand-guidelines", zh:"品牌指南", en:"brand-guidelines", cat:"anthropic", platform:"general", usage:"brand-guidelines — 应用 Anthropic 品牌风格", desc:"将 Anthropic 官方品牌颜色和排版应用到任何需要 Anthropic 外观风格的作品中。", triggers:["品牌色","品牌风格","Anthropic 设计"] },
+  { id:"theme-factory", zh:"主题工厂", en:"theme-factory", cat:"anthropic", platform:"general", usage:"theme-factory — 给作品套上主题样式", desc:"为幻灯片、文档、报告、HTML 页面等作品应用主题样式的工具箱。10 个预设主题（颜色/字体），也可生成新主题。", triggers:["主题","配色","样式","theme"] },
+  { id:"doc-coauthoring", zh:"文档协作", en:"doc-coauthoring", cat:"anthropic", platform:"general", usage:"doc-coauthoring — 协作撰写文档", desc:"引导用户完成结构化文档协作工作流：文档、提案、技术规格、决策文档等。高效传递上下文，减少写作阻力。", triggers:["写文档","协作写作","提案","技术规格"] },
+  { id:"internal-comms", zh:"内部沟通", en:"internal-comms", cat:"anthropic", platform:"general", usage:"internal-comms — 帮我写内部沟通文档", desc:"帮助撰写各类内部沟通文档：状态报告、领导层更新、3 行摘要、团队公告等，使用公司标准格式。", triggers:["内部沟通","状态报告","团队公告","领导更新"] },
+  { id:"docx", zh:"DOCX 文档", en:"docx", cat:"anthropic", platform:"general", usage:"docx — 创建/读取/编辑 Word 文档", desc:"创建、读取、编辑或操作 Word 文档（.docx），支持表格、格式化等专业文档样式。", triggers:["Word","docx","文档","Word 文档"] },
+  { id:"pdf", zh:"PDF 文档", en:"pdf", cat:"anthropic", platform:"general", usage:"pdf — 创建/合并/拆分/水印 PDF", desc:"PDF 全能工具：读取提取文本/表格、合并多个 PDF、拆分、旋转、添加水印、创建新 PDF、表单填写。", triggers:["PDF","合并 PDF","拆分 PDF","水印"] },
+  { id:"pptx", zh:"PPTX 演示", en:"pptx", cat:"anthropic", platform:"general", usage:"pptx — 创建/读取/编辑 PPT 演示文稿", desc:"处理 .pptx 演示文稿：创建幻灯片、演示文稿、提取文本内容。支持输入和输出场景。", triggers:["PPT","PPTX","PowerPoint","演示文稿"] },
+  { id:"xlsx", zh:"XLSX 电子表格", en:"xlsx", cat:"anthropic", platform:"general", usage:"xlsx — 创建/读取/编辑 Excel 电子表格", desc:"处理电子表格文件：打开/读取/编辑/修复 .xlsx/.xlsm/.csv/.tsv，添加列、计算公式、格式化、图表。", triggers:["Excel","xlsx","CSV","电子表格","表格"] },
+  { id:"mcp-builder", zh:"MCP 服务器构建", en:"mcp-builder", cat:"anthropic", platform:"general", usage:"mcp-builder — 构建 MCP 服务器", desc:"创建高质量 MCP（Model Context Protocol）服务器的指南，让 LLM 通过工具与外部服务交互。支持 Python（FastMCP）和 TypeScript。", triggers:["MCP","MCP 服务器","FastMCP","工具集成"] },
+  { id:"claude-api", zh:"Claude API 开发", en:"claude-api", cat:"anthropic", platform:"general", usage:"claude-api — 构建/调试 Claude API 应用", desc:"构建、调试和优化 Claude API / Anthropic SDK 应用，含 prompt caching。处理 Claude 模型版本间迁移。", triggers:["Claude API","Anthropic SDK","prompt caching","模型迁移"] },
+  { id:"web-artifacts-builder", zh:"Web Artifacts 构建", en:"web-artifacts-builder", cat:"anthropic", platform:"general", usage:"web-artifacts-builder — 构建复杂 claude.ai HTML Artifacts", desc:"使用现代前端技术（React、Tailwind CSS、shadcn/ui）构建复杂多组件 claude.ai HTML Artifacts，支持状态管理和路由。", triggers:["Artifacts","claude.ai","React Artifact","shadcn"] },
+  { id:"webapp-testing", zh:"Web 应用测试", en:"webapp-testing", cat:"anthropic", platform:"general", usage:"webapp-testing — 用 Playwright 测试 Web 应用", desc:"使用 Playwright 与本地 Web 应用交互和测试：验证前端功能、调试 UI 行为、截取浏览器截图、查看浏览器日志。", triggers:["Playwright","测试","E2E","浏览器测试","截图"] },
+  { id:"skill-creator-anthropic", zh:"技能创建器", en:"skill-creator", cat:"anthropic", platform:"general", usage:"skill-creator — 创建/优化/评估技能", desc:"创建新技能、修改改进现有技能、测量技能性能。支持从头创建、编辑优化、运行 evals 测试和基准性能分析。", triggers:["创建技能","评估技能","优化技能","skill eval"] },
+  { id:"slack-gif-creator", zh:"Slack GIF 创建", en:"slack-gif-creator", cat:"anthropic", platform:"general", usage:"slack-gif-creator — 为 Slack 创建 GIF 动画", desc:"创建为 Slack 优化的动画 GIF：提供约束条件、验证工具和动画概念，确保 GIF 符合 Slack 尺寸和帧数要求。", triggers:["Slack GIF","动画 GIF","Slack 表情"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
   { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
@@ -534,6 +555,7 @@ const categoryMeta = {
   business:       { label: "商业工具",      color: "#f0883e" },
   finance:        { label: "金融研究",      color: "#56d4dd" },
   minimax:        { label: "MiniMax",      color: "#f77878" },
+  anthropic:      { label: "Anthropic",    color: "#d4a574" },
 };
 
 const platformLabels = {
@@ -663,7 +685,7 @@ function renderSkills(filtered) {
   }
 
   let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","ecosystem","codex-system","codex-plugins","opencli"];
+  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","anthropic","ecosystem","codex-system","codex-plugins","opencli"];
   catOrder.forEach(cat => {
     const list = byCat[cat];
     if (!list || list.length === 0) return;
@@ -705,7 +727,8 @@ function filterAndRender() {
     "gsap-timeline","gsap-scrolltrigger","gsap-plugins","gsap-react","gsap-frameworks","gsap-performance","gsap-utils",
     "opencli-browser","opencli-adapter-author","opencli-autofix",
     "dbs-diagnosis","dbs-goal","dbs-action","dbs-benchmark","dbs-content","dbs-content-system","dbs-hook","dbs-xhs-title","dbs-ai-check","dbs-deconstruct","dbs-decision","dbs-learning","dbs-good-question","dbs-chatroom","dbs-chatroom-austrian","dbs-slowisfast","dbs-agent-migration","dbs-save","dbs-restore","dbs-report",
-    "android-native-dev","ios-application-dev","flutter-dev","react-native-dev","frontend-dev","fullstack-dev","shader-dev","minimax-pdf","minimax-docx","minimax-xlsx","pptx-generator","minimax-music-gen","minimax-music-playlist","buddy-sings","gif-sticker-maker","vision-analysis"
+    "android-native-dev","ios-application-dev","flutter-dev","react-native-dev","frontend-dev","fullstack-dev","shader-dev","minimax-pdf","minimax-docx","minimax-xlsx","pptx-generator","minimax-music-gen","minimax-music-playlist","buddy-sings","gif-sticker-maker","vision-analysis",
+    "frontend-design","canvas-design","algorithmic-art","brand-guidelines","theme-factory","doc-coauthoring","internal-comms","docx","pdf","pptx","xlsx","mcp-builder","claude-api","web-artifacts-builder","webapp-testing","skill-creator-anthropic","slack-gif-creator"
   ]);
   const isParent = s => s.familyParent || !subSkillIds.has(s.id);
   const mainSkills = skills.filter(isParent);
