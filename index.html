@@ -187,6 +187,7 @@
   .platform-badge.codex { background: var(--codex-bg); color: var(--codex-text); }
   .platform-badge.general { background: var(--general-bg); color: var(--general-text); }
   .platform-badge.claude { background: #2a1a1a; color: #f77878; }
+  .platform-badge.hermes { background: #1a2a1a; color: #78f7a0; }
 
   .skill-card .eng {
     font-size: 0.75rem;
@@ -311,6 +312,7 @@
   .legend .dot.codex { background: var(--codex-text); }
   .legend .dot.general { background: var(--general-text); }
   .legend .dot.claude { background: #f77878; }
+  .legend .dot.hermes { background: #78f7a0; }
 
   @media (max-width: 600px) {
     .skill-grid { grid-template-columns: 1fr; }
@@ -345,6 +347,7 @@
       <span><span class="dot codex"></span> Codex 专属</span>
       <span><span class="dot general"></span> 通用（所有 Agent）</span>
       <span><span class="dot claude"></span> Claude Code 专属</span>
+      <span><span class="dot hermes"></span> Hermes（Ubuntu）</span>
     </div>
   </div>
 </header>
@@ -438,6 +441,8 @@ const skills = [
   { id:"to-issues", zh:"任务拆解", en:"to-issues", cat:"project", platform:"general", usage:"convert to issues — 把当前 plan 拆成可领取的 issues", desc:"使用 tracer-bullet vertical slices 方式，将 plan/spec/PRD 拆解为可独立领取的 issues 并发布到项目 issue tracker。", triggers:["拆 issues","任务拆分","分解任务"] },
   { id:"to-prd", zh:"生成 PRD", en:"to-prd", cat:"project", platform:"general", usage:"create a PRD — 把当前对话转成产品需求文档", desc:"将当前对话上下文转化为结构化 PRD 文档并发布到项目 issue tracker。", triggers:["PRD","产品需求","写需求文档"] },
   { id:"triage", zh:"Issue 分类", en:"triage", cat:"project", platform:"general", usage:"triage — 帮我分类和管理这些 issues", desc:"通过状态机驱动的 triage 角色对 issues 进行分类和管理，适用于 bug 审查、功能请求评审和 AFK agent 准备工作。", triggers:["triage","issue 管理","bug 分类"] },
+  { id:"planning-with-files", zh:"文件规划", en:"planning-with-files", cat:"project", platform:"general", usage:"plan with files — 用文件做规划", desc:"Manus 风格的文件规划技能：为每个复杂任务创建 task_plan.md、findings.md、progress.md 三个文件，把上下文窗口当 RAM、文件系统当磁盘，实现持久化规划和会话恢复。", triggers:["文件规划","planning","task plan","持久化规划"] },
+  { id:"context-engineering-collection", zh:"上下文工程技能集", en:"context-engineering-collection", cat:"project", platform:"general", usage:"context engineering — 优化 Agent 上下文管理", desc:"Agent 上下文工程综合技能集：覆盖上下文管理、Harness 工程、多 Agent 架构和生产级 Agent 系统。用于构建、优化、评估和调试需要有效上下文管理和可靠运行循环的 Agent 系统。", triggers:["上下文工程","context engineering","Agent 优化","多 Agent"] },
 
   // ═══════════════════════════ 技能生态 ═══════════════════════════
   { id:"write-a-skill", zh:"创建技能", en:"write-a-skill", cat:"ecosystem", platform:"general", usage:"write a skill — 帮我创建一个新的 agent 技能", desc:"创建结构正确、支持渐进式披露并带 bundled resources 的新 Agent 技能。", triggers:["创建技能","新技能"] },
@@ -461,8 +466,7 @@ const skills = [
   { id:"spreadsheets", zh:"电子表格", en:"spreadsheets", cat:"codex-plugins", platform:"codex", usage:"create a spreadsheet — 帮我做一个 Excel 表格", desc:"创建、修改、分析和可视化 .xlsx/.csv 电子表格，支持公式、格式化、图表和 Google Sheets。", triggers:["Excel","表格","CSV"] },
 
   // ═══════════════════════════ OpenCLI ═══════════════════════════
-  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", family:"opencli", familyParent:true, familyCount:4, usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式。含 4 项子技能：浏览器驱动、Adapter 编写、自动修复。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
-  { id:"opencli-browser", zh:"OpenCLI 浏览器驱动", en:"opencli-browser", cat:"opencli", platform:"general", usage:"用 opencli 打开 X 网站 — 帮我操作网页", desc:"通过 opencli 驱动真实 Chrome 窗口——打开页面、检查元素、填表单、点击、截图、抓包。适合没有 adapter 时的即时浏览器操作。", triggers:["opencli browser","浏览器操控","网页自动化"] },
+  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", family:"opencli", familyParent:true, familyCount:3, usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式。含 4 项子技能：浏览器驱动、Adapter 编写、自动修复。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
   { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
   { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
 
@@ -494,7 +498,7 @@ const skills = [
   { id:"vibe-trading", zh:"Vibe-Trading 量化研究", en:"vibe-trading", cat:"finance", platform:"general", usage:"vibe-trading — 启动量化研究 / 回测 / 多因子 / 期权 / Alpha Zoo / 影子账户", desc:"专业金融研究工具箱：7 种回测引擎 + 基准对比、多因子分析、Alpha Zoo（452 个预构建 alpha：qlib158/alpha101/gtja191/学术）、期权定价、77 项金融子技能、29 个多 Agent 投研团队、交易日记分析、影子账户（提取→回测→渲染），覆盖 7 大数据源（tushare/yfinance/okx/akshare/mootdx/ccxt/futu）。安装：pip install vibe-trading-ai。", triggers:["回测","因子分析","Alpha Zoo","量化交易","多 Agent 投研","vibe-trading","交易日记","影子账户"] },
 
   // ═══════════════════════════ MiniMax ═══════════════════════════
-  { id:"minimax-multimodal-toolkit", zh:"MiniMax 多模态工具箱", en:"mmx-cli", cat:"minimax", platform:"general", family:"minimax", familyParent:true, familyCount:16, usage:"mmx — 用 MiniMax 生成文本/图片/视频/语音/音乐", desc:"MiniMax AI 平台统一入口：通过 mmx 命令生成文本、图片、视频、语音和音乐，支持聊天、搜索和 API 资源管理。含 16 项子技能，覆盖移动开发、文档套件、音乐生成和图像分析。", triggers:["mmx","MiniMax","多模态","生成音乐","生成视频"] },
+  { id:"minimax-multimodal-toolkit", zh:"MiniMax 多模态工具箱", en:"mmx-cli", cat:"minimax", platform:"general", family:"minimax", familyParent:true, familyCount:13, usage:"mmx — 用 MiniMax 生成文本/图片/视频/语音/音乐", desc:"MiniMax AI 平台统一入口：通过 mmx 命令生成文本、图片、视频、语音和音乐，支持聊天、搜索和 API 资源管理。含 12 项子技能，覆盖移动开发、音乐生成和图像分析。", triggers:["mmx","MiniMax","多模态","生成音乐","生成视频"] },
   { id:"android-native-dev", zh:"Android 原生开发", en:"android-native-dev", cat:"minimax", platform:"general", usage:"android-native-dev — Material Design 3 / Kotlin Compose", desc:"Android 原生开发指南：Material Design 3、Kotlin/Compose、项目配置、无障碍和构建排错。", triggers:["Android","Kotlin","Compose","Material Design 3"] },
   { id:"ios-application-dev", zh:"iOS 应用开发", en:"ios-application-dev", cat:"minimax", platform:"general", usage:"ios-application-dev — UIKit / SwiftUI / SnapKit", desc:"iOS 应用开发指南：UIKit、SnapKit、SwiftUI、导航模式、Dynamic Type、Dark Mode、无障碍和 HIG 规范。", triggers:["iOS","SwiftUI","UIKit","Swift","iPhone"] },
   { id:"flutter-dev", zh:"Flutter 跨平台开发", en:"flutter-dev", cat:"minimax", platform:"general", usage:"flutter-dev — Riverpod / Bloc / GoRouter", desc:"Flutter 跨平台开发：Widget 模式、Riverpod/Bloc 状态管理、GoRouter 导航、性能优化和 DevTools 分析。", triggers:["Flutter","Dart","Riverpod","Bloc","GoRouter"] },
@@ -502,10 +506,6 @@ const skills = [
   { id:"frontend-dev", zh:"前端全栈开发", en:"frontend-dev", cat:"minimax", platform:"general", usage:"frontend-dev — 高端 UI / 动画 / AI 素材 / 文案", desc:"全栈前端开发：高端 UI 设计、电影级动画、AI 生成素材、营销文案和视觉艺术，构建完整高品质页面。", triggers:["前端","UI 设计","动画","landing page"] },
   { id:"fullstack-dev", zh:"全栈后端架构", en:"fullstack-dev", cat:"minimax", platform:"general", usage:"fullstack-dev — REST API / CRUD / 实时应用", desc:"全栈后端架构与前后端集成：REST API、CRUD、实时应用、聊天应用搭建。", triggers:["全栈","REST API","后端","CRUD"] },
   { id:"shader-dev", zh:"GLSL 着色器开发", en:"shader-dev", cat:"minimax", platform:"general", usage:"shader-dev — ray marching / SDF / 流体 / 粒子", desc:"GLSL 着色器技术大全：ray marching、SDF 建模、流体模拟、粒子系统、程序化生成、光照和后处理。", triggers:["GLSL","shader","着色器","ray marching","SDF"] },
-  { id:"minimax-pdf", zh:"MiniMax PDF", en:"minimax-pdf", cat:"minimax", platform:"general", usage:"minimax-pdf — 生成/填充/格式化 PDF", desc:"PDF 创建/编辑/格式化：从零生成专业 PDF（报告、提案、简历），填充已有内容，应用模板格式化。", triggers:["PDF","生成报告","简历","专业文档"] },
-  { id:"minimax-docx", zh:"MiniMax DOCX", en:"minimax-docx", cat:"minimax", platform:"general", usage:"minimax-docx — Word 文档创建/编辑/格式化", desc:"专业 DOCX 文档创建、编辑和格式化：OpenXML SDK (.NET) 驱动，三条流水线（创建/填充/格式化）。", triggers:["Word","docx","OpenXML","文档格式化"] },
-  { id:"minimax-xlsx", zh:"MiniMax Excel", en:"minimax-xlsx", cat:"minimax", platform:"general", usage:"minimax-xlsx — Excel 创建/分析/验证", desc:"Excel 全流程：创建/读取/分析/编辑/验证 .xlsx/.xlsm/.csv，公式计算、数据透视表、金融格式标准。", triggers:["Excel","xlsx","CSV","数据透视表","金融模型"] },
-  { id:"pptx-generator", zh:"PPT 生成器", en:"pptx-generator", cat:"minimax", platform:"general", usage:"pptx-generator — 创建/编辑/读取 PPT", desc:"PPT 生成/编辑/读取：PptxGenJS 从零创建（封面、目录、内容、分隔、总结页），XML 编辑已有 PPTX。", triggers:["PPT","PPTX","PowerPoint","幻灯片","演示"] },
   { id:"minimax-music-gen", zh:"MiniMax 音乐生成", en:"minimax-music-gen", cat:"minimax", platform:"general", usage:"minimax-music-gen — 生成歌曲/纯音乐/翻唱", desc:"AI 音乐生成：歌曲创作、歌词谱曲、纯音乐制作、翻唱和音频制作，支持多种风格。", triggers:["音乐生成","作曲","歌词","翻唱","音频"] },
   { id:"minimax-music-playlist", zh:"MiniMax 播放列表", en:"minimax-music-playlist", cat:"minimax", platform:"general", usage:"minimax-music-playlist — 按口味生成播放列表", desc:"分析用户音乐品味和生成反馈历史，生成个性化播放列表和推荐。", triggers:["播放列表","音乐推荐","音乐品味"] },
   { id:"buddy-sings", zh:"AI 宠物唱歌", en:"buddy-sings", cat:"minimax", platform:"general", usage:"buddy-sings — 让我的 AI 宠物唱首歌", desc:"为你的 AI 宠物（/buddy）生成个性化歌曲，支持多语言触发。", triggers:["buddy","宠物唱歌","AI 宠物"] },
@@ -513,7 +513,7 @@ const skills = [
   { id:"vision-analysis", zh:"MiniMax 图像分析", en:"vision-analysis", cat:"minimax", platform:"general", usage:"vision-analysis — 分析/描述/提取图像信息", desc:"通过 MiniMax 视觉 MCP 工具分析、描述和提取图像信息，支持 jpg/png/gif/webp/bmp/svg。", triggers:["图像分析","看图","视觉","图片描述"] },
 
   // ═══════════════════════════ Anthropic ═══════════════════════════
-  { id:"anthropic-skills", zh:"Anthropic 官方技能", en:"anthropics/skills", cat:"anthropic", platform:"general", family:"anthropic", familyParent:true, familyCount:17, usage:"npx skills add anthropics/skills@<skill> — 安装 Anthropic 官方技能", desc:"Anthropic 官方技能套件，含 17 项子技能：前端设计、视觉艺术、文档协作、文档套件（DOCX/PDF/PPTX/XLSX）、品牌指南、MCP 服务器构建、主题工厂、Web Artifacts、应用测试、内部沟通、算法艺术、Slack GIF、技能创建等。", triggers:["Anthropic","Claude","官方技能","anthropics"] },
+  { id:"anthropic-skills", zh:"Anthropic 官方技能", en:"anthropics/skills", cat:"anthropic", platform:"general", family:"anthropic", familyParent:true, familyCount:15, usage:"npx skills add anthropics/skills@<skill> — 安装 Anthropic 官方技能", desc:"Anthropic 官方技能套件，含 17 项子技能：前端设计、视觉艺术、文档协作、文档套件（DOCX/PDF/PPTX/XLSX）、品牌指南、MCP 服务器构建、主题工厂、Web Artifacts、应用测试、内部沟通、算法艺术、Slack GIF、技能创建等。", triggers:["Anthropic","Claude","官方技能","anthropics"] },
   { id:"frontend-design", zh:"前端设计", en:"frontend-design", cat:"anthropic", platform:"general", usage:"frontend-design — 构建高品质前端界面", desc:"创建独特的、生产级前端界面，高设计质量。适用于构建网页组件、页面、Artifacts、海报或应用。", triggers:["前端设计","UI","landing page","dashboard"] },
   { id:"canvas-design", zh:"视觉艺术设计", en:"canvas-design", cat:"anthropic", platform:"general", usage:"canvas-design — 创建视觉艺术/海报", desc:"创建精美的视觉艺术作品（.png/.pdf），适用于海报、艺术品或静态设计。原创设计，不复制已有艺术家风格。", triggers:["海报","视觉设计","艺术","poster","art"] },
   { id:"algorithmic-art", zh:"算法艺术", en:"algorithmic-art", cat:"anthropic", platform:"general", usage:"algorithmic-art — 用 p5.js 创建生成艺术", desc:"使用 p5.js 创建算法艺术，支持种子随机性和交互式参数探索：流场、粒子系统、生成艺术。", triggers:["生成艺术","算法艺术","p5.js","流场","粒子系统"] },
@@ -521,10 +521,7 @@ const skills = [
   { id:"theme-factory", zh:"主题工厂", en:"theme-factory", cat:"anthropic", platform:"general", usage:"theme-factory — 给作品套上主题样式", desc:"为幻灯片、文档、报告、HTML 页面等作品应用主题样式的工具箱。10 个预设主题（颜色/字体），也可生成新主题。", triggers:["主题","配色","样式","theme"] },
   { id:"doc-coauthoring", zh:"文档协作", en:"doc-coauthoring", cat:"anthropic", platform:"general", usage:"doc-coauthoring — 协作撰写文档", desc:"引导用户完成结构化文档协作工作流：文档、提案、技术规格、决策文档等。高效传递上下文，减少写作阻力。", triggers:["写文档","协作写作","提案","技术规格"] },
   { id:"internal-comms", zh:"内部沟通", en:"internal-comms", cat:"anthropic", platform:"general", usage:"internal-comms — 帮我写内部沟通文档", desc:"帮助撰写各类内部沟通文档：状态报告、领导层更新、3 行摘要、团队公告等，使用公司标准格式。", triggers:["内部沟通","状态报告","团队公告","领导更新"] },
-  { id:"docx", zh:"DOCX 文档", en:"docx", cat:"anthropic", platform:"general", usage:"docx — 创建/读取/编辑 Word 文档", desc:"创建、读取、编辑或操作 Word 文档（.docx），支持表格、格式化等专业文档样式。", triggers:["Word","docx","文档","Word 文档"] },
   { id:"pdf", zh:"PDF 文档", en:"pdf", cat:"anthropic", platform:"general", usage:"pdf — 创建/合并/拆分/水印 PDF", desc:"PDF 全能工具：读取提取文本/表格、合并多个 PDF、拆分、旋转、添加水印、创建新 PDF、表单填写。", triggers:["PDF","合并 PDF","拆分 PDF","水印"] },
-  { id:"pptx", zh:"PPTX 演示", en:"pptx", cat:"anthropic", platform:"general", usage:"pptx — 创建/读取/编辑 PPT 演示文稿", desc:"处理 .pptx 演示文稿：创建幻灯片、演示文稿、提取文本内容。支持输入和输出场景。", triggers:["PPT","PPTX","PowerPoint","演示文稿"] },
-  { id:"xlsx", zh:"XLSX 电子表格", en:"xlsx", cat:"anthropic", platform:"general", usage:"xlsx — 创建/读取/编辑 Excel 电子表格", desc:"处理电子表格文件：打开/读取/编辑/修复 .xlsx/.xlsm/.csv/.tsv，添加列、计算公式、格式化、图表。", triggers:["Excel","xlsx","CSV","电子表格","表格"] },
   { id:"mcp-builder", zh:"MCP 服务器构建", en:"mcp-builder", cat:"anthropic", platform:"general", usage:"mcp-builder — 构建 MCP 服务器", desc:"创建高质量 MCP（Model Context Protocol）服务器的指南，让 LLM 通过工具与外部服务交互。支持 Python（FastMCP）和 TypeScript。", triggers:["MCP","MCP 服务器","FastMCP","工具集成"] },
   { id:"claude-api", zh:"Claude API 开发", en:"claude-api", cat:"anthropic", platform:"general", usage:"claude-api — 构建/调试 Claude API 应用", desc:"构建、调试和优化 Claude API / Anthropic SDK 应用，含 prompt caching。处理 Claude 模型版本间迁移。", triggers:["Claude API","Anthropic SDK","prompt caching","模型迁移"] },
   { id:"web-artifacts-builder", zh:"Web Artifacts 构建", en:"web-artifacts-builder", cat:"anthropic", platform:"general", usage:"web-artifacts-builder — 构建复杂 claude.ai HTML Artifacts", desc:"使用现代前端技术（React、Tailwind CSS、shadcn/ui）构建复杂多组件 claude.ai HTML Artifacts，支持状态管理和路由。", triggers:["Artifacts","claude.ai","React Artifact","shadcn"] },
@@ -545,7 +542,7 @@ const skills = [
   { id:"writing-guidelines", zh:"写作规范", en:"writing-guidelines", cat:"vercel", platform:"general", usage:"writing guidelines — 审查文档是否符合写作规范", desc:"审查文档/文案是否符合 Writing Guidelines：语调、风格、清晰度、一致性、技术写作最佳实践。", triggers:["写作审查","文档风格","语调","技术写作"] },
   // rtk — CLI proxy that reduces LLM token consumption by 60-90%
   
-  { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"general", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。安装：brew install rtk 或 curl|sh。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
+  { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"hermes", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。已安装在 Ubuntu 环境，供 Hermes Agent 使用。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
 ];
 
 // ── Render ──
@@ -575,7 +572,8 @@ const categoryMeta = {
 const platformLabels = {
   codex: "Codex",
   general: "通用",
-  claude: "Claude Code"
+  claude: "Claude Code",
+  hermes: "Hermes"
 };
 
 const siteNames = {
@@ -737,14 +735,7 @@ function filterAndRender() {
   const query = searchInput.value.toLowerCase().trim();
   const activeTab = document.querySelector('.filter-tab.active');
   const activeCat = activeTab ? activeTab.dataset.cat : 'all';
-  const subSkillIds = new Set([
-    "gsap-timeline","gsap-scrolltrigger","gsap-plugins","gsap-react","gsap-frameworks","gsap-performance","gsap-utils",
-    "opencli-browser","opencli-adapter-author","opencli-autofix",
-    "dbs-diagnosis","dbs-goal","dbs-action","dbs-benchmark","dbs-content","dbs-content-system","dbs-hook","dbs-xhs-title","dbs-ai-check","dbs-deconstruct","dbs-decision","dbs-learning","dbs-good-question","dbs-chatroom","dbs-chatroom-austrian","dbs-slowisfast","dbs-agent-migration","dbs-save","dbs-restore","dbs-report",
-    "android-native-dev","ios-application-dev","flutter-dev","react-native-dev","frontend-dev","fullstack-dev","shader-dev","minimax-pdf","minimax-docx","minimax-xlsx","pptx-generator","minimax-music-gen","minimax-music-playlist","buddy-sings","gif-sticker-maker","vision-analysis",
-    "frontend-design","canvas-design","algorithmic-art","brand-guidelines","theme-factory","doc-coauthoring","internal-comms","docx","pdf","pptx","xlsx","mcp-builder","claude-api","web-artifacts-builder","webapp-testing","skill-creator-anthropic","slack-gif-creator",
-    "composition-patterns","deploy-to-vercel","react-best-practices","react-native-skills","react-view-transitions","vercel-cli-with-tokens","vercel-optimize","web-design-guidelines","writing-guidelines"
-  ]);
+  const subSkillIds = new Set(["gsap-timeline", "gsap-scrolltrigger", "gsap-plugins", "gsap-react", "gsap-frameworks", "gsap-performance", "gsap-utils", "opencli-adapter-author", "opencli-autofix", "dbs-diagnosis", "dbs-goal", "dbs-action", "dbs-benchmark", "dbs-content", "dbs-content-system", "dbs-hook", "dbs-xhs-title", "dbs-ai-check", "dbs-deconstruct", "dbs-decision", "dbs-learning", "dbs-good-question", "dbs-chatroom", "dbs-chatroom-austrian", "dbs-slowisfast", "dbs-agent-migration", "dbs-save", "dbs-restore", "dbs-report", "android-native-dev", "ios-application-dev", "flutter-dev", "react-native-dev", "frontend-dev", "fullstack-dev", "shader-dev", "minimax-music-gen", "minimax-music-playlist", "buddy-sings", "gif-sticker-maker", "vision-analysis", "frontend-design", "canvas-design", "algorithmic-art", "brand-guidelines", "theme-factory", "doc-coauthoring", "internal-comms", "pdf", "mcp-builder", "claude-api", "web-artifacts-builder", "webapp-testing", "skill-creator-anthropic", "slack-gif-creator", "composition-patterns", "deploy-to-vercel", "react-best-practices", "react-native-skills", "react-view-transitions", "vercel-cli-with-tokens", "vercel-optimize", "web-design-guidelines", "writing-guidelines"]);
   const isParent = s => s.familyParent || !subSkillIds.has(s.id);
   const mainSkills = skills.filter(isParent);
 
