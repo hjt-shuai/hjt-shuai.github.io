@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Skills</title>
+<title>Agent Skills — 技能参考手册</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,11 +22,10 @@
     --green: #3fb950;
     --yellow: #d2991d;
     --purple: #a371f7;
-    --code-bg: #0d1117;
-    --codex-bg: #1a2332;
-    --codex-text: #79c0ff;
-    --general-bg: #1a2e1a;
-    --general-text: #7ee787;
+    --global-bg: #1a2e1a;
+    --global-text: #7ee787;
+    --project-bg: #2a1a1a;
+    --project-text: #f77878;
   }
 
   html { font-size: 15px; }
@@ -37,37 +36,59 @@
     line-height: 1.5;
     min-height: 100vh;
   }
-
-  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
   header {
-    padding: 48px 0 32px;
+    padding: 40px 0 20px;
     border-bottom: 1px solid var(--border);
   }
-  header h1 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-  header .sub {
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    margin-top: 6px;
-  }
+  header h1 { font-size: 1.5rem; font-weight: 600; }
+  header .sub { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 0.72rem; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .legend .dot.global { background: var(--global-text); }
+  .header-btns { display: flex; gap: 8px; margin-top: 10px; }
+.header-btn {
+  display: inline-block; background: var(--bg-elevated);
+  border: 1px solid var(--border); color: var(--accent);
+  padding: 5px 14px; border-radius: 6px; font-size: 0.8rem;
+  text-decoration: none; transition: all 0.15s;
+}
+.header-btn:hover { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.legend .dot.project { background: var(--project-text); }
 
-  .search-wrap {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+  /* Category tabs */
+  .cat-nav {
+    position: sticky; top: 0; z-index: 10;
     background: var(--bg);
-    padding: 20px 0 16px;
     border-bottom: 1px solid var(--border);
+    padding: 12px 0;
   }
-  .search-inner {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  .cat-tabs {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    max-height: 120px; overflow-y: auto;
+  }
+  .cat-tab {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .cat-tab:hover { color: var(--text); border-color: var(--text-dim); }
+  .cat-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+  .cat-tab .count { font-size: 0.65rem; opacity: 0.6; }
+
+  /* Search */
+  .search-bar {
+    display: flex; gap: 10px; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
   }
   .search-input {
     flex: 1;
@@ -78,262 +99,148 @@
     font-size: 0.9rem;
     color: var(--text);
     outline: none;
-    transition: border-color 0.15s;
   }
   .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--text-dim); }
-
-  .filter-tabs {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-    flex-wrap: wrap;
+  .scope-filter {
+    display: flex; gap: 2px;
   }
-  .filter-tab {
+  .scope-btn {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     color: var(--text-dim);
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 5px 14px;
     font-size: 0.78rem;
     cursor: pointer;
     transition: all 0.15s;
+  }
+  .scope-btn:first-child { border-radius: 6px 0 0 6px; }
+  .scope-btn:last-child { border-radius: 0 6px 6px 0; }
+  .scope-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
+  /* Stats */
+  .stats { font-size: 0.78rem; color: var(--text-dim); padding: 10px 0; }
+
+  /* Category sections */
+  .cat-section { margin: 20px 0; }
+  .cat-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 0 8px;
+    cursor: pointer;
     user-select: none;
+    border-bottom: 1px solid var(--border);
   }
-  .filter-tab:hover { color: var(--text); border-color: var(--text-dim); }
-  .view-toggle { display: flex; gap: 2px; }
-  .view-bar { padding: 16px 24px 0; }
-  .view-bar.sites-mode { background: var(--bg-elevated); border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .cat-header:hover .cat-label { color: var(--text); }
+  .cat-icon { font-size: 1.1rem; width: 20px; text-align: center; flex-shrink: 0; }
+  .cat-label { font-size: 0.95rem; font-weight: 600; transition: color 0.15s; }
+  .cat-count { font-size: 0.72rem; color: var(--text-dim); margin-left: 4px; }
+  .cat-arrow { margin-left: auto; color: var(--text-dim); transition: transform 0.2s; font-size: 0.8rem; }
+  .cat-header.open .cat-arrow { transform: rotate(90deg); }
+  .cat-body { display: none; }
+  .cat-body.open { display: block; }
 
-  .view-btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 18px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
-  .view-btn:first-child { border-radius: 6px 0 0 6px; }
-  .view-btn:last-child { border-radius: 0 6px 6px 0; }
-  .view-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-  .view-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
-
-  .site-section { margin-bottom: 28px; }
-  .site-section-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
-  .site-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-  .site-tag { background: var(--tag-bg); color: var(--tag-text); padding: 3px 10px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
-  .site-tag { text-decoration: none; }
-  .site-tag:hover { background: var(--accent-dim); color: #fff; }
-
-  .filter-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-
-  .stats {
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    margin-top: 8px;
+  /* Scope summary */
+  .scope-summary {
+    display: flex; gap: 16px; font-size: 0.72rem; color: var(--text-dim);
+    padding: 4px 0 10px;
   }
-  .stats strong { color: var(--text); }
+  .scope-summary .g { color: var(--global-text); }
+  .scope-summary .p { color: var(--project-text); }
 
-  .category { margin: 32px 0; }
-  .category-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .category-title .count {
-    font-weight: 400;
-    color: var(--text-dim);
-    font-size: 0.75rem;
-  }
-
+  /* Skill cards */
   .skill-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 10px;
+    padding-bottom: 10px;
   }
   .skill-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 16px;
+    padding: 14px;
     transition: background 0.15s;
-    cursor: default;
-    display: flex;
-    flex-direction: column;
   }
   .skill-card:hover { background: var(--card-hover); }
   .skill-card.hidden { display: none; }
 
-  .skill-card .card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
+  .card-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 8px; margin-bottom: 2px;
   }
-  .skill-card .name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text);
+  .card-name { font-size: 0.88rem; font-weight: 600; }
+  .card-en { font-size: 0.72rem; color: var(--accent); font-family: "SF Mono", "Fira Code", monospace; margin-bottom: 6px; }
+  .card-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; }
+  
+  .scope-badge {
+    font-size: 0.62rem; font-weight: 600;
+    padding: 1px 8px; border-radius: 10px;
+    white-space: nowrap; flex-shrink: 0;
   }
-  .skill-card .platform-badge {
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 1px 8px;
-    border-radius: 10px;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    flex-shrink: 0;
-  }
-  .platform-badge.codex { background: var(--codex-bg); color: var(--codex-text); }
-  .platform-badge.general { background: var(--general-bg); color: var(--general-text); }
-  .platform-badge.claude { background: #2a1a1a; color: #f77878; }
-  .platform-badge.hermes { background: #1a2a1a; color: #78f7a0; }
+  .scope-badge.global { background: var(--global-bg); color: var(--global-text); }
+  .scope-badge.project { background: var(--project-bg); color: var(--project-text); }
 
-  .skill-card .eng {
-    font-size: 0.75rem;
-    color: var(--accent);
-    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  .card-path {
+    font-size: 0.68rem; color: var(--text-dim);
+    font-family: "SF Mono", "Fira Code", monospace;
+    background: rgba(0,0,0,0.2);
+    padding: 3px 8px; border-radius: 3px;
     margin-bottom: 8px;
-  }
-  .skill-card .desc {
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    line-height: 1.55;
-    flex: 1;
-  }
-  .skill-card .triggers {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .skill-card .trigger-tag {
-    background: var(--tag-bg);
-    color: var(--tag-text);
-    font-size: 0.68rem;
-    padding: 2px 8px;
-    border-radius: 10px;
-    white-space: nowrap;
+    word-break: break-all;
   }
 
-  .skill-card .usage-block {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .card-usage {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
   }
-  .skill-card .usage-cmd {
+  .usage-cmd {
     flex: 1;
-    background: var(--code-bg);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    padding: 5px 8px;
+    font-size: 0.72rem;
+    font-family: "SF Mono", "Fira Code", monospace;
     color: var(--green);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .skill-card .copy-btn {
+  .copy-btn {
     flex-shrink: 0;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
+    border-radius: 4px; padding: 4px 8px;
+    font-size: 0.68rem; color: var(--text-dim);
+    cursor: pointer; transition: all 0.15s;
   }
-  .skill-card .copy-btn:hover { color: var(--text); border-color: var(--accent); }
-  .skill-card .copy-btn.copied { color: var(--green); border-color: var(--green); }
-  .skill-card.family-parent { border-color: var(--accent-dim); cursor: pointer; position: relative; }
-  .skill-card.family-parent:hover { border-color: var(--accent); background: rgba(31,111,235,0.08); }
-  .family-count {
-    font-size: 0.68rem;
-    font-weight: 500;
-    background: var(--accent-dim);
-    color: var(--accent);
-    padding: 1px 8px;
-    border-radius: 10px;
-    white-space: nowrap;
-  }
-  .family-arrow {
-    position: absolute;
-    right: 14px;
-    bottom: 14px;
-    color: var(--accent);
-    font-size: 1.1rem;
-    opacity: 0;
-    transition: opacity 0.15s, transform 0.15s;
-    transform: translateX(-4px);
-    pointer-events: none;
-  }
-  .skill-card.family-parent:hover .family-arrow { opacity: 1; transform: translateX(0); }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
 
+  .triggers { display: flex; flex-wrap: wrap; gap: 4px; }
+  .trigger-tag {
+    background: var(--tag-bg); color: var(--tag-text);
+    font-size: 0.65rem; padding: 2px 7px; border-radius: 10px;
+  }
 
   footer {
-    padding: 40px 0 32px;
-    border-top: 1px solid var(--border);
-    margin-top: 40px;
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    text-align: center;
+    padding: 32px 0; border-top: 1px solid var(--border);
+    margin-top: 32px; font-size: 0.75rem; color: var(--text-dim); text-align: center;
   }
+  footer div { margin-top: 4px; }
+  footer code { background: var(--bg-elevated); padding: 1px 5px; border-radius: 3px; font-size: 0.75rem; }
 
   .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--green);
-    color: #0d1117;
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    z-index: 100;
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: #0d1117;
+    padding: 8px 20px; border-radius: 6px;
+    font-size: 0.82rem; font-weight: 600;
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none; z-index: 100;
   }
   .toast.show { opacity: 1; }
 
-  .legend {
-    display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    font-size: 0.72rem;
-  }
-  .legend span { display: flex; align-items: center; gap: 4px; }
-  .legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .legend .dot.codex { background: var(--codex-text); }
-  .legend .dot.general { background: var(--general-text); }
-  .legend .dot.claude { background: #f77878; }
-  .legend .dot.hermes { background: #78f7a0; }
-
   @media (max-width: 600px) {
     .skill-grid { grid-template-columns: 1fr; }
-    header { padding: 32px 0 24px; }
-    .search-inner { flex-direction: column; }
+    .container { padding: 0 16px; }
   }
-
-.all-skills-btn {
-  background: var(--accent);
-  color: #fff !important;
-  padding: 5px 14px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background 0.15s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.all-skills-btn:hover { background: #4090e0; }
-
 </style>
 </head>
 <body>
@@ -341,428 +248,426 @@
 <header>
   <div class="container">
     <h1>Agent Skills</h1>
-    <p class="sub">个人 Agent 技能参考手册 — 共 <span id="total-count">35</span> 项技能，点击复制即可执行</p>
-    <p class="sub"><a href="codex-guide.html" style="color:#58a6ff;">📖 Codex Agent 使用指南 →</a></p>
+    <p class="sub">技能参考手册 — 按分类浏览，标注安装位置</p>
+    <div class="header-btns">
+      <a href="skill-detail.html" class="header-btn">📋 查看全部技能</a>
+      <a href="codex-guide.html" class="header-btn">📖 Codex 使用指南</a>
+    </div>
     <div class="legend">
-      <span><span class="dot codex"></span> Codex 专属</span>
-      <span><span class="dot general"></span> 通用（所有 Agent）</span>
-      <span><span class="dot claude"></span> Claude Code 专属</span>
-      <span><span class="dot hermes"></span> Hermes（Ubuntu）</span>
+      <span><span class="dot global"></span> 全局安装（所有项目可用）</span>
+      <span><span class="dot project"></span> 项目级安装（按需复制）</span>
     </div>
   </div>
 </header>
 
-<a href="skill-detail.html" class="all-skills-btn" style="display:block;text-align:center;margin:0 auto 12px;padding:10px 24px;max-width:240px">查看全部 585 项技能 →</a>
-
-<div class="view-bar" id="view-bar">
+<div class="cat-nav">
   <div class="container">
-    <div class="view-toggle" id="view-toggle">
-      <button class="view-btn active" data-view="skills">技能</button>
-      <button class="view-btn" data-view="sites">网站</button>
-    </div>
+    <div class="cat-tabs" id="cat-tabs"></div>
   </div>
 </div>
 
-<div class="search-wrap">
-  <div class="container">
-    <div class="search-inner">
-      <input type="text" class="search-input" id="search" placeholder="搜索技能名称、描述、触发词…" autocomplete="off">
+<div class="container">
+  <div class="search-bar">
+    <input type="text" class="search-input" id="search" placeholder="搜索技能名称、描述、路径…" autocomplete="off">
+    <div class="scope-filter" id="scope-filter">
+      <button class="scope-btn active" data-scope="all">全部</button>
+      <button class="scope-btn" data-scope="global">全局</button>
+      <button class="scope-btn" data-scope="project">项目</button>
     </div>
-    <div class="filter-tabs" id="filter-tabs">
-      <span class="filter-tab active" data-cat="all">全部</span>
-      <span class="filter-tab" data-cat="communication">通信协作</span>
-      <span class="filter-tab" data-cat="diagnosis">调试诊断</span>
-      <span class="filter-tab" data-cat="design">设计规划</span>
-      <span class="filter-tab" data-cat="engineering">工程开发</span>
-      <span class="filter-tab" data-cat="project">项目管理</span>
-      <span class="filter-tab" data-cat="ecosystem">技能生态</span>
-      <span class="filter-tab" data-cat="codex-system">Codex 系统</span>
-      <span class="filter-tab" data-cat="codex-plugins">Codex 插件</span>
-      <span class="filter-tab" data-cat="opencli">OpenCLI</span>
-      <span class="filter-tab" data-cat="business">商业工具</span>
-      <span class="filter-tab" data-cat="finance">金融研究</span>
-      <span class="filter-tab" data-cat="minimax">MiniMax</span>
-      <span class="filter-tab" data-cat="anthropic">Anthropic</span>
-      <span class="filter-tab" data-cat="vercel">Vercel Labs</span>
-    </div>
-    <div class="stats" id="stats"></div>
   </div>
+  <div class="stats" id="stats"></div>
 </div>
 
 <main class="container" id="skills-container"></main>
 
-<main class="container" id="sites-container" style="display:none">
-  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:20px">以下站点均通过 <code style="background:var(--codex-bg);color:var(--codex-text);padding:1px 6px;border-radius:3px;font-size:0.82rem">opencli &lt;site&gt; &lt;command&gt;</code> 命令访问，共206个。<a href="https://github.com/jackwener/OpenCLI" target="_blank" style="color:var(--accent);margin-left:8px">OpenCLI ↗</a></p>
-  <div id="sites-list"></div>
-</main>
-
 <footer>
   <div class="container">
-    <div>通用技能：<code>C:\Users\hujiangtao\.agents\skills\</code></div>
-    <div style="margin-top:4px">Codex 系统技能：<code>C:\Users\hujiangtao\.codex\skills\.system\</code></div>
-    <div style="margin-top:4px">Codex 插件：<code>C:\Users\hujiangtao\.codex\plugins\</code></div>
+    <div>全局技能：<code>C:\Users\hujiangtao\.agents\skills\</code>（25 项通用）</div>
+    <div>系统技能：<code>C:\Users\hujiangtao\.codex\skills\</code> + <code>C:\Users\hujiangtao\.codex\skills\.system\</code>（14 项）</div>
+    <div>项目技能：<code>&lt;项目&gt;\.agents\skills\</code>（按需从 D:\skills-reference\ 复制）</div>
   </div>
 </footer>
 
 <div class="toast" id="toast">已复制</div>
 
 <script>
-const skills = [
-  // ═══════════════════════════ 通信协作 ═══════════════════════════
-  { id:"caveman", zh:"超压缩通信", en:"caveman", cat:"communication", platform:"general", usage:"用 caveman 模式", desc:"切换为极简通信模式，去除填充词和客套语，token 消耗降低约 75%，技术准确性不变。", triggers:["token 优化","精简模式"] },
-  { id:"handoff", zh:"对话交接", en:"handoff", cat:"communication", platform:"general", usage:"handoff — 把当前对话交接给另一个 agent", desc:"将当前对话上下文压缩为一份结构化交接文档，供另一个 Agent 无缝接续工作。", triggers:["交接","换 agent"] },
-
-  // ═══════════════════════════ 调试诊断 ═══════════════════════════
-  { id:"diagnose", zh:"纪律化诊断", en:"diagnose", cat:"diagnosis", platform:"general", usage:"diagnose this — 帮我诊断这个 bug", desc:"面向棘手 bug 和性能回退的结构化诊断循环：复现→缩小范围→假设→插桩→修复→回归测试。", triggers:["bug","报错","debug","性能问题"] },
-  { id:"zoom-out", zh:"高层视角", en:"zoom-out", cat:"diagnosis", platform:"general", usage:"zoom out — 帮我看一下整体架构", desc:"跳出当前代码段，给出更广泛的上下文和更高层视角，帮你理解代码在整体架构中的位置。", triggers:["不熟悉代码","全局视角"] },
-
-  // ═══════════════════════════ 设计规划 ═══════════════════════════
-  { id:"grill-me", zh:"设计追问", en:"grill-me", cat:"design", platform:"general", usage:"grill my plan — 帮我把这个方案追问到底", desc:"围绕你的 plan 或 design 持续 interview，直到达成 shared understanding，逐一解决 decision tree 的每个分支。", triggers:["grill me","评审方案","推敲设计"] },
-  { id:"grill-with-docs", zh:"文档化追问", en:"grill-with-docs", cat:"design", platform:"general", usage:"grill with docs — 结合项目文档评审这个方案", desc:"在 grill-me 基础上结合 CONTEXT.md 和 ADR，挑战方案与现有领域模型的一致性，决策明朗时同步更新文档。", triggers:["结合文档评审","ADR","CONTEXT.md"] },
-  { id:"prototype", zh:"快速原型", en:"prototype", cat:"design", platform:"general", usage:"prototype this — 帮我搭个原型验证这个想法", desc:"搭建可丢弃的原型验证设计，支持终端 App（状态/业务逻辑）或多风格 UI 变体切换两种路线。", triggers:["原型","试试看","验证设计"] },
-
-  // ═══════════════════════════ 工程开发 ═══════════════════════════
-  { id:"improve-codebase-architecture", zh:"架构改进", en:"improve-codebase-architecture", cat:"engineering", platform:"general", usage:"improve the architecture — 分析这个项目的架构改进空间", desc:"基于 CONTEXT.md 领域语言和 ADR 决策，寻找代码库深化机会——重构、解耦、提升可测试性和 AI 可导航性。", triggers:["架构","重构","代码质量"] },
-  { id:"tdd", zh:"测试驱动开发", en:"tdd", cat:"engineering", platform:"general", usage:"用 TDD 方式开发 — red-green-refactor 循环", desc:"使用 red-green-refactor 循环进行测试驱动开发，覆盖单元测试和集成测试。", triggers:["TDD","测试驱动","先写测试"] },
-  { id:"setup-pre-commit", zh:"Pre-commit 配置", en:"setup-pre-commit", cat:"engineering", platform:"general", usage:"setup pre-commit — 给这个项目加上提交前检查", desc:"设置 Husky pre-commit hooks，集成 lint-staged（Prettier）、type checking 和自动化测试。", triggers:["pre-commit","husky","提交检查"] },
-  { id:"git-guardrails-claude-code", zh:"Git 安全护栏", en:"git-guardrails-claude-code", cat:"engineering", platform:"claude", usage:"add git guardrails — 给项目加上 git 安全 hooks（仅限 Claude Code）", desc:"配置 hooks 阻止危险的 git 操作（push、reset --hard、clean、branch -D 等），防止误操作。仅限 Claude Code 环境。", triggers:["git 安全","阻止 push"] },
-  // GSAP 动画引擎
-  { id:"gsap-core", zh:"GSAP 核心动画", en:"gsap-core", cat:"engineering", platform:"general", family:"gsap", familyParent:true, familyCount:8, usage:"animate with GSAP — 用 GSAP 做动画", desc:"GSAP 核心 API：gsap.to/from/fromTo、缓动、stagger、matchMedia 响应式动画、prefers-reduced-motion。含 8 项子技能，覆盖时间线、滚动触发、插件、React/Vue 集成和性能优化。", triggers:["GSAP","动画","tween","缓动","easing"] },
-  { id:"gsap-timeline", zh:"GSAP 时间线", en:"gsap-timeline", cat:"engineering", platform:"general", usage:"sequence animations — 编排动画序列", desc:"GSAP 时间线：timeline()、位置参数、嵌套、播放控制。编排复杂动画序列。", triggers:["timeline","动画序列","编排动画","时间线"] },
-  { id:"gsap-scrolltrigger", zh:"GSAP 滚动触发", en:"gsap-scrolltrigger", cat:"engineering", platform:"general", usage:"scroll animation — 滚动驱动的动画", desc:"GSAP ScrollTrigger：滚动联动动画、pin、scrub、视差、滚动触发。", triggers:["ScrollTrigger","滚动动画","视差","pin","滚动触发"] },
-  { id:"gsap-plugins", zh:"GSAP 插件", en:"gsap-plugins", cat:"engineering", platform:"general", usage:"GSAP plugins — Flip、Draggable、SplitText 等", desc:"GSAP 插件集：ScrollTo、Flip、Draggable、SplitText、SVG 绘制、物理插件、GSDevTools。", triggers:["GSAP插件","ScrollTo","Flip","Draggable","SplitText"] },
-  { id:"gsap-react", zh:"GSAP React 集成", en:"gsap-react", cat:"engineering", platform:"general", usage:"GSAP in React — useGSAP hook", desc:"GSAP React：useGSAP hook、refs、gsap.context()、cleanup。React/Next.js 动画最佳实践。", triggers:["useGSAP","React动画","GSAP React","Next.js动画"] },
-  { id:"gsap-frameworks", zh:"GSAP 框架集成", en:"gsap-frameworks", cat:"engineering", platform:"general", usage:"GSAP in Vue/Svelte — 框架生命周期", desc:"GSAP 框架集成：Vue、Nuxt、Svelte、SvelteKit 中的生命周期、选择器作用域、unmount cleanup。", triggers:["Vue动画","Svelte动画","Nuxt动画"] },
-  { id:"gsap-performance", zh:"GSAP 性能优化", en:"gsap-performance", cat:"engineering", platform:"general", usage:"optimize GSAP — 动画性能优化", desc:"GSAP 性能：优先 transforms、避免布局抖动、will-change、批量更新，确保 60fps。", triggers:["动画性能","60fps","jank","优化动画"] },
-  { id:"gsap-utils", zh:"GSAP 工具函数", en:"gsap-utils", cat:"engineering", platform:"general", usage:"gsap.utils — clamp、mapRange、random", desc:"GSAP 工具集：clamp、mapRange、random、snap、toArray、wrap、pipe 等辅助函数。", triggers:["gsap.utils","clamp","mapRange","random","snap"] },
-
-
-  // ═══════════════════════════ 项目管理 ═══════════════════════════
-  { id:"to-issues", zh:"任务拆解", en:"to-issues", cat:"project", platform:"general", usage:"convert to issues — 把当前 plan 拆成可领取的 issues", desc:"使用 tracer-bullet vertical slices 方式，将 plan/spec/PRD 拆解为可独立领取的 issues 并发布到项目 issue tracker。", triggers:["拆 issues","任务拆分","分解任务"] },
-  { id:"to-prd", zh:"生成 PRD", en:"to-prd", cat:"project", platform:"general", usage:"create a PRD — 把当前对话转成产品需求文档", desc:"将当前对话上下文转化为结构化 PRD 文档并发布到项目 issue tracker。", triggers:["PRD","产品需求","写需求文档"] },
-  { id:"triage", zh:"Issue 分类", en:"triage", cat:"project", platform:"general", usage:"triage — 帮我分类和管理这些 issues", desc:"通过状态机驱动的 triage 角色对 issues 进行分类和管理，适用于 bug 审查、功能请求评审和 AFK agent 准备工作。", triggers:["triage","issue 管理","bug 分类"] },
-  { id:"planning-with-files", zh:"文件规划", en:"planning-with-files", cat:"project", platform:"general", usage:"plan with files — 用文件做规划", desc:"Manus 风格的文件规划技能：为每个复杂任务创建 task_plan.md、findings.md、progress.md 三个文件，把上下文窗口当 RAM、文件系统当磁盘，实现持久化规划和会话恢复。", triggers:["文件规划","planning","task plan","持久化规划"] },
-  { id:"context-engineering-collection", zh:"上下文工程技能集", en:"context-engineering-collection", cat:"project", platform:"general", usage:"context engineering — 优化 Agent 上下文管理", desc:"Agent 上下文工程综合技能集：覆盖上下文管理、Harness 工程、多 Agent 架构和生产级 Agent 系统。用于构建、优化、评估和调试需要有效上下文管理和可靠运行循环的 Agent 系统。", triggers:["上下文工程","context engineering","Agent 优化","多 Agent"] },
-
-  // ═══════════════════════════ 技能生态 ═══════════════════════════
-  { id:"write-a-skill", zh:"创建技能", en:"write-a-skill", cat:"ecosystem", platform:"general", usage:"write a skill — 帮我创建一个新的 agent 技能", desc:"创建结构正确、支持渐进式披露并带 bundled resources 的新 Agent 技能。", triggers:["创建技能","新技能"] },
-  { id:"find-skills", zh:"发现技能", en:"find-skills", cat:"ecosystem", platform:"general", usage:"find a skill for X — 帮我找有没有能做 X 的技能", desc:"帮助用户发现和安装 Agent 技能，适用于「怎么做到 X」「有没有能做 Y 的技能」等场景。", triggers:["找技能","安装技能"] },
-  { id:"cli-hub-meta-skill", zh:"CLI 工具目录", en:"cli-hub-meta-skill", cat:"ecosystem", platform:"general", usage:"show me CLI tools for X — 查一下有哪些 CLI 工具可用", desc:"发现 agent-native CLI 工具，访问实时目录查找创意工作流、生产力工具、AI 工具等。", triggers:["CLI 工具","工具发现"] },
-  { id:"scaffold-exercises", zh:"练习脚手架", en:"scaffold-exercises", cat:"ecosystem", platform:"general", usage:"scaffold exercises — 帮我搭建练习目录结构", desc:"创建包含 sections、problems、solutions 和 explainers 的练习目录结构，并通过 linting 验证。", triggers:["练习题","scaffold","课程结构"] },
-  { id:"migrate-to-shoehorn", zh:"Shoehorn 迁移", en:"migrate-to-shoehorn", cat:"ecosystem", platform:"general", usage:"migrate to shoehorn — 把测试中的 as 断言迁移到 shoehorn", desc:"将测试文件中的 `as` type assertions 迁移到 @total-typescript/shoehorn 模式。TypeScript 项目专用。", triggers:["shoohorn","as 迁移","测试迁移"] },
-  { id:"setup-matt-pocock-skills", zh:"工程技能初始化", en:"setup-matt-pocock-skills", cat:"ecosystem", platform:"general", usage:"setup agent skills context — 给项目配置 skills 上下文", desc:"在 AGENTS.md/CLAUDE.md 中配置 Agent skills 块，让工程技能获知项目 issue tracker、triage 标签和文档布局。", triggers:["初始化技能","配置 agent"] },
-
-  // ═══════════════════════════ Codex 系统技能 ═══════════════════════════
-  { id:"imagegen", zh:"图像生成", en:"imagegen", cat:"codex-system", platform:"codex", usage:"generate an image of X — 生成一张 X 的图像", desc:"生成或编辑位图图像：照片、插图、纹理、sprites、mockup、透明背景 cutout。适用于需要创建新图像或变换现有图像的场景。", triggers:["生成图片","插图","纹理","mockup"] },
-  { id:"openai-docs", zh:"OpenAI 文档", en:"openai-docs", cat:"codex-system", platform:"codex", usage:"查 OpenAI 文档 — X API 怎么用？", desc:"查询 OpenAI 官方文档，获取最新 API 使用方法、模型选型建议和 prompt 升级指导。", triggers:["OpenAI","API 文档","模型推荐"] },
-  { id:"plugin-creator", zh:"插件创建器", en:"plugin-creator", cat:"codex-system", platform:"codex", usage:"create a Codex plugin — 帮我创建一个插件", desc:"创建和 scaffold Codex 插件目录，含必需的 .codex-plugin/plugin.json、可选目录和 manifest 默认值。", triggers:["创建插件","plugin"] },
-  { id:"skill-creator", zh:"技能创建向导", en:"skill-creator", cat:"codex-system", platform:"codex", usage:"create a skill — 帮我创建一个 Codex 技能", desc:"创建或更新 Codex 技能的指导工具，帮助扩展 Codex 的专业知识、工作流和工具集成能力。", triggers:["创建 Codex 技能","skill creator"] },
-  { id:"skill-installer", zh:"技能安装器", en:"skill-installer", cat:"codex-system", platform:"codex", usage:"install a skill — 从目录安装一个技能", desc:"从精选列表或 GitHub 仓库安装 Codex 技能到 $CODEX_HOME/skills。", triggers:["安装技能","skill install"] },
-  { id:"cli-anything", zh:"CLI-Anything 构建器", en:"cli-anything", cat:"codex-system", platform:"codex", usage:"build a CLI harness for X — 给软件 X 构建命令行接口", desc:"为 GUI 应用或源码仓库构建 CLI harness，支持 Build/Refine/Test/Validate 四种模式，让 Agent 能命令行操控 GUI 软件。", triggers:["CLI harness","GUI 命令行","cli-anything"] },
-
-  // ═══════════════════════════ Codex 插件技能 ═══════════════════════════
-  { id:"documents", zh:"文档处理", en:"documents", cat:"codex-plugins", platform:"codex", usage:"create a Word document — 帮我生成一个 .docx 文件", desc:"创建、编辑、标注 .docx/Word/Google Docs 文档，支持渲染→截图验证→迭代修正的完整工作流。", triggers:["Word","docx","文档"] },
-  { id:"presentations", zh:"演示文稿", en:"presentations", cat:"codex-plugins", platform:"codex", usage:"create a presentation — 帮我做一个 PPT", desc:"创建、编辑、渲染和导出 PPTX 演示文稿（PowerPoint/Google Slides），含 slide deck 完整工作流。", triggers:["PPT","幻灯片","演示"] },
-  { id:"spreadsheets", zh:"电子表格", en:"spreadsheets", cat:"codex-plugins", platform:"codex", usage:"create a spreadsheet — 帮我做一个 Excel 表格", desc:"创建、修改、分析和可视化 .xlsx/.csv 电子表格，支持公式、格式化、图表和 Google Sheets。", triggers:["Excel","表格","CSV"] },
-
-  // ═══════════════════════════ OpenCLI ═══════════════════════════
-  { id:"opencli-usage", zh:"OpenCLI 使用指南", en:"opencli-usage", cat:"opencli", platform:"general", family:"opencli", familyParent:true, familyCount:3, usage:"show me how to use opencli — OpenCLI 怎么用？", desc:"OpenCLI 顶层导航：解释 opencli 能做什么、如何发现 adapter、通用 flag 和输出格式。含 4 项子技能：浏览器驱动、Adapter 编写、自动修复。", triggers:["opencli","opencli 帮助","opencli 能做什么"] },
-  { id:"opencli-adapter-author", zh:"OpenCLI Adapter 编写", en:"opencli-adapter-author", cat:"opencli", platform:"general", usage:"write an opencli adapter for X — 给这个网站写 adapter", desc:"从零为网站编写 OpenCLI adapter：站点侦察→API 发现→endpoint 验证→字段解码→写 adapter→verify，30 分钟闭环。", triggers:["写 adapter","opencli adapter","站点适配"] },
-  { id:"opencli-autofix", zh:"OpenCLI 自动修复", en:"opencli-autofix", cat:"opencli", platform:"general", usage:"fix this opencli command — 这个命令坏了帮我修", desc:"当 opencli 命令因网站 DOM/API/响应格式变化而失败时，自动收集 trace 证据、修复 adapter 并重试。最多 3 轮修复。", triggers:["opencli 报错","adapter 坏了","autofix"] },
-
-  // ═══════════════════════════ 商业工具 ═══════════════════════════
-  { id:"dbs", zh:"商业工具箱", en:"dbs", cat:"business", platform:"general", family:"dbs", familyParent:true, familyCount:21, usage:"/dbs — 帮我看看商业模式问题", desc:"dontbesilent 商业工具箱主入口。根据你的问题自动路由到最合适的诊断工具。含 21 项子技能：商业模式诊断、目标清晰化、执行力诊断、对标分析、内容创作、短视频开头优化、小红书标题公式等。", triggers:["/dbs","/商业","帮我看看"] },
-  { id:"dbs-diagnosis", zh:"商业模式诊断", en:"dbs-diagnosis", cat:"business", platform:"general", usage:"/dbs-diagnosis — 帮我诊断商业模式", desc:"两种诊断模式：问诊（消解你的具体问题）和体检（系统性拆解你的商业模式），用本体论框架找出结构性问题。", triggers:["/问诊","商业模式","诊断业务"] },
-  { id:"dbs-goal", zh:"目标清晰化", en:"dbs-goal", cat:"business", platform:"general", usage:"/dbs-goal — 帮我把目标说清楚", desc:"用维特根斯坦的语言哲学把模糊目标审计成可检查的交付物，解决「我想做个人 IP」「我想变得更…」类模糊愿望。", triggers:["/目标","搞清楚目标","个人 IP"] },
-  { id:"dbs-action", zh:"执行力诊断", en:"dbs-action", cat:"business", platform:"general", usage:"/dbs-action — 为什么我一直在拖延？", desc:"用阿德勒心理学框架诊断「知道该做什么但就是不做」的真正原因，找到执行阻碍的根源。", triggers:["/action","拖延","知道但做不到"] },
-  { id:"dbs-benchmark", zh:"对标分析", en:"dbs-benchmark", cat:"business", platform:"general", usage:"/dbs-benchmark — 帮我找到值得模仿的对标", desc:"用五重过滤法帮你找到值得模仿的对标对象，排除一切关于「我」的噪音，聚焦真正可学的标杆。", triggers:["/对标","找对标","模仿谁"] },
-  { id:"dbs-content", zh:"内容创作诊断", en:"dbs-content", cat:"business", platform:"general", usage:"/dbs-content — 这个选题怎么做成好内容？", desc:"选题通过后，诊断怎么把这个选题做成好内容：结构、角度、表达方式，每一步都有明确的创作指导。", triggers:["/内容诊断","这个内容怎么做","文案"] },
-  { id:"dbs-content-system", zh:"内容结构化系统", en:"dbs-content-system", cat:"business", platform:"general", usage:"/dbs-content-system — 把我的内容搭成可复用的资产", desc:"审计本地内容规模与边界，建立可生长的内容知识工程：素材抽取、主题地图、选题装配稿，把旧内容变成可复用资产。", triggers:["/内容结构化","内容资产","可复用资产"] },
-  { id:"dbs-hook", zh:"短视频开头优化", en:"dbs-hook", cat:"business", platform:"general", usage:"/dbs-hook — 帮我优化短视频开头", desc:"诊断短视频开头的问题并生成优化方案，解决「开头怎么写」「为什么没人看」的困境。", triggers:["/hook","优化开头","开头怎么写"] },
-  { id:"dbs-xhs-title", zh:"小红书标题公式", en:"dbs-xhs-title", cat:"business", platform:"general", usage:"/dbs-xhs-title — 帮我起个小红书标题", desc:"从 75 个验证过的爆款公式中，帮你挑对的、用对的、理解为什么用这个，不只是给标题而是教方法。", triggers:["/小红书标题","标题公式","起标题"] },
-  { id:"dbs-ai-check", zh:"AI 写作检测", en:"dbs-ai-check", cat:"business", platform:"general", usage:"/dbs-ai-check — 帮我看看有没有 AI 味", desc:"扫描文案中的 AI 生成痕迹，输出检测报告。默认只诊断不改，让你了解内容的人工感得分。", triggers:["/AI检测","AI 味","检测 AI 特征"] },
-  { id:"dbs-deconstruct", zh:"概念拆解", en:"dbs-deconstruct", cat:"business", platform:"general", usage:"/dbs-deconstruct — 把这个概念拆到原子级别", desc:"用维特根斯坦 + 奥派经济学的方法，把模糊的商业概念拆到原子级别，搞清楚你真正在说什么。", triggers:["/拆概念","这个词什么意思","概念拆解"] },
-  { id:"dbs-decision", zh:"个人决策系统", en:"dbs-decision", cat:"business", platform:"general", usage:"/dbs-decision — 帮我在这个领域建立决策系统", desc:"把任何一个需要长期跟踪的领域（业务、关系、健康、职业、学习、投资）做成一个本地知识工程：四层结构、来源标签、快照和概念库。", triggers:["/决策系统","决策立案","结果回填","状态画像"] },
-  { id:"dbs-learning", zh:"交互式学习", en:"dbs-learning", cat:"business", platform:"general", usage:"/dbs-learning — 带我学一个课题", desc:"把一个课题拆成连续学习文章，根据你在上一篇中的反馈调整下一篇的深度、角度和节奏，实现适应性学习。", triggers:["/dbs-learn","/交互式学习","继续下一篇"] },
-  { id:"dbs-good-question", zh:"好问题生成器", en:"dbs-good-question", cat:"business", platform:"general", usage:"/dbs-good-question — 帮我把问题说清楚", desc:"把模糊问题改写成 Agent 可推理、可批评、可验证的问题说明书，并判断它能被自动化解决到什么程度。", triggers:["/好问题","/问题说明书","自动化解决"] },
-  { id:"dbs-chatroom", zh:"定向聊天室", en:"dbs-chatroom", cat:"business", platform:"general", usage:"/dbs-chatroom — 开一个多角色对话", desc:"根据话题推荐或接受用户指定的专家，模拟多角色对话，让不同视角碰撞出新的洞见。", triggers:["/定向聊天室","多角色对话"] },
-  { id:"dbs-chatroom-austrian", zh:"奥派聊天室", en:"dbs-chatroom-austrian", cat:"business", platform:"general", usage:"/dbs-chatroom-austrian — 哈耶克 × 米塞斯对话", desc:"哈耶克 × 米塞斯 × Claude 三人对话，从奥派经济学视角讨论你的商业问题，给你不同寻常的思考框架。", triggers:["/chatroom-austrian","/奥派","奥派聊天室"] },
-  { id:"dbs-slowisfast", zh:"慢就是快", en:"dbs-slowisfast", cat:"business", platform:"general", usage:"/dbs-slowisfast — 有没有更慢但更好的方法？", desc:"帮创业者找到看起来更慢但长期更快的方法，用摩擦建造资产，拒绝「快就是好」的思维惯性。", triggers:["/慢就是快","更慢的方法","是不是太快了"] },
-  { id:"dbs-agent-migration", zh:"Agent 工作台迁移", en:"dbs-agent-migration", cat:"business", platform:"general", usage:"/dbs-agent-migration — 统一我的 Agent 工作台", desc:"把任意项目整理成 Claude Code / Codex / Grok 三端一致、可长期维护的 Agent 工作台：审计规则文件、识别真源、统一命名并生成 bridge。", triggers:["/agent迁移","统一 AGENTS.md","整理 skill bridge"] },
-  { id:"dbs-save", zh:"诊断状态存档", en:"dbs-save", cat:"business", platform:"general", usage:"/dbs-save — 保存这次诊断", desc:"把当前诊断的关键状态存到本地，下次回来可以接着用。配合 dbs-restore 实现跨会话的诊断连续性。", triggers:["/存档","保存诊断","记下来"] },
-  { id:"dbs-restore", zh:"诊断状态恢复", en:"dbs-restore", cat:"business", platform:"general", usage:"/dbs-restore — 接着上次的诊断继续", desc:"把上次 dbs-save 保存的诊断状态拉出来，接着用。实现跨会话的诊断工作流。", triggers:["/续上","接着上次","之前的结论"] },
-  { id:"dbs-report", zh:"诊断报告生成", en:"dbs-report", cat:"business", platform:"general", usage:"/dbs-report — 把所有诊断打包成报告", desc:"把多次 dbs-save 攒下来的诊断状态合并成一份可交付的 markdown 报告，适合给合伙人看或存档。", triggers:["/出报告","打包","整理一份"] },
-  { id:"career-ops", zh:"求职指挥中心", en:"career-ops", cat:"business", platform:"general", usage:"/career-ops — AI 求职全流程自动化", desc:"AI 求职指挥中心：评估职位（A-F 评分）、生成 ATS 优化简历 PDF、扫描 45+ 招聘门户、跟踪申请状态、面试准备（STAR+R）。16 种模式覆盖求职全流程，实战评估 740+ 职位。", triggers:["/career-ops","求职","简历","面试准备","ATS"] },
-
-  // ═══════════════════════════ 金融研究 ═══════════════════════════
-  { id:"vibe-trading", zh:"Vibe-Trading 量化研究", en:"vibe-trading", cat:"finance", platform:"general", usage:"vibe-trading — 启动量化研究 / 回测 / 多因子 / 期权 / Alpha Zoo / 影子账户", desc:"专业金融研究工具箱：7 种回测引擎 + 基准对比、多因子分析、Alpha Zoo（452 个预构建 alpha：qlib158/alpha101/gtja191/学术）、期权定价、77 项金融子技能、29 个多 Agent 投研团队、交易日记分析、影子账户（提取→回测→渲染），覆盖 7 大数据源（tushare/yfinance/okx/akshare/mootdx/ccxt/futu）。安装：pip install vibe-trading-ai。", triggers:["回测","因子分析","Alpha Zoo","量化交易","多 Agent 投研","vibe-trading","交易日记","影子账户"] },
-
-  // ═══════════════════════════ MiniMax ═══════════════════════════
-  { id:"minimax-multimodal-toolkit", zh:"MiniMax 多模态工具箱", en:"mmx-cli", cat:"minimax", platform:"general", family:"minimax", familyParent:true, familyCount:13, usage:"mmx — 用 MiniMax 生成文本/图片/视频/语音/音乐", desc:"MiniMax AI 平台统一入口：通过 mmx 命令生成文本、图片、视频、语音和音乐，支持聊天、搜索和 API 资源管理。含 12 项子技能，覆盖移动开发、音乐生成和图像分析。", triggers:["mmx","MiniMax","多模态","生成音乐","生成视频"] },
-  { id:"android-native-dev", zh:"Android 原生开发", en:"android-native-dev", cat:"minimax", platform:"general", usage:"android-native-dev — Material Design 3 / Kotlin Compose", desc:"Android 原生开发指南：Material Design 3、Kotlin/Compose、项目配置、无障碍和构建排错。", triggers:["Android","Kotlin","Compose","Material Design 3"] },
-  { id:"ios-application-dev", zh:"iOS 应用开发", en:"ios-application-dev", cat:"minimax", platform:"general", usage:"ios-application-dev — UIKit / SwiftUI / SnapKit", desc:"iOS 应用开发指南：UIKit、SnapKit、SwiftUI、导航模式、Dynamic Type、Dark Mode、无障碍和 HIG 规范。", triggers:["iOS","SwiftUI","UIKit","Swift","iPhone"] },
-  { id:"flutter-dev", zh:"Flutter 跨平台开发", en:"flutter-dev", cat:"minimax", platform:"general", usage:"flutter-dev — Riverpod / Bloc / GoRouter", desc:"Flutter 跨平台开发：Widget 模式、Riverpod/Bloc 状态管理、GoRouter 导航、性能优化和 DevTools 分析。", triggers:["Flutter","Dart","Riverpod","Bloc","GoRouter"] },
-  { id:"react-native-dev", zh:"React Native 开发", en:"react-native-dev", cat:"minimax", platform:"general", usage:"react-native-dev — Expo / 组件 / 动画 / 导航", desc:"React Native 与 Expo 开发指南：组件、动画、导航、状态管理、表单、网络、性能优化和测试。", triggers:["React Native","Expo","RN","移动端"] },
-  { id:"frontend-dev", zh:"前端全栈开发", en:"frontend-dev", cat:"minimax", platform:"general", usage:"frontend-dev — 高端 UI / 动画 / AI 素材 / 文案", desc:"全栈前端开发：高端 UI 设计、电影级动画、AI 生成素材、营销文案和视觉艺术，构建完整高品质页面。", triggers:["前端","UI 设计","动画","landing page"] },
-  { id:"fullstack-dev", zh:"全栈后端架构", en:"fullstack-dev", cat:"minimax", platform:"general", usage:"fullstack-dev — REST API / CRUD / 实时应用", desc:"全栈后端架构与前后端集成：REST API、CRUD、实时应用、聊天应用搭建。", triggers:["全栈","REST API","后端","CRUD"] },
-  { id:"shader-dev", zh:"GLSL 着色器开发", en:"shader-dev", cat:"minimax", platform:"general", usage:"shader-dev — ray marching / SDF / 流体 / 粒子", desc:"GLSL 着色器技术大全：ray marching、SDF 建模、流体模拟、粒子系统、程序化生成、光照和后处理。", triggers:["GLSL","shader","着色器","ray marching","SDF"] },
-  { id:"minimax-music-gen", zh:"MiniMax 音乐生成", en:"minimax-music-gen", cat:"minimax", platform:"general", usage:"minimax-music-gen — 生成歌曲/纯音乐/翻唱", desc:"AI 音乐生成：歌曲创作、歌词谱曲、纯音乐制作、翻唱和音频制作，支持多种风格。", triggers:["音乐生成","作曲","歌词","翻唱","音频"] },
-  { id:"minimax-music-playlist", zh:"MiniMax 播放列表", en:"minimax-music-playlist", cat:"minimax", platform:"general", usage:"minimax-music-playlist — 按口味生成播放列表", desc:"分析用户音乐品味和生成反馈历史，生成个性化播放列表和推荐。", triggers:["播放列表","音乐推荐","音乐品味"] },
-  { id:"buddy-sings", zh:"AI 宠物唱歌", en:"buddy-sings", cat:"minimax", platform:"general", usage:"buddy-sings — 让我的 AI 宠物唱首歌", desc:"为你的 AI 宠物（/buddy）生成个性化歌曲，支持多语言触发。", triggers:["buddy","宠物唱歌","AI 宠物"] },
-  { id:"gif-sticker-maker", zh:"GIF 表情包制作", en:"gif-sticker-maker", cat:"minimax", platform:"general", usage:"gif-sticker-maker — 照片转 GIF 表情包", desc:"将照片（人物/宠物/物体/Logo）转化为 4 张带字幕的 GIF 动画贴纸，支持 Funko Pop/盲盒风格。", triggers:["GIF","表情包","贴纸","动画头像","盲盒风格"] },
-  { id:"vision-analysis", zh:"MiniMax 图像分析", en:"vision-analysis", cat:"minimax", platform:"general", usage:"vision-analysis — 分析/描述/提取图像信息", desc:"通过 MiniMax 视觉 MCP 工具分析、描述和提取图像信息，支持 jpg/png/gif/webp/bmp/svg。", triggers:["图像分析","看图","视觉","图片描述"] },
-
-  // ═══════════════════════════ Anthropic ═══════════════════════════
-  { id:"anthropic-skills", zh:"Anthropic 官方技能", en:"anthropics/skills", cat:"anthropic", platform:"general", family:"anthropic", familyParent:true, familyCount:15, usage:"npx skills add anthropics/skills@<skill> — 安装 Anthropic 官方技能", desc:"Anthropic 官方技能套件，含 17 项子技能：前端设计、视觉艺术、文档协作、文档套件（DOCX/PDF/PPTX/XLSX）、品牌指南、MCP 服务器构建、主题工厂、Web Artifacts、应用测试、内部沟通、算法艺术、Slack GIF、技能创建等。", triggers:["Anthropic","Claude","官方技能","anthropics"] },
-  { id:"frontend-design", zh:"前端设计", en:"frontend-design", cat:"anthropic", platform:"general", usage:"frontend-design — 构建高品质前端界面", desc:"创建独特的、生产级前端界面，高设计质量。适用于构建网页组件、页面、Artifacts、海报或应用。", triggers:["前端设计","UI","landing page","dashboard"] },
-  { id:"canvas-design", zh:"视觉艺术设计", en:"canvas-design", cat:"anthropic", platform:"general", usage:"canvas-design — 创建视觉艺术/海报", desc:"创建精美的视觉艺术作品（.png/.pdf），适用于海报、艺术品或静态设计。原创设计，不复制已有艺术家风格。", triggers:["海报","视觉设计","艺术","poster","art"] },
-  { id:"algorithmic-art", zh:"算法艺术", en:"algorithmic-art", cat:"anthropic", platform:"general", usage:"algorithmic-art — 用 p5.js 创建生成艺术", desc:"使用 p5.js 创建算法艺术，支持种子随机性和交互式参数探索：流场、粒子系统、生成艺术。", triggers:["生成艺术","算法艺术","p5.js","流场","粒子系统"] },
-  { id:"brand-guidelines", zh:"品牌指南", en:"brand-guidelines", cat:"anthropic", platform:"general", usage:"brand-guidelines — 应用 Anthropic 品牌风格", desc:"将 Anthropic 官方品牌颜色和排版应用到任何需要 Anthropic 外观风格的作品中。", triggers:["品牌色","品牌风格","Anthropic 设计"] },
-  { id:"theme-factory", zh:"主题工厂", en:"theme-factory", cat:"anthropic", platform:"general", usage:"theme-factory — 给作品套上主题样式", desc:"为幻灯片、文档、报告、HTML 页面等作品应用主题样式的工具箱。10 个预设主题（颜色/字体），也可生成新主题。", triggers:["主题","配色","样式","theme"] },
-  { id:"doc-coauthoring", zh:"文档协作", en:"doc-coauthoring", cat:"anthropic", platform:"general", usage:"doc-coauthoring — 协作撰写文档", desc:"引导用户完成结构化文档协作工作流：文档、提案、技术规格、决策文档等。高效传递上下文，减少写作阻力。", triggers:["写文档","协作写作","提案","技术规格"] },
-  { id:"internal-comms", zh:"内部沟通", en:"internal-comms", cat:"anthropic", platform:"general", usage:"internal-comms — 帮我写内部沟通文档", desc:"帮助撰写各类内部沟通文档：状态报告、领导层更新、3 行摘要、团队公告等，使用公司标准格式。", triggers:["内部沟通","状态报告","团队公告","领导更新"] },
-  { id:"pdf", zh:"PDF 文档", en:"pdf", cat:"anthropic", platform:"general", usage:"pdf — 创建/合并/拆分/水印 PDF", desc:"PDF 全能工具：读取提取文本/表格、合并多个 PDF、拆分、旋转、添加水印、创建新 PDF、表单填写。", triggers:["PDF","合并 PDF","拆分 PDF","水印"] },
-  { id:"mcp-builder", zh:"MCP 服务器构建", en:"mcp-builder", cat:"anthropic", platform:"general", usage:"mcp-builder — 构建 MCP 服务器", desc:"创建高质量 MCP（Model Context Protocol）服务器的指南，让 LLM 通过工具与外部服务交互。支持 Python（FastMCP）和 TypeScript。", triggers:["MCP","MCP 服务器","FastMCP","工具集成"] },
-  { id:"claude-api", zh:"Claude API 开发", en:"claude-api", cat:"anthropic", platform:"general", usage:"claude-api — 构建/调试 Claude API 应用", desc:"构建、调试和优化 Claude API / Anthropic SDK 应用，含 prompt caching。处理 Claude 模型版本间迁移。", triggers:["Claude API","Anthropic SDK","prompt caching","模型迁移"] },
-  { id:"web-artifacts-builder", zh:"Web Artifacts 构建", en:"web-artifacts-builder", cat:"anthropic", platform:"general", usage:"web-artifacts-builder — 构建复杂 claude.ai HTML Artifacts", desc:"使用现代前端技术（React、Tailwind CSS、shadcn/ui）构建复杂多组件 claude.ai HTML Artifacts，支持状态管理和路由。", triggers:["Artifacts","claude.ai","React Artifact","shadcn"] },
-  { id:"webapp-testing", zh:"Web 应用测试", en:"webapp-testing", cat:"anthropic", platform:"general", usage:"webapp-testing — 用 Playwright 测试 Web 应用", desc:"使用 Playwright 与本地 Web 应用交互和测试：验证前端功能、调试 UI 行为、截取浏览器截图、查看浏览器日志。", triggers:["Playwright","测试","E2E","浏览器测试","截图"] },
-  { id:"skill-creator-anthropic", zh:"技能创建器", en:"skill-creator", cat:"anthropic", platform:"general", usage:"skill-creator — 创建/优化/评估技能", desc:"创建新技能、修改改进现有技能、测量技能性能。支持从头创建、编辑优化、运行 evals 测试和基准性能分析。", triggers:["创建技能","评估技能","优化技能","skill eval"] },
-  { id:"slack-gif-creator", zh:"Slack GIF 创建", en:"slack-gif-creator", cat:"anthropic", platform:"general", usage:"slack-gif-creator — 为 Slack 创建 GIF 动画", desc:"创建为 Slack 优化的动画 GIF：提供约束条件、验证工具和动画概念，确保 GIF 符合 Slack 尺寸和帧数要求。", triggers:["Slack GIF","动画 GIF","Slack 表情"] },
-
-  // ═══════════════════════════ Vercel Labs ═══════════════════════════
-  { id:"vercel-labs-skills", zh:"Vercel Labs 技能", en:"vercel-labs/agent-skills", cat:"vercel", platform:"general", family:"vercel", familyParent:true, familyCount:9, usage:"npx skills add vercel-labs/agent-skills@<skill> — 安装 Vercel Labs 技能", desc:"Vercel Labs 官方技能套件，含 9 项子技能：React 最佳实践、组合模式、视图过渡、React Native、Vercel 部署与优化、Web 设计规范、写作规范等。", triggers:["Vercel","Vercel Labs","Next.js","部署","React"] },
-  { id:"composition-patterns", zh:"React 组合模式", en:"composition-patterns", cat:"vercel", platform:"general", usage:"composition-patterns — React 组件组合最佳实践", desc:"React 组件组合模式指南：何时使用组合 vs 继承、插槽模式、高阶组件替代方案、关注点分离。", triggers:["组合模式","composition","React 模式","组件设计"] },
-  { id:"deploy-to-vercel", zh:"Vercel 部署", en:"deploy-to-vercel", cat:"vercel", platform:"general", usage:"deploy to vercel — 部署应用到 Vercel", desc:"部署应用和网站到 Vercel：创建预览部署、生产部署、设置自定义域名和环境变量。", triggers:["部署","Vercel 部署","deploy","上线"] },
-  { id:"react-best-practices", zh:"React 最佳实践", en:"react-best-practices", cat:"vercel", platform:"general", usage:"react best practices — React 开发最佳实践", desc:"React 开发最佳实践：性能优化、状态管理、组件架构、服务端组件、Suspense 边界、数据获取模式。", triggers:["React 最佳实践","React 优化","React 架构"] },
-  { id:"react-native-skills", zh:"React Native 技能", en:"react-native-skills", cat:"vercel", platform:"general", usage:"react-native skills — React Native 开发指南", desc:"React Native 开发指南：Expo 集成、原生模块、导航、动画、性能优化和部署。", triggers:["React Native","Expo","RN 开发","移动端"] },
-  { id:"react-view-transitions", zh:"React 视图过渡", en:"react-view-transitions", cat:"vercel", platform:"general", usage:"react view transitions — React 视图过渡动画", desc:"React 视图过渡动画：View Transitions API、页面切换动画、共享元素过渡、路由动画。", triggers:["视图过渡","页面切换","View Transitions","路由动画"] },
-  { id:"vercel-cli-with-tokens", zh:"Vercel CLI Token", en:"vercel-cli-with-tokens", cat:"vercel", platform:"general", usage:"vercel cli with tokens — 用 Token 认证管理 Vercel 项目", desc:"使用 Token 认证管理 Vercel 项目：非交互式部署、环境变量配置、项目关联，适合 CI/CD 流程。", triggers:["Vercel CLI","Token","CI/CD","自动化部署"] },
-  { id:"vercel-optimize", zh:"Vercel 性能优化", en:"vercel-optimize", cat:"vercel", platform:"general", usage:"vercel optimize — 优化 Vercel 项目性能和成本", desc:"Vercel 成本和性能优化：收集指标、分析用量、检查项目配置和代码，针对 Next.js/SvelteKit/Nuxt/Astro 提供具体优化方案。", triggers:["Vercel 优化","性能","成本","Speed Insights"] },
-  { id:"web-design-guidelines", zh:"Web 设计规范", en:"web-design-guidelines", cat:"vercel", platform:"general", usage:"web design guidelines — 审查 UI 是否符合 Web 设计规范", desc:"审查 UI 代码是否符合 Web Interface Guidelines：可访问性、设计一致性、用户体验、响应式布局。", triggers:["设计审查","UI 规范","可访问性","UX 审计"] },
-  { id:"writing-guidelines", zh:"写作规范", en:"writing-guidelines", cat:"vercel", platform:"general", usage:"writing guidelines — 审查文档是否符合写作规范", desc:"审查文档/文案是否符合 Writing Guidelines：语调、风格、清晰度、一致性、技术写作最佳实践。", triggers:["写作审查","文档风格","语调","技术写作"] },
-  // rtk — CLI proxy that reduces LLM token consumption by 60-90%
-  
-  { id:"rtk", zh:"RTK Token 优化", en:"rtk", cat:"ecosystem", platform:"hermes", usage:"rtk ls / rtk git diff / rtk cargo test", desc:"CLI 代理，压缩命令输出减少 LLM token 消耗 60-90%。支持 100+ 命令：ls/tree(80%)、cat/read(70%)、grep/rg(80%)、git status/diff/log/add/commit/push(75-92%)、cargo test/npm test/pytest/go test(90%)、ruff check(80%)、docker ps(80%)。Rust 编写，不到 10ms 开销。已安装在 Ubuntu 环境，供 Hermes Agent 使用。官网 rtk-ai.app", triggers:["token 优化","省 token","压缩","rtk","费用"] },
+// ═══════════════════ 分类定义 ═══════════════════
+const categories = [
+  { id:"01-venice",       label:"Venice AI 平台",     icon:"🌐", desc:"21 项 — Venice API 全平台：聊天、图片、视频、音频、嵌入" },
+  { id:"02-dbs",           label:"dbs 商业工具箱",     icon:"💼", desc:"21 项 — 商业模式诊断、内容创作、执行力分析" },
+  { id:"03-context",       label:"上下文工程",          icon:"🧠", desc:"15 项 — 上下文管理、记忆系统、多 Agent 模式" },
+  { id:"04-writing",       label:"内容创作与写作",      icon:"✍️", desc:"10 项 — 素材挖掘→结构塑形→编辑打磨→风格审查" },
+  { id:"05-frontend",      label:"前端开发",            icon:"🎨", desc:"14 项 — Angular、React Native、Flutter、iOS、Android、UI" },
+  { id:"06-gsap",          label:"GSAP 动画",           icon:"✨", desc:"8 项 — GreenSock 动画库：Core、Timeline、ScrollTrigger" },
+  { id:"07-browser",       label:"浏览器自动化",        icon:"🌍", desc:"8 项 — 浏览器操控、数据提取、自动化测试" },
+  { id:"08-code-quality",  label:"代码质量",            icon:"🔍", desc:"11 项 — 审查、重构、TDD、类型系统、Lint" },
+  { id:"09-backend",       label:"后端 / Node.js",      icon:"⚙️", desc:"6 项 — Node.js、Fastify、OAuth、MCP" },
+  { id:"10-deploy",        label:"部署运维",            icon:"🚀", desc:"4 项 — Vercel 部署、性能优化、Composio" },
+  { id:"11-minimax",       label:"MiniMax 多模态",      icon:"🎵", desc:"3 项 — 文本/图片/视频/音乐生成" },
+  { id:"12-voltagent",     label:"VoltAgent",           icon:"🤖", desc:"4 项 — Agent 框架创建、最佳实践" },
+  { id:"13-opencli",       label:"OpenCLI",             icon:"💻", desc:"3 项 — Agent 驱动网站自动化 CLI" },
+  { id:"14-system",        label:"系统与工作流",        icon:"🏠", desc:"14 项 — Codex 系统技能 + SC 工作流方法" },
+  { id:"15-creative",      label:"创意多媒体",          icon:"🎬", desc:"6 项 — 图片分析、PDF、算法艺术、Shader、GIF" },
+  { id:"16-research",      label:"搜索与研究",          icon:"🔎", desc:"5 项 — 网络搜索、抓取、公司调研" },
+  { id:"17-utility",       label:"通用工具",            icon:"🧰", desc:"12 项 — 职业、教学、项目管理、CLI 开发" },
 ];
 
-// ── Render ──
+// ═══════════════════ 技能数据 — 按分类组织 ═══════════════════
+const skillsByCat = {
+"01-venice": [
+  { zh:"Venice 认证", en:"venice-auth", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-auth\\", usage:"配置 Venice API Key", desc:"Venice API 认证，Bearer Token 配置", tags:["认证","API Key"] },
+  { zh:"Venice API 概览", en:"venice-api-overview", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-api-overview\\", usage:"了解 Venice API 结构", desc:"Venice API 全局地图：base URL、端点概览、速率限制", tags:["API","概览"] },
+  { zh:"Venice API Keys", en:"venice-api-keys", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-api-keys\\", usage:"管理 API Keys", desc:"管理 Venice API Keys：创建、列表、更新、删除", tags:["密钥管理"] },
+  { zh:"Venice 模型", en:"venice-models", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-models\\", usage:"查看可用模型", desc:"查看 Venice 可用模型及其能力、限制、价格", tags:["模型","选型"] },
+  { zh:"Venice 错误处理", en:"venice-errors", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-errors\\", usage:"处理 API 错误", desc:"Venice API 错误码处理指南", tags:["错误","调试"] },
+  { zh:"Venice 计费", en:"venice-billing", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-billing\\", usage:"查询用量和账单", desc:"计费与用量分析", tags:["计费","用量"] },
+  { zh:"Venice Chat", en:"venice-chat", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-chat\\", usage:"POST /chat/completions", desc:"LLM 对话：联网搜索、E2EE、角色、思维控制、流式、缓存", tags:["对话","LLM","Chat"] },
+  { zh:"Venice Responses", en:"venice-responses", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-responses\\", usage:"Alpha Responses API", desc:"新一代 Responses API 对话接口", tags:["Responses","Alpha"] },
+  { zh:"Venice 角色", en:"venice-characters", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-characters\\", usage:"使用预设角色", desc:"发现和使用 Venice 公共角色（预设人格）", tags:["角色","人格"] },
+  { zh:"Venice 嵌入", en:"venice-embeddings", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-embeddings\\", usage:"POST /embeddings", desc:"文本向量化，语义搜索/RAG", tags:["嵌入","Embedding","RAG"] },
+  { zh:"Venice Augment", en:"venice-augment", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-augment\\", usage:"Agent pipeline 增强", desc:"Venice 增强端点，Agent 管道用", tags:["增强","Pipeline"] },
+  { zh:"Venice 图片生成", en:"venice-image-generate", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-image-generate\\", usage:"文生图", desc:"Venice 原生 + OpenAI 兼容双接口文生图", tags:["图片","生成","Image"] },
+  { zh:"Venice 图片编辑", en:"venice-image-edit", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-image-edit\\", usage:"编辑图片", desc:"图片放大、多图合成、背景移除", tags:["编辑","放大","背景"] },
+  { zh:"Venice 视频", en:"venice-video", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-video\\", usage:"生成/转录视频", desc:"视频生成与转录", tags:["视频","生成"] },
+  { zh:"Venice 语音", en:"venice-audio-speech", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-audio-speech\\", usage:"文本转语音", desc:"TTS 语音合成", tags:["TTS","语音"] },
+  { zh:"Venice 音乐", en:"venice-audio-music", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-audio-music\\", usage:"生成音乐", desc:"异步音乐/音轨生成", tags:["音乐","音轨"] },
+  { zh:"Venice 转录", en:"venice-audio-transcription", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-audio-transcription\\", usage:"语音转文本", desc:"音频转录为文本", tags:["转录","语音转文字"] },
+  { zh:"Venice Crypto RPC", en:"venice-crypto-rpc", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-crypto-rpc\\", usage:"区块链 JSON-RPC", desc:"按次付费连接 200+ 区块链", tags:["Web3","区块链"] },
+  { zh:"Venice x402", en:"venice-x402", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\venice-x402\\", usage:"管理 x402 积分", desc:"Venice x402 钱包积分管理", tags:["钱包","积分"] },
+  { zh:"自定义 Venice", en:"my-venice-skill", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\my-venice-skill\\", usage:"自定义场景", desc:"用户自定义 Venice 技能", tags:["自定义"] },
+],
+
+"02-dbs": [
+  { zh:"dbs 主入口", en:"dbs", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs\\", usage:"/dbs — 帮我看看商业模式", desc:"商业工具箱主入口，自动路由到合适的诊断工具", tags:["/dbs","/商业"] },
+  { zh:"商业模式诊断", en:"dbs-diagnosis", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-diagnosis\\", usage:"/dbs-diagnosis — 诊断商业模式", desc:"问诊（消解问题）和体检（拆解商业模式）", tags:["/问诊","诊断"] },
+  { zh:"概念拆解", en:"dbs-deconstruct", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-deconstruct\\", usage:"/dbs-deconstruct — 拆解概念", desc:"维特根斯坦+奥派经济学方法拆解模糊商业概念", tags:["/拆概念"] },
+  { zh:"对标分析", en:"dbs-benchmark", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-benchmark\\", usage:"/dbs-benchmark — 找对标", desc:"五重过滤法找值得模仿的对标", tags:["/对标"] },
+  { zh:"目标清晰化", en:"dbs-goal", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-goal\\", usage:"/dbs-goal — 说清目标", desc:"把模糊目标审计成可检查的交付物", tags:["/目标"] },
+  { zh:"个人决策系统", en:"dbs-decision", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-decision\\", usage:"/dbs-decision — 决策跟踪", desc:"长期跟踪决策领域的因果关系", tags:["/决策"] },
+  { zh:"慢就是快", en:"dbs-slowisfast", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-slowisfast\\", usage:"/dbs-slowisfast — 更慢的方法", desc:"找到值得慢做的环节，用摩擦建造资产", tags:["/慢就是快"] },
+  { zh:"内容创作诊断", en:"dbs-content", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-content\\", usage:"/dbs-content — 内容怎么做", desc:"选题通过后的五维检测", tags:["/内容"] },
+  { zh:"短视频开头优化", en:"dbs-hook", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-hook\\", usage:"/dbs-hook — 优化开头", desc:"诊断开头问题+生成方案", tags:["/hook"] },
+  { zh:"小红书标题公式", en:"dbs-xhs-title", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-xhs-title\\", usage:"/dbs-xhs-title — 起标题", desc:"75 个验证过的爆款公式匹配", tags:["/标题","小红书"] },
+  { zh:"AI 写作检测", en:"dbs-ai-check", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-ai-check\\", usage:"/dbs-ai-check — 检测 AI 味", desc:"扫描文案 AI 痕迹，只诊断不改", tags:["/AI检测"] },
+  { zh:"定向聊天室", en:"dbs-chatroom", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-chatroom\\", usage:"/dbs-chatroom — 多角色对话", desc:"推荐专家进行多角色讨论", tags:["/聊天室"] },
+  { zh:"奥派聊天室", en:"dbs-chatroom-austrian", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-chatroom-austrian\\", usage:"/dbs-chatroom-austrian — 哈耶克对话", desc:"哈耶克×米塞斯×AI 三人对话", tags:["/奥派"] },
+  { zh:"交互式学习", en:"dbs-learning", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-learning\\", usage:"/dbs-learning — 学课题", desc:"课题拆成连续学习文章，根据反馈调整", tags:["/学习"] },
+  { zh:"执行力诊断", en:"dbs-action", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-action\\", usage:"/dbs-action — 为什么拖延", desc:"阿德勒框架找到「知道但不做」的原因", tags:["/action","拖延"] },
+  { zh:"内容结构化", en:"dbs-content-system", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-content-system\\", usage:"/dbs-content-system — 搭系统", desc:"搭可持续创作的内容工作流", tags:["/结构化"] },
+  { zh:"Agent 迁移", en:"dbs-agent-migration", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-agent-migration\\", usage:"/dbs-agent-migration — 迁移项目", desc:"整理项目成 Agent 可用配置", tags:["/迁移"] },
+  { zh:"好问题生成器", en:"dbs-good-question", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-good-question\\", usage:"/dbs-good-question — 改写问题", desc:"把模糊问题改写成 Agent 可推理的问题", tags:["/好问题"] },
+  { zh:"诊断存档", en:"dbs-save", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-save\\", usage:"/dbs-save — 保存诊断", desc:"保存诊断状态到本地", tags:["/存档"] },
+  { zh:"诊断恢复", en:"dbs-restore", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-restore\\", usage:"/dbs-restore — 恢复诊断", desc:"恢复上次诊断状态", tags:["/恢复"] },
+  { zh:"诊断报告", en:"dbs-report", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\dbs-report\\", usage:"/dbs-report — 出报告", desc:"合并多次诊断状态为 Markdown 报告", tags:["/报告"] },
+],
+
+"03-context": [
+  { zh:"上下文基础", en:"context-fundamentals", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\context-fundamentals\\", usage:"学习上下文工程基础", desc:"解释上下文工程的基本概念与原理", tags:["上下文","基础"] },
+  { zh:"上下文压缩", en:"context-compression", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\context-compression\\", usage:"压缩 Agent 上下文", desc:"长时间运行 Agent 的上下文压缩策略", tags:["压缩","优化"] },
+  { zh:"上下文降级诊断", en:"context-degradation", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\context-degradation\\", usage:"诊断上下文质量", desc:"诊断和缓解上下文质量下降", tags:["降级","诊断"] },
+  { zh:"上下文优化", en:"context-optimization", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\context-optimization\\", usage:"优化上下文效率", desc:"改进上下文的整体质量与效率", tags:["优化","效率"] },
+  { zh:"记忆系统", en:"memory-systems", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\memory-systems\\", usage:"设计 Agent 记忆", desc:"持久化语义记忆系统设计与实现", tags:["记忆","持久化"] },
+  { zh:"文件系统上下文", en:"filesystem-context", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\filesystem-context\\", usage:"用文件做上下文", desc:"文件系统作为 Agent 的上下文存储", tags:["文件","存储"] },
+  { zh:"多 Agent 模式", en:"multi-agent-patterns", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\multi-agent-patterns\\", usage:"多 Agent 设计", desc:"多 Agent 系统的设计模式", tags:["多Agent","模式"] },
+  { zh:"Harness 工程", en:"harness-engineering", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\harness-engineering\\", usage:"构建 Agent 测试", desc:"自主 Agent 测试框架设计", tags:["测试","框架"] },
+  { zh:"托管 Agent", en:"hosted-agents", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\hosted-agents\\", usage:"部署生产 Agent", desc:"托管式 Agent 的设计与运营", tags:["托管","部署"] },
+  { zh:"项目开发", en:"project-development", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\project-development\\", usage:"Agent 项目决策", desc:"项目级别的 Agent 开发决策", tags:["项目","决策"] },
+  { zh:"工具设计", en:"tool-design", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\tool-design\\", usage:"设计 Agent 工具", desc:"Agent 工具接口层设计原则", tags:["工具","接口"] },
+  { zh:"评估框架", en:"evaluation", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\evaluation\\", usage:"构建评估系统", desc:"Agent 评估框架的构建", tags:["评估","框架"] },
+  { zh:"BDI 心理状态", en:"bdi-mental-states", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\bdi-mental-states\\", usage:"建模 Agent 行为", desc:"用 BDI 模型建模 Agent 心理状态", tags:["BDI","建模"] },
+  { zh:"潜在简报", en:"latent-briefing", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\latent-briefing\\", usage:"提取对话简报", desc:"从对话中提取潜在简报", tags:["简报","提取"] },
+  { zh:"推理轨迹优化", en:"reasoning-trace-optimizer", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\reasoning-trace-optimizer\\", usage:"调试 Agent 推理", desc:"通过分析推理轨迹优化 Agent", tags:["推理","调试"] },
+],
+
+"04-writing": [
+  { zh:"素材挖掘", en:"writing-fragments", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\writing-fragments\\", usage:"挖掘写作素材", desc:"通过对话深入挖掘写作碎片", tags:["素材","挖掘"] },
+  { zh:"结构塑形", en:"writing-shape", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\writing-shape\\", usage:"整理文章结构", desc:"把原始素材整理成有结构的文章", tags:["结构","整理"] },
+  { zh:"节奏设计", en:"writing-beats", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\writing-beats\\", usage:"设计文章节奏", desc:"将文章塑造成叙事节拍序列", tags:["节奏","叙事"] },
+  { zh:"编辑打磨", en:"edit-article", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\edit-article\\", usage:"润色文章", desc:"重构段落、优化表达、提升可读性", tags:["润色","编辑"] },
+  { zh:"风格审查", en:"writing-guidelines", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\writing-guidelines\\", usage:"审查文案风格", desc:"按 Writing Guidelines 标准审查文案", tags:["审查","规范"] },
+  { zh:"技术文档", en:"documentation", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\documentation\\", usage:"写技术文档", desc:"技术文档的创建、结构化与审查", tags:["文档","技术"] },
+  { zh:"文档协作", en:"doc-coauthoring", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\doc-coauthoring\\", usage:"协作写文档", desc:"结构化协同写作工作流", tags:["协作","写作"] },
+  { zh:"内部沟通", en:"internal-comms", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\internal-comms\\", usage:"写内部通知", desc:"邮件、公告、备忘录等内部文案", tags:["邮件","公告"] },
+  { zh:"长篇小说", en:"inkos", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\inkos\\", usage:"写长篇小说", desc:"自主长篇小说创作 Agent，带 Web 搜索", tags:["小说","创作"] },
+],
+
+"05-frontend": [
+  { zh:"前端设计", en:"frontend-design", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\frontend-design\\", usage:"构建前端界面", desc:"独特的、生产级前端设计", tags:["UI","设计"] },
+  { zh:"前端全栈", en:"frontend-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\frontend-dev\\", usage:"前端全栈开发", desc:"高端 UI + 电影级动画 + AI 素材 + 营销文案", tags:["前端","全栈"] },
+  { zh:"界面设计探索", en:"design-an-interface", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\design-an-interface\\", usage:"探索 UI 方案", desc:"生成多种截然不同的界面设计方案", tags:["UI","探索"] },
+  { zh:"Web 设计规范", en:"web-design-guidelines", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\web-design-guidelines\\", usage:"审查 UI 规范", desc:"按 Web Interface Guidelines 审查 UI", tags:["审查","规范"] },
+  { zh:"品牌指南", en:"brand-guidelines", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\brand-guidelines\\", usage:"应用品牌色", desc:"Anthropic 官方品牌颜色和排版", tags:["品牌","颜色"] },
+  { zh:"Canvas 设计", en:"canvas-design", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\canvas-design\\", usage:"视觉艺术设计", desc:"创建精美的 PNG/PDF 视觉设计", tags:["海报","艺术"] },
+  { zh:"主题工厂", en:"theme-factory", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\theme-factory\\", usage:"套用主题样式", desc:"14 个预设主题，也可生成新主题", tags:["主题","配色"] },
+  { zh:"快速原型", en:"prototype", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\prototype\\", usage:"快速搭建原型", desc:"可丢弃的原型验证设计", tags:["原型","验证"] },
+  { zh:"Angular 开发", en:"angular-developer", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\angular-developer\\", usage:"Angular 开发", desc:"Angular 代码生成与架构指导", tags:["Angular"] },
+  { zh:"Angular 新建", en:"angular-new-app", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\angular-new-app\\", usage:"新建 Angular 项目", desc:"Angular CLI 创建新应用", tags:["Angular","CLI"] },
+  { zh:"React Native", en:"react-native-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\react-native-dev\\", usage:"React Native 开发", desc:"Expo + React Native 跨平台开发", tags:["React Native","Expo"] },
+  { zh:"Flutter", en:"flutter-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\flutter-dev\\", usage:"Flutter 开发", desc:"Flutter 跨平台开发", tags:["Flutter","Dart"] },
+  { zh:"iOS 开发", en:"ios-application-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\ios-application-dev\\", usage:"iOS 原生开发", desc:"UIKit、SwiftUI 开发指南", tags:["iOS","Swift"] },
+  { zh:"Android 开发", en:"android-native-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\android-native-dev\\", usage:"Android 原生开发", desc:"Material Design 3、Kotlin Compose", tags:["Android","Kotlin"] },
+  { zh:"Web Artifacts", en:"web-artifacts-builder", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\web-artifacts-builder\\", usage:"构建复杂组件", desc:"React + Tailwind + shadcn/ui 多组件构建", tags:["Artifacts","React"] },
+  { zh:"全栈开发", en:"fullstack-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\fullstack-dev\\", usage:"全栈项目开发", desc:"后端架构 + 前后端集成", tags:["全栈","REST"] },
+],
+
+"06-gsap": [
+  { zh:"GSAP 核心", en:"gsap-core", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-core\\", usage:"gsap.to/from/fromTo", desc:"GSAP 核心 API：缓动、stagger、matchMedia", tags:["GSAP","tween"] },
+  { zh:"GSAP 时间线", en:"gsap-timeline", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-timeline\\", usage:"timeline() 动画序列", desc:"编排复杂动画序列", tags:["timeline","序列"] },
+  { zh:"GSAP 滚动触发", en:"gsap-scrolltrigger", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-scrolltrigger\\", usage:"滚动驱动动画", desc:"ScrollTrigger：pin、scrub、视差", tags:["ScrollTrigger","滚动"] },
+  { zh:"GSAP 插件", en:"gsap-plugins", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-plugins\\", usage:"Flip、Draggable 等", desc:"GSAP 插件集：ScrollTo、Flip、Draggable、SplitText", tags:["插件","Flip"] },
+  { zh:"GSAP React", en:"gsap-react", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-react\\", usage:"useGSAP hook", desc:"React/Next.js 中 GSAP 最佳实践", tags:["React","useGSAP"] },
+  { zh:"GSAP 框架", en:"gsap-frameworks", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-frameworks\\", usage:"Vue/Svelte 集成", desc:"Vue/Nuxt/Svelte 中 GSAP 生命周期", tags:["Vue","Svelte"] },
+  { zh:"GSAP 性能", en:"gsap-performance", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-performance\\", usage:"动画性能优化", desc:"优先 transforms、避免 layout thrashing", tags:["性能","60fps"] },
+  { zh:"GSAP 工具", en:"gsap-utils", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gsap-utils\\", usage:"clamp/mapRange 等", desc:"clamp、mapRange、random、snap 等辅助函数", tags:["utils","工具"] },
+],
+
+"07-browser": [
+  { zh:"浏览器自动化", en:"browser", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\browser\\", usage:"自然语言操控浏览器", desc:"导航、截图、填表、点击等操作", tags:["浏览器","自动化"] },
+  { zh:"安全浏览器", en:"safe-browser", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\safe-browser\\", usage:"本地沙箱浏览器", desc:"受限的本地浏览器 Agent", tags:["安全","沙箱"] },
+  { zh:"Browser to API", en:"browser-to-api", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\browser-to-api\\", usage:"网站 HTTP → API", desc:"将网站流量转为可调用 API", tags:["API","HTTP"] },
+  { zh:"Browser Trace", en:"browser-trace", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\browser-trace\\", usage:"DevTools trace", desc:"捕获完整 DevTools Protocol trace", tags:["trace","DevTools"] },
+  { zh:"Browserbase CLI", en:"browserbase-cli", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\browserbase-cli\\", usage:"远程浏览器", desc:"Browserbase 远程浏览器会话管理", tags:["Browserbase","远程"] },
+  { zh:"Cookie 同步", en:"cookie-sync", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\cookie-sync\\", usage:"同步 Cookie", desc:"本地 Chrome Cookie → Browserbase", tags:["Cookie","同步"] },
+  { zh:"UI 对抗测试", en:"ui-test", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\ui-test\\", usage:"AI 驱动 UI 测试", desc:"对抗性 UI 测试", tags:["测试","UI"] },
+  { zh:"Web 应用测试", en:"webapp-testing", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\webapp-testing\\", usage:"Playwright 测试", desc:"本地 Web 应用的交互测试", tags:["Playwright","E2E"] },
+],
+
+"08-code-quality": [
+  { zh:"代码审查", en:"review", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\review\\", usage:"/review — 审查代码", desc:"双轴审查：Standards（规范）+ Spec（需求）", tags:["审查","review"] },
+  { zh:"架构改进", en:"improve-codebase-architecture", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\improve-codebase-architecture\\", usage:"优化架构", desc:"发现代码库深层优化机会", tags:["架构","重构"] },
+  { zh:"重构计划", en:"request-refactor-plan", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\request-refactor-plan\\", usage:"制定重构计划", desc:"详细的、可小步提交的重构计划", tags:["重构","计划"] },
+  { zh:"TDD", en:"tdd", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\tdd\\", usage:"TDD 开发", desc:"红-绿-重构循环的测试驱动开发", tags:["TDD","测试"] },
+  { zh:"Rust TDD", en:"tdd-rust", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\tdd-rust\\", usage:"Rust TDD", desc:"RTK filter 的 TDD 专用工作流", tags:["Rust","TDD"] },
+  { zh:"TypeScript 类型", en:"typescript-magician", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\typescript-magician\\", usage:"TS 类型设计", desc:"复杂泛型设计、any 类型重构", tags:["TS","类型"] },
+  { zh:"ESLint 配置", en:"linting-neostandard-eslint9", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\linting-neostandard-eslint9\\", usage:"配置 ESLint", desc:"ESLint v9 flat config + neostandard", tags:["ESLint","lint"] },
+  { zh:"Pre-commit", en:"setup-pre-commit", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\setup-pre-commit\\", usage:"配置 Git hooks", desc:"Husky + lint-staged 提交前检查", tags:["husky","hooks"] },
+  { zh:"Git 安全护栏", en:"git-guardrails-claude-code", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\git-guardrails-claude-code\\", usage:"阻止危险 git 操作", desc:"拦截 push、reset --hard 等操作", tags:["git","安全"] },
+  { zh:"通用语言", en:"ubiquitous-language", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\ubiquitous-language\\", usage:"提取 DDD 术语", desc:"DDD 风格通用语言词汇表", tags:["DDD","术语"] },
+  { zh:"Rust 简化", en:"code-simplifier", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\code-simplifier\\", usage:"简化 Rust 代码", desc:"RTK Rust 代码的惯用简化审查", tags:["Rust","简化"] },
+],
+
+"09-backend": [
+  { zh:"Node.js", en:"node", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\node\\", usage:"Node.js 开发", desc:"Node.js 领域最佳实践指南", tags:["Node.js"] },
+  { zh:"Node.js Core", en:"nodejs-core", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\nodejs-core\\", usage:"V8 性能调试", desc:"原生模块崩溃调试、V8 性能优化", tags:["V8","调试"] },
+  { zh:"Fastify", en:"fastify-best-practices", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\fastify-best-practices\\", usage:"Fastify 开发", desc:"Fastify 后端服务开发指导", tags:["Fastify"] },
+  { zh:"OAuth", en:"oauth", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\oauth\\", usage:"OAuth 集成", desc:"OAuth 2.0/2.1 授权流程实现", tags:["OAuth","认证"] },
+  { zh:"MCP Builder", en:"mcp-builder", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\mcp-builder\\", usage:"构建 MCP 服务器", desc:"MCP 服务器构建指南（Python/TS）", tags:["MCP","服务器"] },
+  { zh:"Serverless 函数", en:"functions", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\functions\\", usage:"部署云函数", desc:"Serverless 浏览器自动化云函数", tags:["Serverless","函数"] },
+],
+
+"10-deploy": [
+  { zh:"Vercel 部署", en:"deploy-to-vercel", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\deploy-to-vercel\\", usage:"部署到 Vercel", desc:"应用/网站部署到 Vercel", tags:["Vercel","部署"] },
+  { zh:"Vercel CLI Token", en:"vercel-cli-with-tokens", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\vercel-cli-with-tokens\\", usage:"Token 认证部署", desc:"非交互式部署，适合 CI/CD", tags:["Vercel","Token"] },
+  { zh:"Vercel 优化", en:"vercel-optimize", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\vercel-optimize\\", usage:"优化性能和成本", desc:"Vercel 成本和性能优化", tags:["优化","性能"] },
+  { zh:"Composio", en:"composio", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\composio\\", usage:"连接外部应用", desc:"1000+ 外部应用集成（GitHub/Slack/Gmail）", tags:["集成","外部"] },
+],
+
+"11-minimax": [
+  { zh:"MiniMax 工具箱", en:"mmx-cli", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\minimax-multimodal-toolkit\\", usage:"mmx 命令生成多媒体", desc:"文本/图片/视频/语音/音乐统一生成", tags:["mmx","MiniMax"] },
+  { zh:"MiniMax 音乐", en:"minimax-music-gen", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\minimax-music-gen\\", usage:"生成音乐/歌曲", desc:"AI 音乐生成：作曲、歌词、翻唱", tags:["音乐","作曲"] },
+  { zh:"MiniMax 播放列表", en:"minimax-music-playlist", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\minimax-music-playlist\\", usage:"生成播放列表", desc:"分析品味生成个性化播放列表", tags:["播放列表"] },
+],
+
+"12-voltagent": [
+  { zh:"创建 VoltAgent", en:"create-voltagent", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\create-voltagent\\", usage:"新建 Agent 项目", desc:"使用 VoltAgent 框架创建项目", tags:["VoltAgent","创建"] },
+  { zh:"VoltAgent 最佳实践", en:"voltagent-best-practices", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\voltagent-best-practices\\", usage:"架构指导", desc:"VoltAgent 架构模式和约定", tags:["架构","模式"] },
+  { zh:"VoltAgent 文档", en:"voltagent-docs-bundle", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\voltagent-docs-bundle\\", usage:"查阅文档", desc:"查询嵌入 npm 包的 VoltAgent 文档", tags:["文档","npm"] },
+  { zh:"开发者体验审计", en:"agent-experience", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\agent-experience\\", usage:"审计 DX", desc:"审计 SDK/API 的开发者体验", tags:["DX","审计"] },
+],
+
+"13-opencli": [
+  { zh:"OpenCLI 使用指南", en:"opencli-usage", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\opencli-usage\\", usage:"opencli 怎么用", desc:"OpenCLI 顶层导航：基础用法和约定", tags:["opencli","CLI"] },
+  { zh:"Adapter 编写", en:"opencli-adapter-author", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\opencli-adapter-author\\", usage:"给网站写 adapter", desc:"新网站 OpenCLI 适配器开发", tags:["adapter","编写"] },
+  { zh:"Adapter 自动修复", en:"opencli-autofix", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\opencli-autofix\\", usage:"修复损坏的 adapter", desc:"自动收集 trace 证据、修复并重试", tags:["修复","autofix"] },
+],
+
+"14-system": [
+  { zh:"头脑风暴", en:"sc-brainstorm", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-brainstorm\\", usage:"激活头脑风暴", desc:"协作探索创意的发散思维模式", tags:["brainstorm","创意"] },
+  { zh:"信心检查", en:"sc-confidence-check", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-confidence-check\\", usage:"决策前评估", desc:"实施前信心评估（≥90% 才执行）", tags:["评估","决策"] },
+  { zh:"深度研究", en:"sc-deep-research", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-deep-research\\", usage:"系统性调研", desc:"多轮验证的深度研究模式", tags:["研究","调研"] },
+  { zh:"项目管理", en:"sc-pm", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-pm\\", usage:"PDCA 项目管理", desc:"PDCA 循环 + 信心检查", tags:["PDCA","管理"] },
+  { zh:"故障排查", en:"sc-troubleshoot", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-troubleshoot\\", usage:"系统排查", desc:"系统性故障排查 + 根因分析", tags:["排查","根因"] },
+  { zh:"Token 优化", en:"sc-token-efficiency", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\sc-token-efficiency\\", usage:"节省 Token", desc:"超压缩输出模式", tags:["Token","节省"] },
+  { zh:"图像生成", en:"imagegen", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\.system\\imagegen\\", usage:"生成/编辑图片", desc:"位图图像生成与编辑", tags:["图片","生成"] },
+  { zh:"OpenAI 文档", en:"openai-docs", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\.system\\openai-docs\\", usage:"查 OpenAI 文档", desc:"查询 OpenAI 官方文档和 API", tags:["OpenAI","文档"] },
+  { zh:"插件创建", en:"plugin-creator", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\.system\\plugin-creator\\", usage:"创建 Codex 插件", desc:"搭建 Codex 插件目录结构", tags:["插件","创建"] },
+  { zh:"技能创建", en:"skill-creator", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\.system\\skill-creator\\", usage:"创建技能", desc:"创建或更新 Codex 技能", tags:["技能","创建"] },
+  { zh:"技能安装", en:"skill-installer", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\.system\\skill-installer\\", usage:"安装技能", desc:"从精选列表安装 Codex 技能", tags:["安装"] },
+  { zh:"CLI-Anything", en:"cli-anything", scope:"global", path:"C:\Users\hujiangtao\.codex\skills\cli-anything\\", usage:"构建 CLI harness", desc:"为 GUI 软件或源码构建命令行接口", tags:["CLI","harness"] },
+  { zh:"文档处理", en:"documents", scope:"global", path:"C:\Users\hujiangtao\.codex\plugins\documents\\", usage:"创建 Word 文档", desc:"创建、编辑 .docx/Google Docs 文档", tags:["Word","docx"] },
+  { zh:"演示文稿", en:"presentations", scope:"global", path:"C:\Users\hujiangtao\.codex\plugins\presentations\\", usage:"创建 PPT", desc:"创建、编辑和导出 PPTX 演示文稿", tags:["PPT","幻灯片"] },
+  { zh:"电子表格", en:"spreadsheets", scope:"global", path:"C:\Users\hujiangtao\.codex\plugins\spreadsheets\\", usage:"创建 Excel", desc:"创建、修改 .xlsx/.csv 电子表格", tags:["Excel","表格"] },
+],
+
+"15-creative": [
+  { zh:"图像分析", en:"vision-analysis", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\vision-analysis\\", usage:"分析图片内容", desc:"分析、描述和提取图片中的信息", tags:["图片","分析"] },
+  { zh:"PDF 处理", en:"pdf", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\pdf\\", usage:"操作 PDF 文件", desc:"创建、合并、拆分、水印 PDF", tags:["PDF","文档"] },
+  { zh:"算法艺术", en:"algorithmic-art", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\algorithmic-art\\", usage:"生成艺术 p5.js", desc:"流场、粒子系统等生成艺术", tags:["p5.js","艺术"] },
+  { zh:"Shader 开发", en:"shader-dev", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\shader-dev\\", usage:"GLSL 着色器", desc:"ray marching、SDF、流体、粒子", tags:["GLSL","shader"] },
+  { zh:"GIF 贴纸", en:"gif-sticker-maker", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\gif-sticker-maker\\", usage:"照片转 GIF 贴纸", desc:"人物/宠物/物体转 GIF 动画贴纸", tags:["GIF","贴纸"] },
+  { zh:"Slack GIF", en:"slack-gif-creator", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\slack-gif-creator\\", usage:"制作 Slack GIF", desc:"符合 Slack 规范的动画 GIF", tags:["Slack","GIF"] },
+],
+
+"16-research": [
+  { zh:"网络搜索", en:"search", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\search\\", usage:"搜索网络信息", desc:"通过网络搜索引擎查询信息", tags:["搜索","查询"] },
+  { zh:"内容抓取", en:"fetch", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\fetch\\", usage:"获取 URL 内容", desc:"获取指定 URL 的网页内容", tags:["抓取","URL"] },
+  { zh:"公司调研", en:"company-research", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\company-research\\", usage:"调研公司", desc:"公司发现与深度研究", tags:["公司","调研"] },
+  { zh:"活动挖掘", en:"event-prospecting", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\event-prospecting\\", usage:"发现行业活动", desc:"会议/活动信息挖掘", tags:["活动","会议"] },
+  { zh:"综合研究", en:"comprehensive-research-agent", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\comprehensive-research-agent\\", usage:"系统研究", desc:"多轮验证 + 错误恢复的深度研究", tags:["研究","验证"] },
+],
+
+"17-utility": [
+  { zh:"超压缩通信", en:"caveman", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\caveman\\", usage:"caveman 模式", desc:"极简通信模式，token 消耗降低约 75%", tags:["Token","压缩"] },
+  { zh:"对话交接", en:"handoff", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\handoff\\", usage:"交谈接文档", desc:"将对话压缩为结构化交接文档", tags:["交接","handoff"] },
+  { zh:"高层视角", en:"zoom-out", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\zoom-out\\", usage:"全局视角", desc:"跳出当前代码段看整体架构", tags:["视角","全局"] },
+  { zh:"诊断", en:"diagnose", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\diagnose\\", usage:"诊断 bug", desc:"纪律化诊断：复现→假设→修复→回归", tags:["bug","诊断"] },
+  { zh:"初始化", en:"init", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\init\\", usage:"初始化项目", desc:"创建/更新 AGENTS.md 项目规范", tags:["init","初始化"] },
+  { zh:"教学", en:"teach", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\teach\\", usage:"教学/学习", desc:"将知识转化为可学习课程", tags:["教学","学习"] },
+  { zh:"文件规划", en:"planning-with-files", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\planning-with-files\\", usage:"文件式规划", desc:"Manus 风格：task_plan + findings + progress", tags:["规划","文件"] },
+  { zh:"发现技能", en:"find-skills", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\find-skills\\", usage:"找技能", desc:"发现和安装 Agent 技能", tags:["技能","发现"] },
+  { zh:"创建技能", en:"write-a-skill", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\write-a-skill\\", usage:"创建新技能", desc:"创建结构正确的 Agent 技能", tags:["创建","技能"] },
+  { zh:"技能优化", en:"skill-optimizer", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\skill-optimizer\\", usage:"优化技能", desc:"优化技能的激活、清晰度和可用性", tags:["优化","技能"] },
+  { zh:"任务拆解", en:"to-issues", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\to-issues\\", usage:"拆解任务", desc:"plan/spec/PRD 拆解为独立 Issues", tags:["issues","拆解"] },
+  { zh:"生成 PRD", en:"to-prd", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\to-prd\\", usage:"写 PRD", desc:"将对话转化为结构化 PRD 文档", tags:["PRD","需求"] },
+  { zh:"Issue 分类", en:"triage", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\triage\\", usage:"分类 Issues", desc:"状态机驱动 Issue 分诊流程", tags:["triage","issue"] },
+  { zh:"交互 QA", en:"qa", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\qa\\", usage:"报告 Bug", desc:"交互式 QA 会话：报告 bug 或问题", tags:["QA","bug"] },
+  { zh:"设计追问", en:"grill-me", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\grill-me\\", usage:"追问方案", desc:"围绕 plan/design 持续追问到底", tags:["追问","评审"] },
+  { zh:"文档化追问", en:"grill-with-docs", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\grill-with-docs\\", usage:"结合文档评审", desc:"结合 CONTEXT.md + ADR 追问方案", tags:["评审","ADR"] },
+  { zh:"求职指挥中心", en:"career-ops", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\career-ops\\", usage:"AI 求职全流程", desc:"评估 Offer、简历、面试准备（STAR+R）", tags:["求职","简历"] },
+  { zh:"CLI 工具目录", en:"cli-hub-meta-skill", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\cli-hub-meta-skill\\", usage:"发现 CLI 工具", desc:"发现 agent-native CLI 工具", tags:["CLI","工具"] },
+  { zh:"Obsidian 笔记", en:"obsidian-vault", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\obsidian-vault\\", usage:"管理 Obsidian", desc:"搜索、创建和管理 Obsidian 笔记", tags:["Obsidian","笔记"] },
+  { zh:"代码截图", en:"snipgrapher", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\snipgrapher\\", usage:"生成代码截图", desc:"配置 snipgrapher 生成精美代码截图", tags:["截图","代码"] },
+  { zh:"工程技能初始化", en:"setup-matt-pocock-skills", scope:"global", path:"C:\Users\hujiangtao\.agents\skills\setup-matt-pocock-skills\\", usage:"配置技能上下文", desc:"在 AGENTS.md 中配置 issue tracker/triage/文档", tags:["初始化","配置"] },
+  { zh:"练习脚手架", en:"scaffold-exercises", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\scaffold-exercises\\", usage:"搭建练习结构", desc:"创建带章节的练习目录结构", tags:["练习","结构"] },
+  { zh:"Octocat", en:"octocat", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\octocat\\", usage:"Octocat 趣味", desc:"GitHub Octocat 相关", tags:["GitHub","octocat"] },
+  { zh:"Buddy Sings", en:"buddy-sings", scope:"project", path:"D:\\github-personal-website\\skills-reference\\01-venice-api\\skills\\buddy-sings\\", usage:"AI 宠物唱歌", desc:"为 AI 宠物生成歌曲", tags:["buddy","宠物"] },
+],
+};
+
+// ═══════════════════ Rendering ═══════════════════
 const container = document.getElementById('skills-container');
 const searchInput = document.getElementById('search');
 const statsEl = document.getElementById('stats');
-const totalCountEl = document.getElementById('total-count');
 const toast = document.getElementById('toast');
 
-const categoryMeta = {
-  communication:  { label: "通信协作",   color: "var(--green)" },
-  diagnosis:      { label: "调试诊断",   color: "var(--red)" },
-  design:         { label: "设计规划",   color: "var(--purple)" },
-  engineering:    { label: "工程开发",   color: "var(--yellow)" },
-  project:        { label: "项目管理",   color: "var(--accent)" },
-  ecosystem:      { label: "技能生态",   color: "var(--text-dim)" },
-  "codex-system": { label: "Codex 系统", color: "var(--codex-text)" },
-  "codex-plugins":{ label: "Codex 插件", color: "#d2a8ff" },
-  opencli:        { label: "OpenCLI",        color: "#ffa657" },
-  business:       { label: "商业工具",      color: "#f0883e" },
-  finance:        { label: "金融研究",      color: "#56d4dd" },
-  minimax:        { label: "MiniMax",      color: "#f77878" },
-  anthropic:      { label: "Anthropic",    color: "#d4a574" },
-  vercel:         { label: "Vercel Labs",  color: "#888" },
-};
+let activeCat = null; // null = show all categories collapsed
+let activeScope = 'all';
 
-const platformLabels = {
-  codex: "Codex",
-  general: "通用",
-  claude: "Claude Code",
-  hermes: "Hermes"
-};
-
-const siteNames = {
-  "36kr":"36氪","12306":"12306","1688":"1688","aibase":"AIbase","baidu-scholar":"百度学术",
-  "bilibili":"B站","boss":"Boss直聘","chaoxing":"超星","cnki":"知网","ctrip":"携程",
-  "dianping":"大众点评","douban":"豆瓣","doubao":"豆包","doubao-app":"豆包桌面","douyin":"抖音",
-  "eastmoney":"东方财富","flomo":"flomo","gitee":"Gitee","hupu":"虎扑","jd":"京东",
-  "jianyu":"简悦","jike":"即刻","jimeng":"即梦","ke":"可颂","maimai":"脉脉","mubu":"幕布",
-  "nowcoder":"牛客","ones":"ONES","powerchina":"中国电建","quark":"夸克","rednote":"小红书",
-  "sinablog":"新浪博客","sinafinance":"新浪财经","smzdm":"什么值得买","taobao":"淘宝",
-  "tdx":"通达信","ths":"同花顺","tieba":"贴吧","toutiao":"今日头条","uisdc":"优设",
-  "v2ex":"V2EX","wanfang":"万方","weibo":"微博","weixin":"微信","weread":"微信读书",
-  "weread-official":"微信读书官版","xianyu":"闲鱼","xiaoe":"小鹅通","xiaohongshu":"小红书",
-  "xiaoyuzhou":"小宇宙","xueqiu":"雪球","youdao":"有道","yuanbao":"元宝","zhihu":"知乎",
-  "zsxq":"知识星球","51job":"51job","linux-do":"Linux DO","deepseek":"DeepSeek",
-  "qwen":"通义千问","codex":"Codex"
-};
-
-const siteUrls = {
-  "36kr":"https://36kr.com","12306":"https://kyfw.12306.cn","1688":"https://www.1688.com",
-  "1point3acres":"https://www.1point3acres.com","51job":"https://www.51job.com",
-  "aibase":"https://www.aibase.com","amazon":"https://www.amazon.com","antigravity":"https://antigravity.google",
-  "apple-podcasts":"https://podcasts.apple.com","arxiv":"https://arxiv.org",
-  "baidu-scholar":"https://xueshu.baidu.com","band":"https://band.us","barchart":"https://www.barchart.com",
-  "bbc":"https://www.bbc.com","bilibili":"https://www.bilibili.com","binance":"https://www.binance.com",
-  "bloomberg":"https://www.bloomberg.com","bluesky":"https://bsky.app","booking":"https://www.booking.com",
-  "boss":"https://www.zhipin.com","brave":"https://search.brave.com","chaoxing":"https://www.chaoxing.com",
-  "chatgpt":"https://chatgpt.com","chatgpt-app":"https://chatgpt.com","chatwise":"https://chatwise.app",
-  "chess":"https://www.chess.com","claude":"https://claude.ai","cnki":"https://www.cnki.net",
-  "codex":"https://codex.openai.com","coingecko":"https://www.coingecko.com",
-  "confluence":"https://www.atlassian.com/confluence","coupang":"https://www.coupang.com",
-  "crates":"https://crates.io","ctrip":"https://www.ctrip.com","cursor":"https://cursor.com",
-  "dblp":"https://dblp.org","deepseek":"https://chat.deepseek.com","defillama":"https://defillama.com",
-  "devto":"https://dev.to","dianping":"https://www.dianping.com","dictionary":"https://www.dictionary.com",
-  "discord-app":"https://discord.com","dockerhub":"https://hub.docker.com","douban":"https://www.douban.com",
-  "doubao":"https://www.doubao.com","doubao-app":"https://www.doubao.com","douyin":"https://www.douyin.com",
-  "duckduckgo":"https://duckduckgo.com","eastmoney":"https://www.eastmoney.com",
-  "endoflife":"https://endoflife.date","facebook":"https://www.facebook.com","flathub":"https://flathub.org",
-  "flomo":"https://flomoapp.com","gemini":"https://gemini.google.com","geogebra":"https://www.geogebra.org",
-  "gitee":"https://gitee.com","google":"https://www.google.com","google-scholar":"https://scholar.google.com",
-  "goproxy":"https://goproxy.cn","gov-law":"https://flk.npc.gov.cn","gov-policy":"https://www.gov.cn",
-  "grok":"https://grok.com","hackernews":"https://news.ycombinator.com","hf":"https://huggingface.co",
-  "homebrew":"https://brew.sh","hupu":"https://www.hupu.com","imdb":"https://www.imdb.com",
-  "indeed":"https://www.indeed.com","instagram":"https://www.instagram.com","jd":"https://www.jd.com",
-  "jianyu":"https://jianyu.io","jike":"https://web.okjike.com","jimeng":"https://jimeng.jianying.com",
-  "jira":"https://www.atlassian.com/jira","ke":"https://www.kechenggezi.com","lesswrong":"https://www.lesswrong.com",
-  "lichess":"https://lichess.org","linkedin":"https://www.linkedin.com",
-  "linkedin-learning":"https://www.linkedin.com/learning","linux-do":"https://linux.do",
-  "lobsters":"https://lobste.rs","maimai":"https://maimai.cn","maven":"https://mvnrepository.com",
-  "mdn":"https://developer.mozilla.org","medium":"https://medium.com","mubu":"https://mubu.com",
-  "notebooklm":"https://notebooklm.google.com","nowcoder":"https://www.nowcoder.com","npm":"https://www.npmjs.com",
-  "nuget":"https://www.nuget.org","nvd":"https://nvd.nist.gov","oeis":"https://oeis.org",
-  "ones":"https://ones.ai","openalex":"https://openalex.org","openfda":"https://open.fda.gov",
-  "openreview":"https://openreview.net","osv":"https://osv.dev","packagist":"https://packagist.org",
-  "paperreview":"https://paperreview.com","pixiv":"https://www.pixiv.net","powerchina":"https://www.powerchina.cn",
-  "producthunt":"https://www.producthunt.com","pubmed":"https://pubmed.ncbi.nlm.nih.gov","pypi":"https://pypi.org",
-  "qwen":"https://tongyi.aliyun.com","quark":"https://www.quark.cn","reddit":"https://www.reddit.com",
-  "rednote":"https://www.xiaohongshu.com","rest-countries":"https://restcountries.com",
-  "reuters":"https://www.reuters.com","rfc":"https://www.rfc-editor.org","rubygems":"https://rubygems.org",
-  "sinablog":"https://blog.sina.com.cn","sinafinance":"https://finance.sina.com.cn",
-  "smzdm":"https://www.smzdm.com","spotify":"https://open.spotify.com",
-  "stackoverflow":"https://stackoverflow.com","steam":"https://store.steampowered.com",
-  "substack":"https://substack.com","suno":"https://suno.com","taobao":"https://www.taobao.com",
-  "tdx":"https://www.tdx.com.cn","ths":"https://www.10jqka.com.cn","tieba":"https://tieba.baidu.com",
-  "tiktok":"https://www.tiktok.com","toutiao":"https://www.toutiao.com","tvmaze":"https://www.tvmaze.com",
-  "twitter":"https://x.com","uisdc":"https://www.uisdc.com","uiverse":"https://uiverse.io",
-  "upwork":"https://www.upwork.com","v2ex":"https://www.v2ex.com","wanfang":"https://www.wanfangdata.com.cn",
-  "web":"https://www.example.com","weibo":"https://weibo.com","weixin":"https://weixin.qq.com",
-  "weread":"https://weread.qq.com","weread-official":"https://weread.qq.com",
-  "wikidata":"https://www.wikidata.org","wikipedia":"https://www.wikipedia.org","wttr":"https://wttr.in",
-  "xianyu":"https://www.goofish.com","xiaoe":"https://www.xiaoe-tech.com",
-  "xiaohongshu":"https://www.xiaohongshu.com","xiaoyuzhou":"https://www.xiaoyuzhou.com",
-  "xueqiu":"https://xueqiu.com","yahoo":"https://www.yahoo.com","yahoo-finance":"https://finance.yahoo.com",
-  "yollomi":"https://www.yollomi.com","youdao":"https://www.youdao.com","youtube":"https://www.youtube.com",
-  "yuanbao":"https://yuanbao.tencent.com","zhihu":"https://www.zhihu.com","zlibrary":"https://z-library.sk",
-  "zsxq":"https://wx.zsxq.com"
-};
-
-const sites = [
-  {cat:"国内社交",sites:["douyin","bilibili","xiaohongshu","zhihu","weibo","toutiao","douban","tieba","hupu","jike","v2ex","linux-do","weread","rednote","sinablog"]},
-  {cat:"电商",sites:["taobao","jd","1688","xianyu","amazon","coupang","smzdm"]},
-  {cat:"招聘",sites:["boss","maimai","51job","upwork","indeed","linkedin"]},
-  {cat:"金融",sites:["eastmoney","tdx","ths","sinafinance","xueqiu","binance","coingecko","defillama","barchart","bloomberg","yahoo-finance"]},
-  {cat:"AI",sites:["chatgpt","claude","deepseek","qwen","grok","gemini","yuanbao","doubao","codex","cursor","chatwise","antigravity","notebooklm","suno","jimeng","yollomi"]},
-  {cat:"国际社交",sites:["twitter","reddit","bluesky","instagram","facebook","band"]},
-  {cat:"视频音乐",sites:["youtube","tiktok","spotify","apple-podcasts","xiaoyuzhou","pixiv"]},
-  {cat:"开发者",sites:["google","stackoverflow","mdn","hackernews","devto","npm","pypi","crates","dockerhub","nuget","packagist","rubygems","maven","homebrew","gitee","flathub","rfc"]},
-  {cat:"学术",sites:["arxiv","pubmed","google-scholar","baidu-scholar","dblp","openreview","cnki","wanfang","openalex","wikidata","wikipedia","nvd","osv","openfda","rest-countries","oeis","endoflife"]},
-  {cat:"新闻",sites:["36kr","bbc","reuters","producthunt","substack","medium","aibase","lesswrong","lobsters"]},
-  {cat:"生活工具",sites:["ctrip","booking","12306","dianping","wttr","dictionary","flomo","mubu","youdao","xiaoe"]},
-  {cat:"游戏",sites:["steam","lichess","chess"]},
-  {cat:"其他",sites:["duckduckgo","brave","imdb","tvmaze","jira","confluence","ones","linkedin-learning","nowcoder","goproxy","gov-law","gov-policy","hf","jianyu","ke","paperreview","quark","uisdc","uiverse","web","zlibrary","zsxq","chaoxing","powerchina","yahoo","weread-official"]},
-  // rtk — CLI proxy that reduces LLM token consumption by 60-90%
-];
-
-
-
-function renderSites() {
-  let html = '';
-  sites.forEach(g => {
-    const tags = g.sites.map(s => {
-      const name = siteNames[s] || s;
-      const url = siteUrls[s] || ('https://www.' + s + '.com');
-      return '<a href="' + url + '" target="_blank" class="site-tag" title="' + s + '">' + name + '</a>';
-    }).join('');
-    html += '<div class="site-section"><div class="site-section-title">' + g.cat + ' <span style="color:var(--text-dim);font-weight:400">(' + g.sites.length + ')</span></div><div class="site-grid">' + tags + '</div></div>';
-  });
-  document.getElementById('sites-list').innerHTML = html;
+function getFilteredSkills(catId) {
+  let skills = skillsByCat[catId] || [];
+  if (activeScope === 'global') skills = skills.filter(s => s.scope === 'global');
+  if (activeScope === 'project') skills = skills.filter(s => s.scope === 'project');
+  return skills;
 }
 
-function renderSkills(filtered) {
-  const byCat = {};
-  filtered.forEach(s => {
-    if (!byCat[s.cat]) byCat[s.cat] = [];
-    byCat[s.cat].push(s);
+function renderAll() {
+  const query = searchInput.value.toLowerCase().trim();
+  let html = '';
+
+  categories.forEach(cat => {
+    let skills = getFilteredSkills(cat.id);
+    if (query) {
+      skills = skills.filter(s =>
+        s.zh.includes(query) || s.en.includes(query) ||
+        s.desc.includes(query) || s.path.includes(query) ||
+        s.tags.some(t => t.includes(query))
+      );
+    }
+    if (skills.length === 0) return;
+
+    const gCount = skills.filter(s => s.scope === 'global').length;
+    const pCount = skills.filter(s => s.scope === 'project').length;
+    const isOpen = activeCat === cat.id;
+
+    html += `<section class="cat-section">
+      <div class="cat-header${isOpen ? ' open' : ''}" data-cat="${cat.id}">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-label">${cat.label}</span>
+        <span class="cat-count">${skills.length} 项</span>
+        <span class="cat-arrow">▶</span>
+      </div>`;
+
+    if (isOpen) {
+      const scopeParts = [];
+      if (gCount > 0) scopeParts.push(`<span class="g">${gCount} 全局</span>`);
+      if (pCount > 0) scopeParts.push(`<span class="p">${pCount} 项目</span>`);
+      html += `<div class="cat-body open">
+        <div class="scope-summary">${scopeParts.join(' · ')}</div>`;
+      if (cat.desc) {
+        html += `<div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px">${cat.desc}</div>`;
+      }
+      html += `<div class="skill-grid">`;
+      skills.forEach(s => {
+        html += `<div class="skill-card" data-scope="${s.scope}">
+          <div class="card-top">
+            <div class="card-name">${s.zh}</div>
+            <span class="scope-badge ${s.scope}">${s.scope === 'global' ? '全局' : '项目'}</span>
+          </div>
+          <div class="card-en">${s.en}</div>
+          <div class="card-desc">${s.desc}</div>
+          <div class="card-path">📁 ${s.path}</div>
+          <div class="card-usage">
+            <span class="usage-cmd">${s.usage}</span>
+            <button class="copy-btn" data-cmd="${s.usage.replace(/"/g,'&quot;')}">复制</button>
+          </div>
+          <div class="triggers">${s.tags.map(t => `<span class="trigger-tag">${t}</span>`).join('')}</div>
+        </div>`;
+      });
+      html += `</div></div>`;
+    }
+    html += `</section>`;
   });
 
-  if (filtered.length === 0) {
-    container.innerHTML = '<div class="no-results" style="display:block;text-align:center;padding:48px 0;color:var(--text-dim);grid-column:1/-1">没有匹配的技能</div>';
+  container.innerHTML = html || '<div style="text-align:center;padding:48px;color:var(--text-dim)">没有匹配的技能</div>';
+
+  // Update stats
+  let total = 0;
+  Object.values(skillsByCat).forEach(arr => {
+    arr.forEach(s => {
+      if (activeScope === 'all' || s.scope === activeScope) total++;
+    });
+  });
+  statsEl.innerHTML = query ? `搜索 "<strong>${query}</strong>" — 显示匹配项` : `共 <strong>${total}</strong> 项技能`;
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('cat-tabs');
+  tabs.innerHTML = categories.map(c => {
+    const skills = getFilteredSkills(c.id);
+    return `<span class="cat-tab${activeCat === c.id ? ' active' : ''}" data-cat="${c.id}">
+      ${c.icon} ${c.label} <span class="count">${skills.length}</span>
+    </span>`;
+  }).join('');
+}
+
+// ═══════════════════ Events ═══════════════════
+
+// Category tab clicks
+document.getElementById('cat-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.cat-tab');
+  if (!tab) return;
+  const catId = tab.dataset.cat;
+  activeCat = activeCat === catId ? null : catId;
+  renderTabs();
+  renderAll();
+});
+
+// Category header clicks (expand/collapse)
+container.addEventListener('click', e => {
+  const header = e.target.closest('.cat-header');
+  if (header) {
+    const catId = header.dataset.cat;
+    activeCat = activeCat === catId ? null : catId;
+    renderTabs();
+    renderAll();
     return;
   }
 
-  let html = '';
-  const catOrder = ["communication","diagnosis","design","engineering","project","business","finance","minimax","anthropic","vercel","ecosystem","codex-system","codex-plugins","opencli"];
-  catOrder.forEach(cat => {
-    const list = byCat[cat];
-    if (!list || list.length === 0) return;
-    const meta = categoryMeta[cat];
-    html += `<section class="category">
-      <h2 class="category-title" style="color:${meta.color}">${meta.label} <span class="count">${list.length}</span></h2>
-      <div class="skill-grid">`;
-    list.forEach(s => {
-      const familyBadge = s.familyParent ? `<span class="family-count">${s.familyCount} 个子技能</span>` : '';
-      const familyArrow = s.familyParent ? `<span class="family-arrow">▸</span>` : '';
-      html += `<div class="skill-card${s.familyParent ? ' family-parent' : ''}" data-id="${s.id}" data-cat="${s.cat}"${s.familyParent ? ` data-family="${s.family}"` : ''}>
-        <div class="card-top">
-          <div class="name">${s.zh}</div>
-          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-            ${familyBadge}
-            <span class="platform-badge ${s.platform}">${platformLabels[s.platform]}</span>
-          </div>
-        </div>
-        <div class="eng">${s.en}</div>
-        <div class="desc">${s.desc}</div>
-        <div class="usage-block">
-          <span class="usage-cmd" title="${s.usage.replace(/"/g,'&quot;')}">${s.usage}</span>
-          <button class="copy-btn" data-cmd="${s.usage.replace(/"/g,'&quot;')}">复制</button>
-        </div>
-        <div class="triggers">${s.triggers.map(t => `<span class="trigger-tag">${t}</span>`).join('')}</div>
-        ${familyArrow}
-      </div>`;
-    });
-    html += '</div></section>';
-  });
-  container.innerHTML = html;
-}
-
-function filterAndRender() {
-  const query = searchInput.value.toLowerCase().trim();
-  const activeTab = document.querySelector('.filter-tab.active');
-  const activeCat = activeTab ? activeTab.dataset.cat : 'all';
-  const subSkillIds = new Set(["gsap-timeline", "gsap-scrolltrigger", "gsap-plugins", "gsap-react", "gsap-frameworks", "gsap-performance", "gsap-utils", "opencli-adapter-author", "opencli-autofix", "dbs-diagnosis", "dbs-goal", "dbs-action", "dbs-benchmark", "dbs-content", "dbs-content-system", "dbs-hook", "dbs-xhs-title", "dbs-ai-check", "dbs-deconstruct", "dbs-decision", "dbs-learning", "dbs-good-question", "dbs-chatroom", "dbs-chatroom-austrian", "dbs-slowisfast", "dbs-agent-migration", "dbs-save", "dbs-restore", "dbs-report", "android-native-dev", "ios-application-dev", "flutter-dev", "react-native-dev", "frontend-dev", "fullstack-dev", "shader-dev", "minimax-music-gen", "minimax-music-playlist", "buddy-sings", "gif-sticker-maker", "vision-analysis", "frontend-design", "canvas-design", "algorithmic-art", "brand-guidelines", "theme-factory", "doc-coauthoring", "internal-comms", "pdf", "mcp-builder", "claude-api", "web-artifacts-builder", "webapp-testing", "skill-creator-anthropic", "slack-gif-creator", "composition-patterns", "deploy-to-vercel", "react-best-practices", "react-native-skills", "react-view-transitions", "vercel-cli-with-tokens", "vercel-optimize", "web-design-guidelines", "writing-guidelines"]);
-  const isParent = s => s.familyParent || !subSkillIds.has(s.id);
-  const mainSkills = skills.filter(isParent);
-
-  let filtered = mainSkills;
-  if (activeCat !== 'all') {
-    filtered = filtered.filter(s => s.cat === activeCat);
-  }
-  if (query) {
-    filtered = filtered.filter(s =>
-      s.zh.toLowerCase().includes(query) || s.en.toLowerCase().includes(query) || s.desc.toLowerCase().includes(query) || s.usage.toLowerCase().includes(query) || s.triggers.some(t => t.toLowerCase().includes(query))
-    );
-  }
-
-  renderSkills(filtered);
-  totalCountEl.textContent = filtered.length;
-  statsEl.innerHTML = query || activeCat !== 'all'
-    ? `显示 <strong>${filtered.length}</strong> / ${mainSkills.length} 项`
-    : '';
-}
-
-// ── Copy ──
-document.getElementById('skills-container').addEventListener('click', e => {
+  // Copy button
   const btn = e.target.closest('.copy-btn');
   if (btn) {
     e.stopPropagation();
-    const cmd = btn.dataset.cmd;
-    navigator.clipboard.writeText(cmd).then(() => {
+    navigator.clipboard.writeText(btn.dataset.cmd).then(() => {
       btn.textContent = '✓ 已复制';
       btn.classList.add('copied');
       toast.classList.add('show');
@@ -772,52 +677,30 @@ document.getElementById('skills-container').addEventListener('click', e => {
         toast.classList.remove('show');
       }, 1500);
     });
-    return;
-  }
-  const parentCard = e.target.closest('.family-parent');
-  if (parentCard && parentCard.dataset.family) {
-    window.location.href = 'skill-detail.html?family=' + parentCard.dataset.family;
   }
 });
 
-// ── Events ──
-searchInput.addEventListener('input', filterAndRender);
-
-document.getElementById('filter-tabs').addEventListener('click', e => {
-  if (!e.target.classList.contains('filter-tab')) return;
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-  e.target.classList.add('active');
-  filterAndRender();
+// Search
+searchInput.addEventListener('input', () => {
+  renderTabs();
+  renderAll();
 });
 
-
-// ── View toggle ──
-const skillsContainer = document.getElementById('skills-container');
-const sitesContainer = document.getElementById('sites-container');
-const searchWrap = document.querySelector('.search-wrap');
-const viewBar = document.getElementById('view-bar');
-
-document.getElementById('view-toggle').addEventListener('click', e => {
-  if (!e.target.classList.contains('view-btn')) return;
-  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  const view = e.target.dataset.view;
-  if (view === 'sites') {
-    skillsContainer.style.display = 'none';
-    searchWrap.style.display = 'none';
-    sitesContainer.style.display = 'block';
-    if (!document.getElementById('sites-list').innerHTML) renderSites();
-    viewBar.classList.add('sites-mode');
-  } else {
-    skillsContainer.style.display = 'block';
-    searchWrap.style.display = 'block';
-    sitesContainer.style.display = 'none';
-    viewBar.classList.remove('sites-mode');
-  }
+// Scope filter
+document.getElementById('scope-filter').addEventListener('click', e => {
+  const btn = e.target.closest('.scope-btn');
+  if (!btn) return;
+  document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeScope = btn.dataset.scope;
+  activeCat = null;
+  renderTabs();
+  renderAll();
 });
 
-// ── Init ──
-filterAndRender();
+// Init
+renderTabs();
+renderAll();
 </script>
 </body>
 </html>
