@@ -84,6 +84,40 @@
   .nav { margin-bottom: 40px; }
   .nav a { color: var(--accent); text-decoration: none; font-size: 0.92rem; }
   .nav a:hover { text-decoration: underline; }
+
+  .principle.best strong { color: var(--accent); }
+  .principle.warn strong { color: var(--orange); }
+
+  .warn-box {
+    background: #2a1f1a; border-left: 3px solid var(--orange);
+    padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box::before { content: "⚠️ "; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    .container { padding: 20px 16px 60px; }
+  }
+
+  .toc {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 20px 28px; margin-bottom: 32px;
+  }
+  .toc h3 { margin-top: 0; margin-bottom: 12px; color: var(--text); }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 4px; font-size: 0.9rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 0.68rem; font-weight: 600; margin-right: 4px;
+  }
+  .tag-core { background: #1a2e1a; color: #7ee787; }
+  .tag-skill { background: #2a1a2e; color: #a371f7; }
+  .tag-meta { background: #2a1a1a; color: #f77878; }
 </style>
 </head>
 <body>
@@ -93,8 +127,25 @@
   <h1>Codex Agent 使用指南</h1>
   <p class="subtitle">以 Codex 为例，教你把 AI 编程助手用到极致</p>
 
+  <!-- ==================== TOC ==================== -->
+  <div class="toc">
+    <h3>📑 目录</h3>
+    <ol>
+      <li><a href="#s1">核心心智模型</a></li>
+      <li><a href="#s2">五条黄金法则 · 记忆机制 · 内置工具引擎 · Skills · Plugins · 工作模式</a></li>
+      <li><a href="#s3">典型工作流</a></li>
+      <li><a href="#s4">进阶技巧</a></li>
+      <li><a href="#s5">常见反模式</a></li>
+      <li><a href="#s6">度量你用得对不对</a></li>
+      <li><a href="#s7">总结</a></li>
+      <li><a href="#s8">按职业角色的最佳实践</a></li>
+      <li><a href="#s9">快速参考卡</a></li>
+      <li><a href="#s10">Agent 技术学习路径</a></li>
+    </ol>
+  </div>
+
 <!-- ============================== -->
-<h2>1. 核心心智模型</h2>
+<h2 id="s1">1. 核心心智模型</h2>
 
 <p>Codex 不是搜索引擎，不是代码补全工具——它是<strong>一个有工具、能执行命令、可编辑文件的自主 Agent</strong>。</p>
 
@@ -105,7 +156,7 @@
 <p>关键点：Agent <strong>自己决定工具调用顺序</strong>。你不需要告诉它每一步怎么做，你只需要说清楚目标。</p>
 
 <!-- ============================== -->
-<h2>2. 五条黄金法则</h2>
+<h2 id="s2">2. 五条黄金法则</h2>
 
 <div class="principle">
   <strong>法则一：说目标，不说步骤</strong>
@@ -226,8 +277,148 @@
 <div class="tip">终极建议：把 Agent 当成一个 <strong>极其聪明但每次醒来都失忆的工程师</strong>。你给它留的 AGENTS.md 就是它的笔记本，代码就是它的记忆。依赖文件系统而非对话上下文做长期记忆。</div>
 
 <!-- ============================== -->
+<h2>2.3 Codex 内置工具引擎 —— 它怎么干活</h2>
+
+<p>Codex 没有斜杠命令。它的「手」是这些底层工具，每次对话中自动组合调用。理解这些工具 = 理解它的能力边界。</p>
+
+<h3>文件与系统操作</h3>
+<div class="table-wrap">
+<table>
+<tr><th>工具</th><th>能力</th><th>典型场景</th></tr>
+<tr><td><span class="inline-code">shell_command</span></td><td>在 PowerShell 沙箱中执行任意命令：文件搜索 (rg/ls)、构建、Git 操作、Python 脚本</td><td>"跑一下测试" "装依赖" "git diff"</td></tr>
+<tr><td><span class="inline-code">apply_patch (add_file)</span></td><td>创建新文件，填写完整内容</td><td>"建一个 app.py"</td></tr>
+<tr><td><span class="inline-code">apply_patch (update_file)</span></td><td>精确打补丁：只改目标行，不动周围代码</td><td>"在 login 函数里加一行日志"</td></tr>
+<tr><td><span class="inline-code">apply_patch (replace_file)</span></td><td>全文件替换覆盖</td><td>"重写这个配置文件"</td></tr>
+<tr><td><span class="inline-code">apply_patch (delete_file)</span></td><td>删除文件</td><td>"删掉废弃的 old_schema.sql"</td></tr>
+<tr><td><span class="inline-code">apply_patch (batch)</span></td><td>单次批处理多个文件操作，原子级修改</td><td>"批量改 10 个 API handler 的签名"</td></tr>
+</table>
+</div>
+
+<div class="tip">Codex 默认用 <span class="inline-code">rg</span> (ripgrep) 搜索代码，比 grep 快一个数量级。给路径让它读文件，别手动贴代码到聊天里。</div>
+
+<h3>信息获取</h3>
+<div class="table-wrap">
+<table>
+<tr><th>工具</th><th>能力</th><th>典型场景</th></tr>
+<tr><td><span class="inline-code">web_search</span></td><td>搜索网页获取实时信息：最新文档、API 变更、方案调研</td><td>"查一下 React 19 新特性" "搜这个报错的方案"</td></tr>
+<tr><td><span class="inline-code">view_image</span></td><td>读取并分析本地图片：截图诊断、设计稿重建、图表解读</td><td>"看看这张 UI 截图有什么问题"</td></tr>
+</table>
+</div>
+
+<h3>任务规划与目标跟踪</h3>
+<div class="table-wrap">
+<table>
+<tr><th>工具</th><th>能力</th><th>典型场景</th></tr>
+<tr><td><span class="inline-code">update_plan</span></td><td>创建并管理分步任务清单，标记 pending / in_progress / completed</td><td>多文件重构时自动拆分步骤并追踪进度</td></tr>
+<tr><td><span class="inline-code">create_goal</span></td><td>设定工作目标 + 可选 token 预算</td><td>限 token 的任务场景</td></tr>
+<tr><td><span class="inline-code">get_goal</span></td><td>查看当前目标、已用/剩余 token、耗时</td><td>检查是否超预算</td></tr>
+<tr><td><span class="inline-code">update_goal</span></td><td>标记目标完成 (complete) 或因阻塞终止 (blocked)</td><td>任务结束/卡住三轮以上</td></tr>
+<tr><td><span class="inline-code">request_user_input</span></td><td>Plan 模式下发起选择题确认方向</td><td>"用 PostgreSQL 还是 MySQL？"</td></tr>
+</table>
+</div>
+
+<div class="principle">
+<strong>工具调用哲学</strong>
+<p>Codex 自己决定用哪个工具、什么顺序、是否并行。你只需说目标。它默认并行搜索和读取文件，单次可同时发起多个独立操作。</p>
+</div>
+
+
 <!-- ============================== -->
-<h2>3. 典型工作流</h2>
+<h2>2.4 Skills 技能系统 —— 专项能力包</h2>
+
+<p>Skills 存放在 <span class="inline-code">.codex/skills/</span> 目录，每个 <span class="inline-code">SKILL.md</span> 封装专项工作流。Codex 对话开头发现 Skill 列表，请求匹配到描述时自动激活。</p>
+
+<h3>工程类</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Skill</th><th>用途</th><th>触发方式</th></tr>
+<tr><td><span class="inline-code">diagnose</span></td><td>系统化 Bug 诊断：复现→最小化→假设→验证→修复</td><td>"diagnose this" "debug 一下"</td></tr>
+<tr><td><span class="inline-code">tdd / test-driven-development</span></td><td>测试驱动开发 red-green-refactor 循环</td><td>"用 TDD 加这个功能"</td></tr>
+<tr><td><span class="inline-code">systematic-debugging</span></td><td>遇 bug 先分析再动手，禁止盲目试错</td><td>bug 场景自动触发</td></tr>
+<tr><td><span class="inline-code">verification-before-completion</span></td><td>声称完成前跑验证命令，拿证据再汇报</td><td>收尾阶段自动触发</td></tr>
+<tr><td><span class="inline-code">security-best-practices</span></td><td>语言/框架安全最佳实践审查</td><td>"安全审查这个 repo"</td></tr>
+<tr><td><span class="inline-code">security-threat-model</span></td><td>仓库级威胁建模：边界、资产、攻击路径</td><td>"做威胁建模"</td></tr>
+<tr><td><span class="inline-code">gh-fix-ci / gh-address-comments</span></td><td>GitHub CI 修复 + PR review 评论处理</td><td>"帮我修 CI" "处理 review 意见"</td></tr>
+</table>
+</div>
+
+<h3>效率与工作流</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Skill</th><th>用途</th><th>触发方式</th></tr>
+<tr><td><span class="inline-code">caveman</span></td><td>极简输出，token 消耗 ~-75%</td><td>"caveman mode"</td></tr>
+<tr><td><span class="inline-code">brainstorm / brainstorming</span></td><td>协作头脑风暴，先探需求再写代码</td><td>"帮我想想这个功能怎么设计"</td></tr>
+<tr><td><span class="inline-code">writing-plans / executing-plans</span></td><td>有 Spec 后先出计划再执行，带检查点</td><td>"先出实施计划"</td></tr>
+<tr><td><span class="inline-code">handoff</span></td><td>生成结构化交接文档</td><td>"handoff 当前进度"</td></tr>
+<tr><td><span class="inline-code">finishing-a-development-branch</span></td><td>开发完成：merge、PR 或清理</td><td>"收尾这个分支"</td></tr>
+<tr><td><span class="inline-code">requesting-code-review / receiving-code-review</span></td><td>提交前自查 / 处理 review 反馈</td><td>review 相关场景自动触发</td></tr>
+<tr><td><span class="inline-code">to-prd / to-issues</span></td><td>对话→PRD / 方案→GitHub Issues</td><td>"生成 PRD" "拆成 issues"</td></tr>
+</table>
+</div>
+
+<h3>设计→代码 / 部署 / 平台</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Skill</th><th>用途</th><th>触发方式</th></tr>
+<tr><td><span class="inline-code">figma-implement-design</span></td><td>Figma 设计稿 1:1 转代码</td><td>"implement design" + Figma URL</td></tr>
+<tr><td><span class="inline-code">figma-generate-design / figma-generate-library / figma-code-connect</span></td><td>代码→Figma 设计稿/组件库/代码连接</td><td>Figma 相关场景</td></tr>
+<tr><td><span class="inline-code">vercel-deploy / netlify-deploy / cloudflare-deploy / render-deploy</span></td><td>多平台一键部署</td><td>"deploy to Vercel" 等</td></tr>
+<tr><td><span class="inline-code">playwright</span></td><td>浏览器自动化：截图、填表、UI 测试</td><td>"用 Playwright 截个图"</td></tr>
+<tr><td><span class="inline-code">sentry</span></td><td>查看 Sentry 生产错误</td><td>"看下 Sentry 最近的报错"</td></tr>
+<tr><td><span class="inline-code">linear</span></td><td>Linear 项目管理</td><td>"在 Linear 建个 ticket"</td></tr>
+</table>
+</div>
+
+<div class="principle best">
+<strong>Skills 无需手动调用</strong>
+<p>Codex 根据请求自动匹配和激活。一个请求可触发多个 Skill 串联——如 "部署到 Vercel 并做安全审查" 同时激活 <span class="inline-code">vercel-deploy</span> + <span class="inline-code">security-best-practices</span>。</p>
+</div>
+
+
+<!-- ============================== -->
+<h2>2.5 Plugins 插件 —— 生产力套件</h2>
+
+<p>Plugin 是可选的增强包，包含一套 Skills + MCP Server + 应用工具链。</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>Plugin</th><th>能力</th><th>触发示例</th></tr>
+<tr><td><span class="inline-code">Documents</span></td><td>创建并编辑 Word (.docx) 和 Google Docs</td><td>"给我写一份需求文档"</td></tr>
+<tr><td><span class="inline-code">Presentations</span></td><td>创建、编辑、渲染 PPT/PPTX（支持 Google Slides）</td><td>"做一份周报 PPT"</td></tr>
+<tr><td><span class="inline-code">Spreadsheets</span></td><td>Excel / CSV / Google Sheets 创建、分析、可视化</td><td>"把这个 CSV 数据画成图表"</td></tr>
+</table>
+</div>
+
+
+<!-- ============================== -->
+<h2>2.6 两种工作模式</h2>
+
+<div class="two-col">
+<div class="principle">
+<strong>Default Mode（默认）</strong>
+<p>收到目标后直接动手：搜索→读代码→分析→改文件→验证。适合明确的需求、修 bug、加小功能。</p>
+</div>
+<div class="principle">
+<strong>Plan Mode（计划）</strong>
+<p>先出方案确认方向再执行。可调用 <span class="inline-code">request_user_input</span> 做选择题。适合多文件重构、架构变更。</p>
+</div>
+</div>
+
+<h3>Codex 的工程价值观</h3>
+<p>无论哪种模式，Codex 自带三层判断：</p>
+<div class="table-wrap">
+<table>
+<tr><th>价值</th><th>行为表现</th></tr>
+<tr><td><strong style="color:var(--green)">Clarity 清晰</strong></td><td>显式解释推理过程，不让你猜</td></tr>
+<tr><td><strong style="color:var(--accent)">Pragmatism 务实</strong></td><td>专注实际效果、推进进度，不过度设计</td></tr>
+<tr><td><strong style="color:var(--orange)">Rigor 严谨</strong></td><td>发现漏洞或弱假设时礼貌指出，不做表面功夫</td></tr>
+</table>
+</div>
+
+
+<!-- ============================== -->
+<!-- ============================== -->
+<h2 id="s3">3. 典型工作流</h2>
 
 <h3>3.1 加新功能</h3>
 <div class="flow">
@@ -254,7 +445,7 @@
 <div class="tip">Codex 内置 tdd skill。说 "用 TDD 加这个功能"，它会自动走 red-green-refactor 循环。</div>
 
 <!-- ============================== -->
-<h2>4. 进阶技巧</h2>
+<h2 id="s4">4. 进阶技巧</h2>
 
 <h3>4.1 使用 Skills</h3>
 <p>Codex 有大量内置 skill，每个都是专项能力包。常见：</p>
@@ -292,7 +483,7 @@
 </div>
 
 <!-- ============================== -->
-<h2>5. 常见反模式</h2>
+<h2 id="s5">5. 常见反模式</h2>
 
 <div class="principle">
   <strong class="dont">❌ 一次给一个超模糊的需求</strong>
@@ -319,7 +510,7 @@
 </div>
 
 <!-- ============================== -->
-<h2>6. 度量你用得对不对</h2>
+<h2 id="s6">6. 度量你用得对不对</h2>
 
 <div class="table-wrap">
 <table>
@@ -335,7 +526,7 @@
 <p>回头翻翻 Agent 对话日志。如果你的指令经常触发 50+ 次搜索、8+ 轮对话——不是 Agent 不行，是<strong>你的指令需要改进</strong>。</p>
 
 <!-- ============================== -->
-<h2>7. 总结</h2>
+<h2 id="s7">7. 总结</h2>
 
 <p>Codex 是一把好刀。好刀没法替代你思考，但能把你的思考执行得飞快。</p>
 
@@ -346,7 +537,7 @@
 </div>
 
 <!-- ============================== -->
-<h2>8. 按职业角色的最佳实践</h2>
+<h2 id="s8">8. 按职业角色的最佳实践</h2>
 
 <h3>8.1 如果你是前端开发</h3>
 
@@ -424,12 +615,12 @@
 <p>PM 关键：<strong>善用内置 skill 链</strong>（to-prd → to-issues → 开发）。多轮对话让 Agent 记录上下文，最后一键产出结构化的文档和 issue。</p>
 
 <!-- ============================== -->
-<h2>9. 快速参考卡</h2>
+<h2 id="s9">9. 快速参考卡</h2>
 
 <div class="table-wrap">
 <table>
   <tr><th>你想要</th><th>就说</th></tr>
-  <tr><td>加功能</td><td>"加 [功能描述]，在 [文件/模块]"</td></tr>
+  <tr><td>加功能</td><td>"加 [功能]，在 [模块]，用 [技术约束]"</td></tr>
   <tr><td>修 bug</td><td>"[现象]，报错 [完整错误信息]"</td></tr>
   <tr><td>重构</td><td>"重构 [模块]，[约束]，不改 [接口/签名]"</td></tr>
   <tr><td>查代码</td><td>"[类/函数] 在哪里被调用了"</td></tr>
@@ -437,14 +628,21 @@
   <tr><td>写测试</td><td>"给 [函数/接口] 写测试，覆盖 [场景]"</td></tr>
   <tr><td>出方案</td><td>"先出方案，plan mode"</td></tr>
   <tr><td>省 token</td><td>"caveman mode"</td></tr>
-  <tr><td>审方案</td><td>"grill me — 审 [方案]"</td></tr>
-  <tr><td>创建 issue</td><td>"拆成 issues"</td></tr>
-  <tr><td>做原型</td><td>"prototype [想法]"</td></tr>
+  <tr><td>Debug</td><td>"diagnose this bug” + 错误信息</td></tr>
+  <tr><td>创建 Issue</td><td>"拆成 issues"</td></tr>
+  <tr><td>生成 PRD</td><td>"生成 PRD"</td></tr>
+  <tr><td>代码审查</td><td>"review 这个 PR" 或 "安全审查"</td></tr>
+  <tr><td>部署</td><td>"deploy to [Vercel/Netlify/Cloudflare/Render]"</td></tr>
+  <tr><td>Figma 转代码</td><td>"implement design" + Figma URL</td></tr>
+  <tr><td>从头创建文件</td><td>"创建 [文件名]，实现 [功能]"</td></tr>
+  <tr><td>批量改多文件</td><td>"把 [修改] 应用到 [N] 个文件"</td></tr>
+  <tr><td>交接进度</td><td>"handoff 当前进度"</td></tr>
+  <tr><td>搜最新信息</td><td>"搜 [技术/方案] 的最新动态"</td></tr>
 </table>
 </div>
 
 <!-- ============================== -->
-<h2>10. Agent 技术学习路径（详细版）</h2>
+<h2 id="s10">10. Agent 技术学习路径（详细版）</h2>
 
 <p>如果你不只是想用好 Agent，还想自己开发 Agent 系统——以下是从零到一的完整 roadmap，每个阶段都包含 <strong>学什么、怎么学、免费资源、动手练习</strong>。</p>
 

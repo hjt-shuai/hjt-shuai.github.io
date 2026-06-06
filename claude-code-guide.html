@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 使用指南 — 内置命令、技能与最佳实践</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d2991d;
+    --red: #f85149;
+    --purple: #a371f7;
+    --code-bg: #1c2128;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 2rem; margin-bottom: 6px; color: #f0f6fc; }
+  h2 {
+    font-size: 1.25rem; margin: 48px 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border); color: #f0f6fc;
+  }
+  h3 { font-size: 1.05rem; margin: 28px 0 8px; color: var(--accent); }
+  h4 { font-size: 0.95rem; margin: 20px 0 6px; color: var(--purple); }
+  p { margin-bottom: 14px; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 32px; }
+
+  .principle {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 18px 22px; margin-bottom: 16px;
+  }
+  .principle strong { color: var(--green); }
+  .principle.warn strong { color: var(--orange); }
+  .principle.best strong { color: var(--accent); }
+
+  .bad, .good {
+    padding: 10px 16px; border-radius: 4px; margin: 8px 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.88rem; white-space: pre-wrap;
+  }
+  .bad { background: #2d1517; border-left: 3px solid var(--red); color: #fdaeb7; }
+  .good { background: #14282c; border-left: 3px solid var(--green); color: #7ee787; }
+
+  .inline-code {
+    background: var(--code-bg); padding: 1px 6px; border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.88em; border: 1px solid var(--border);
+  }
+
+  .tip {
+    background: #1b201d; border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+    font-size: 0.92rem;
+  }
+  .tip::before { content: "💡 "; }
+
+  .warn-box {
+    background: #2a1f1a; border-left: 3px solid var(--orange);
+    padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box::before { content: "⚠️ "; }
+
+  .flow {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--bg2); padding: 16px 20px; border-radius: 6px;
+    border: 1px solid var(--border); margin: 12px 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85rem;
+  }
+  .flow span { color: var(--accent); }
+  .flow .arrow { color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); font-weight: 600; white-space: nowrap; }
+  td:first-child { white-space: nowrap; }
+  tr:hover { background: var(--bg2); }
+
+  .do { color: var(--green); }
+  .dont { color: var(--red); }
+
+  .nav { margin-bottom: 40px; }
+  .nav a { color: var(--accent); text-decoration: none; font-size: 0.92rem; }
+  .nav a:hover { text-decoration: underline; }
+
+  .toc {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 20px 28px; margin-bottom: 32px;
+  }
+  .toc h3 { margin-top: 0; margin-bottom: 12px; color: var(--text); }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 4px; font-size: 0.9rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 0.68rem; font-weight: 600; margin-right: 4px;
+  }
+  .tag-core { background: #1a2e1a; color: #7ee787; }
+  .tag-skill { background: #2a1a2e; color: #a371f7; }
+  .tag-meta { background: #2a1a1a; color: #f77878; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    .container { padding: 20px 16px 60px; }
+  }
+
+  .cmd-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px; margin: 12px 0;
+  }
+  .cmd-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  .cmd-card .cmd-name { color: var(--accent); font-weight: 600; font-family: 'SFMono-Regular', Consolas, monospace; }
+  .cmd-card .cmd-desc { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+
+  summary {
+    cursor: pointer; user-select: none;
+    font-weight: 600; color: var(--accent);
+  }
+  details { margin-bottom: 16px; }
+  details[open] summary { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="nav"><a href="index.html">← 回首页</a> &nbsp;|&nbsp; <a href="codex-guide.html">Codex 使用指南</a></div>
+
+  <h1>Claude Code 使用指南</h1>
+  <p class="subtitle">内置命令大全 · 技能参考 · Token 优化 · 高效协作方法论</p>
+
+  <!-- ==================== TOC ==================== -->
+  <div class="toc">
+    <h3>📑 目录</h3>
+    <ol>
+      <li><a href="#s1">Claude Code 是什么</a></li>
+      <li><a href="#s2">内置斜杠命令全集</a></li>
+      <li><a href="#s3">内置技能 Skills 全集</a></li>
+      <li><a href="#s4">核心心智模型：如何用好 Claude Code</a></li>
+      <li><a href="#s5">Token 优化圣经：让每分钱花在刀刃上</a></li>
+      <li><a href="#s6">写出好内容的 Prompt 工程</a></li>
+      <li><a href="#s7">典型工作流实战</a></li>
+      <li><a href="#s8">常见反模式</a></li>
+      <li><a href="#s9">快速参考卡</a></li>
+    </ol>
+  </div>
+
+  <!-- ==================== 1 ==================== -->
+  <h2 id="s1">1. Claude Code 是什么</h2>
+
+  <p>Claude Code 是 <strong>Anthropic 出品的终端 AI 编程助手</strong>，不是一个代码补全插件，而是一个<strong>具有完整工具访问权限的自主 Agent</strong>。</p>
+
+  <div class="flow">
+    用户输入指令 <span class="arrow">→</span> <span>理解意图</span> <span class="arrow">→</span> <span>搜索代码库</span> <span class="arrow">→</span> <span>读取文件</span> <span class="arrow">→</span> <span>分析与推理</span> <span class="arrow">→</span> <span>执行 Bash 命令</span> <span class="arrow">→</span> <span>编辑文件</span> <span class="arrow">→</span> <span>验证结果</span> <span class="arrow">→</span> 回复用户
+  </div>
+
+  <p>它能做什么？</p>
+
+  <div class="two-col">
+    <div class="principle">
+      <strong>🔍 代码搜索</strong>
+      <p>用 Glob 匹配文件名、Grep 正则搜内容，ripgrep 级别的搜索速度</p>
+    </div>
+    <div class="principle">
+      <strong>✏️ 文件编辑</strong>
+      <p>精确字符串替换（Edit）、整体覆写（Write）、Jupyter Notebook 编辑</p>
+    </div>
+    <div class="principle">
+      <strong>⚡ 命令执行</strong>
+      <p>运行测试、构建项目、安装依赖、Git 操作，一切 Bash 命令</p>
+    </div>
+    <div class="principle">
+      <strong>🤖 多 Agent 协作</strong>
+      <p>启动子 Agent 并行处理任务，Workflow 编排大规模自动化</p>
+    </div>
+    <div class="principle">
+      <strong>🌐 网络能力</strong>
+      <p>Web 搜索最新信息、抓取网页内容、访问在线文档</p>
+    </div>
+    <div class="principle">
+      <strong>📋 项目管理</strong>
+      <p>创建和跟踪 TODO 列表，制定实施计划，管理任务依赖</p>
+    </div>
+  </div>
+
+  <!-- ==================== 2 ==================== -->
+  <h2 id="s2">2. 内置斜杠命令全集</h2>
+
+  <p>在对话中直接输入 <span class="inline-code">/<命令></span> 即可触发。以下是 Claude Code 所有内置命令：</p>
+
+  <h3>核心操作</h3>
+  <div class="cmd-grid">
+    <div class="cmd-card"><span class="cmd-name">/help</span><div class="cmd-desc">显示帮助信息</div></div>
+    <div class="cmd-card"><span class="cmd-name">/clear</span><div class="cmd-desc">清空当前对话，重新开始</div></div>
+    <div class="cmd-card"><span class="cmd-name">/compact</span><div class="cmd-desc">压缩对话上下文，释放 token</div></div>
+    <div class="cmd-card"><span class="cmd-name">/config</span><div class="cmd-desc">修改配置（主题、模型等）</div></div>
+    <div class="cmd-card"><span class="cmd-name">/cost</span><div class="cmd-desc">查看当前会话 token 用量与费用</div></div>
+    <div class="cmd-card"><span class="cmd-name">/doctor</span><div class="cmd-desc">诊断 Claude Code 安装问题</div></div>
+    <div class="cmd-card"><span class="cmd-name">/upgrade</span><div class="cmd-desc">升级 Claude Code 到最新版</div></div>
+    <div class="cmd-card"><span class="cmd-name">/export</span><div class="cmd-desc">导出对话历史</div></div>
+    <div class="cmd-card"><span class="cmd-name">/stats</span><div class="cmd-desc">查看使用统计</div></div>
+  </div>
+
+  <h3>项目管理</h3>
+  <div class="cmd-grid">
+    <div class="cmd-card"><span class="cmd-name">/init</span><div class="cmd-desc">初始化项目配置（生成 CLAUDE.md）</div></div>
+    <div class="cmd-card"><span class="cmd-name">/tasks</span><div class="cmd-desc">查看任务列表</div></div>
+    <div class="cmd-card"><span class="cmd-name">/todos</span><div class="cmd-desc">查看 TODO 列表</div></div>
+    <div class="cmd-card"><span class="cmd-name">/status</span><div class="cmd-desc">显示当前会话状态</div></div>
+    <div class="cmd-card"><span class="cmd-name">/context</span><div class="cmd-desc">查看当前上下文信息</div></div>
+    <div class="cmd-card"><span class="cmd-name">/memory</span><div class="cmd-desc">查看持久化记忆</div></div>
+    <div class="cmd-card"><span class="cmd-name">/workspace</span><div class="cmd-desc">切换工作区</div></div>
+    <div class="cmd-card"><span class="cmd-name">/add-dir</span><div class="cmd-desc">添加工作目录</div></div>
+  </div>
+
+  <h3>代码审查与安全</h3>
+  <div class="cmd-grid">
+    <div class="cmd-card"><span class="cmd-name">/review</span><div class="cmd-desc">审查 GitHub PR</div></div>
+    <div class="cmd-card"><span class="cmd-name">/security-review</span><div class="cmd-desc">安全审查</div></div>
+    <div class="cmd-card"><span class="cmd-name">/pr-comments</span><div class="cmd-desc">行级评论方式回复 PR review</div></div>
+  </div>
+
+  <h3>Agent 与任务管理</h3>
+  <div class="cmd-grid">
+    <div class="cmd-card"><span class="cmd-name">/agents</span><div class="cmd-desc">查看正在运行的子 Agent</div></div>
+    <div class="cmd-card"><span class="cmd-name">/bashes</span><div class="cmd-desc">查看后台运行的 Bash 任务</div></div>
+    <div class="cmd-card"><span class="cmd-name">/terminal-setup</span><div class="cmd-desc">配置终端集成</div></div>
+    <div class="cmd-card"><span class="cmd-name">/output-style</span><div class="cmd-desc">切换输出样式</div></div>
+  </div>
+
+  <h3>权限与扩展</h3>
+  <div class="cmd-grid">
+    <div class="cmd-card"><span class="cmd-name">/permissions</span><div class="cmd-desc">管理工具权限设置</div></div>
+    <div class="cmd-card"><span class="cmd-name">/hooks</span><div class="cmd-desc">管理 hooks 钩子</div></div>
+    <div class="cmd-card"><span class="cmd-name">/mcp</span><div class="cmd-desc">MCP 服务器管理</div></div>
+    <div class="cmd-card"><span class="cmd-name">/plugin</span><div class="cmd-desc">插件管理</div></div>
+  </div>
+
+  <!-- ==================== 3 ==================== -->
+  <h2 id="s3">3. 内置技能 Skills 全集</h2>
+
+  <p>Skills 是专项能力包，输入 <span class="inline-code">/<技能名></span> 调用。每个技能都封装了特定领域的提示词和工具链。</p>
+
+  <h3>代码工程</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>技能</th><th>用途</th><th>触发示例</th></tr>
+    <tr><td><span class="inline-code">/code-review</span></td><td>代码审查：bug 发现、简化建议、安全扫描</td><td>"review 这个 PR"</td></tr>
+    <tr><td><span class="inline-code">/review</span></td><td>审查 PR，支持行级评论</td><td>"/review"</td></tr>
+    <tr><td><span class="inline-code">/simplify</span></td><td>代码简化重构（不做 bug 审查）</td><td>"simplify 这段代码"</td></tr>
+    <tr><td><span class="inline-code">/diagnose</span></td><td>系统化 Bug 诊断：复现→最小化→假设→验证→修复</td><td>"diagnose this bug"</td></tr>
+    <tr><td><span class="inline-code">/tdd</span></td><td>测试驱动开发 red-green-refactor 循环</td><td>"用 TDD 加这个功能"</td></tr>
+    <tr><td><span class="inline-code">/verify</span></td><td>验证代码修改是否生效，运行应用确认</td><td>"verify this fix works"</td></tr>
+    <tr><td><span class="inline-code">/run</span></td><td>启动项目应用，确认改动</td><td>"run the app"</td></tr>
+    <tr><td><span class="inline-code">/setup-pre-commit</span></td><td>配置 Husky + lint-staged pre-commit 钩子</td><td>"setup pre-commit hooks"</td></tr>
+    <tr><td><span class="inline-code">/git-guardrails-claude-code</span></td><td>阻止危险 Git 操作（push --force, reset --hard）</td><td>"add git safety hooks"</td></tr>
+    <tr><td><span class="inline-code">/security-review</span></td><td>安全审查</td><td>"/security-review"</td></tr>
+  </table>
+  </div>
+
+  <h3>效率与工作流</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>技能</th><th>用途</th><th>触发示例</th></tr>
+    <tr><td><span class="inline-code">/caveman</span></td><td>极简输出模式，token 消耗降低约 75%</td><td>"caveman mode"</td></tr>
+    <tr><td><span class="inline-code">/loop</span></td><td>定时重复执行任务（如每 5 分钟检查部署）</td><td>"/loop 5m /verify"</td></tr>
+    <tr><td><span class="inline-code">/init</span></td><td>初始化项目，创建 CLAUDE.md</td><td>"/init"</td></tr>
+    <tr><td><span class="inline-code">/handoff</span></td><td>生成结构化交接文档给下一位 Agent</td><td>"handoff 当前进度"</td></tr>
+    <tr><td><span class="inline-code">/to-prd</span></td><td>将对话内容转为 PRD 文档</td><td>"to prd"</td></tr>
+    <tr><td><span class="inline-code">/to-issues</span></td><td>将方案拆解为 GitHub Issues</td><td>"to issues"</td></tr>
+    <tr><td><span class="inline-code">/triage</span></td><td>Issue 分类与优先级排序</td><td>"triage issues"</td></tr>
+    <tr><td><span class="inline-code">/fewer-permission-prompts</span></td><td>自动添加常用命令到 allowlist，减少弹窗</td><td>"reduce permission prompts"</td></tr>
+  </table>
+  </div>
+
+  <h3>搜索、配置与参考</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>技能</th><th>用途</th><th>触发示例</th></tr>
+    <tr><td><span class="inline-code">/deep-research</span></td><td>多源搜索 + 交叉验证 + 生成引用报告</td><td>"deep research X 技术方案"</td></tr>
+    <tr><td><span class="inline-code">/claude-api</span></td><td>Claude API / SDK 参考：模型、价格、参数</td><td>"claude api pricing"</td></tr>
+    <tr><td><span class="inline-code">/find-skills</span></td><td>搜索可安装的技能</td><td>"find a skill for X"</td></tr>
+    <tr><td><span class="inline-code">/write-a-skill</span></td><td>创建自定义技能</td><td>"write a skill"</td></tr>
+    <tr><td><span class="inline-code">/update-config</span></td><td>管理 settings.json 配置和 hooks</td><td>"update my config"</td></tr>
+    <tr><td><span class="inline-code">/keybindings-help</span></td><td>自定义键盘快捷键</td><td>"customize keybindings"</td></tr>
+  </table>
+  </div>
+
+  <!-- ==================== 4 ==================== -->
+  <h2 id="s4">4. 核心心智模型：如何用好 Claude Code</h2>
+
+  <div class="principle best">
+    <strong>法则一：说目标（What），不说步骤（How）</strong>
+    <p>Agent 自己决定工具调用顺序。你描述期望结果，它规划执行路径。</p>
+    <div class="bad">坏："用 grep 搜所有 auth 文件，然后把它们全部读一遍，分析清楚中间件逻辑……"</div>
+    <div class="good">好："重构 auth 模块，把 token 校验逻辑从路由层抽到独立 middleware"</div>
+  </div>
+
+  <div class="principle best">
+    <strong>法则二：给上下文，一次性给全</strong>
+    <p>文件路径、行号、错误信息、环境版本——全部在第一轮给出。Agent 追问 = 浪费 token 和回合。</p>
+    <div class="bad">坏："报错了"</div>
+    <div class="good">好："app.py:42 TypeError: 'NoneType' object is not subscriptable，Python 3.12，FastAPI 项目"</div>
+  </div>
+
+  <div class="principle best">
+    <strong>法则三：多个需求放一回合</strong>
+    <p>相关需求合在一起提交，Agent 并行处理。分开提交 → 每次都重载上下文 → 浪费 token。</p>
+    <div class="bad">坏：第 1 轮 "加个 API"，第 2 轮 "写个测试"，第 3 轮 "更新文档"</div>
+    <div class="good">好："加 POST /api/user，写单元测试 + 集成测试，更新 README"</div>
+  </div>
+
+  <div class="principle best">
+    <strong>法则四：复杂任务先 Plan</strong>
+    <p>涉及多文件、架构变更、大重构时，先让 Agent 出完整方案（Enter Plan Mode），确认后再执行。</p>
+    <div class="good">好："先出方案：把支付模块从单体拆成微服务。Plan mode。"</div>
+  </div>
+
+  <div class="principle best">
+    <strong>法则五：信任 Agent 的工具选择</strong>
+    <p>不要说"用 grep 搜"、"用 sed 改"。Agent 有 Glob/Grep/Edit/Bash 全套工具，它知道什么场景用什么。你只需描述结果。</p>
+  </div>
+
+  <div class="principle best">
+    <strong>法则六：用 CLAUDE.md 做项目记忆</strong>
+    <p>Claude Code 每次对话开头自动读取 CLAUDE.md。把架构约定、代码风格、常用命令写进去，Agent 自动理解你的项目。</p>
+    <div class="good">好：运行 <span class="inline-code">/init</span> 生成模板 → 填入项目规范 → Agent 每轮自动读取</div>
+  </div>
+
+  <div class="tip">你的角色不是指挥者，是 <strong>Product Manager</strong>。你定义 What & Why，Claude Code 负责 How。和好工程师协作一样——给清楚背景和验收标准，放手让它做。</div>
+
+  <!-- ==================== 5 ==================== -->
+  <h2 id="s5">5. Token 优化圣经：让每分钱花在刀刃上</h2>
+
+  <p>Claude Code 按 token 计费。输入的 token + 输出的 token 都要钱。以下策略从最有效到最激进排列：</p>
+
+  <h3>5.1 最高 ROI：Caveman Mode</h3>
+  <p>输入 <span class="inline-code">/caveman</span>，Claude 会用极简风格回复，输出 token 降低约 <strong>75%</strong>。信息密度反而更高。</p>
+  <div class="flow">
+    前：<span>"好的，我已经理解了您的需求。让我先搜索相关代码，然后进行分析，最后给出建议……"</span><br>
+    后：<span>"done. 改 3 files. tests pass."</span>
+  </div>
+  <div class="tip">快速迭代时必用。当你有大量任务要串行处理时效果最显著。</div>
+
+  <h3>5.2 减少回合数 = 减少上下文重复加载</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>策略</th><th>说明</th><th>预估节省</th></tr>
+    <tr><td>一次说清全部需求</td><td>相关需求合并成一个 prompt</td><td class="do">30-50%</td></tr>
+    <tr><td>给完整上下文</td><td>文件路径、行号、错误信息一次给全</td><td class="do">20-30%</td></tr>
+    <tr><td>用 Plan Mode 先确认方案</td><td>避免走弯路 → 删掉重来</td><td class="do">40-60%</td></tr>
+    <tr><td>精确描述而非宽泛</td><td>"改 UserService 的 login 方法" > "改登录"</td><td class="do">20-40%</td></tr>
+  </table>
+  </div>
+
+  <h3>5.3 善用 /compact</h3>
+  <p>对话长了以后，输入 <span class="inline-code">/compact</span> 让系统自动压缩上下文为摘要。摘要会保留关键信息，丢掉已完成的冗余细节。相当于「整理聊天记录」。</p>
+  <div class="warn-box">压缩有损：有时关键细节会被摘要掉。压缩后检查 Agent 是否还能正确理解你的意图。如果跑偏，说明需要重新描述。</div>
+
+  <h3>5.4 让 Agent 读文件，而非你贴内容</h3>
+  <div class="bad">坏：把 500 行代码直接贴到聊天里 → 两者都消耗 input token</div>
+  <div class="good">好：说 "看 src/auth.py:30-80" → Agent 自己读，只消耗它的一次 Read 调用</div>
+  <div class="tip">你贴内容 = 你的 input token 也被计费。给路径让 Agent 自己读 = 更便宜。</div>
+
+  <h3>5.5 避免在 Agent 工作时插入干扰</h3>
+  <p>Agent 在执行任务时，你突然说"顺便改个别的"→ 上下文混乱 → Agent 重读代码 → 浪费 token。</p>
+  <p class="do">✅ 等当前任务结束，或说 "停，新需求：……" 让它重新组织计划。</p>
+
+  <h3>5.6 复杂任务用 Workflow 而非对话驱动</h3>
+  <p>如果你有大量文件要审计/迁移/生成，让 Agent 用 Workflow 工具编排多个子 Agent 并行处理，比你在对话里一个文件一个文件地让它改高效得多。Workflow 并行调度比对话轮询带宽大 10 倍以上。</p>
+
+  <h3>5.7 Token 消耗自查清单</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>检查项</th><th>不 OK</th><th>OK</th></tr>
+    <tr><td>是否一次性给了上下文</td><td class="dont">Agent 追问 2+ 次</td><td class="do">Agent 直接开始干活</td></tr>
+    <tr><td>是否有不相关的大段内容</td><td class="dont">贴了 500+ 行无关代码</td><td class="do">给了精确路径</td></tr>
+    <tr><td>是否一个会话做多个任务</td><td class="dont">改了 Auth 又改 UI 又改 DB</td><td class="do">一个会话一个完整功能</td></tr>
+    <tr><td>是否启用了 caveman mode</td><td class="dont">Agent 回复大段文字</td><td class="do">简洁短小</td></tr>
+    <tr><td>是否先用 plan 确认了方向</td><td class="dont">执行到一半发现方向错</td><td class="do">Plan 确认后一步到位</td></tr>
+  </table>
+  </div>
+
+  <!-- ==================== 6 ==================== -->
+  <h2 id="s6">6. 写出好内容的 Prompt 工程</h2>
+
+  <p>同样是 Claude Code，同样的模型，prompt 的质量决定了输出的质量。以下是针对 Claude Code 场景的专用技巧：</p>
+
+  <h3>6.1 指定输出格式</h3>
+  <div class="bad">坏："写个 API 文档"</div>
+  <div class="good">好："用 OpenAPI 3.0 格式写 API 文档，包含 200/400/500 响应示例，Markdown 文件输出到 docs/api.md"</div>
+
+  <h3>6.2 给约束边界</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>场景</th><th>指令</th></tr>
+    <tr><td>不改某个文件</td><td>"别碰 config.py"</td></tr>
+    <tr><td>限定技术栈</td><td>"用原生 JS，不引入框架"</td></tr>
+    <tr><td>代码风格</td><td>"遵循现有代码风格，不做无关重构"</td></tr>
+    <tr><td>测试覆盖</td><td>"先写测试再写实现，branch coverage ≥ 90%"</td></tr>
+    <tr><td>架构约束</td><td>"新增的模块放 src/services/ 下，不改 API 签名"</td></tr>
+    <tr><td>只分析不动手</td><td>"只出分析报告，不要改代码"</td></tr>
+  </table>
+  </div>
+
+  <h3>6.3 用角色设定提升质量</h3>
+  <div class="bad">坏："review 这段代码"</div>
+  <div class="good">好："作为安全审计专家，review 这段代码，重点检查 OWASP Top 10 漏洞"</div>
+
+  <div class="tip">角色设定的本质是帮助 Agent 选择合适的「脑内知识库」。说"作为 React 性能专家"比"优化性能"更精准，因为 Agent 会激活 React 特定的优化模式。</div>
+
+  <h3>6.4 示例驱动：描述输入 → 输出</h3>
+  <div class="bad">坏："重构这段屎山代码"</div>
+  <div class="good">好："下面的函数太长了，拆成 3 个职责单一的小函数，每个不超过 20 行。不改 public API，现有测试必须通过"</div>
+
+  <h3>6.5 善用 Claude 的 Structred Output 能力</h3>
+  <p>当你需要 Agent 返回特定结构（JSON 配置、代码模板等），直接描述 schema：</p>
+  <div class="good">好："生成一个 JSON 配置文件，包含：name(string)、version(semver)、routes(array of {path, method, handler})。用 camelCase。"</div>
+
+  <h3>6.6 迭代式提问：从模糊到精确</h3>
+  <div class="flow">
+    <span>第一轮：宽泛描述</span> <span class="arrow">→</span>
+    <span>看输出</span> <span class="arrow">→</span>
+    <span>第二轮：加约束</span> <span class="arrow">→</span>
+    <span>看输出</span> <span class="arrow">→</span>
+    <span>第三轮：微调细节</span>
+  </div>
+  <p>不要期待一轮完美。把 Agent 当成 junior developer 来指导——先让 ta 做个大概，你审完再给具体修改意见。三轮之后通常质量远超一次性「完美 prompt」。</p>
+
+  <div class="warn-box">避免微管理：每行代码都让 Agent 按你的意思改 = 浪费 token。描述可验证的验收标准（"所有测试必须通过"），而不是逐行指导。你的时间比 token 贵。</div>
+
+  <!-- ==================== 7 ==================== -->
+  <h2 id="s7">7. 典型工作流实战</h2>
+
+  <h3>7.1 加新功能</h3>
+  <div class="flow">
+    描述功能 + 给约束 <span class="arrow">→</span> <span>Agent 自动读代码</span> <span class="arrow">→</span> <span>实现</span> <span class="arrow">→</span> <span>跑测试</span> <span class="arrow">→</span> <span>你验收</span>
+  </div>
+  <div class="tip">大功能先 Plan。Agent 会读完所有相关文件再动手，不会盲改。</div>
+
+  <h3>7.2 修 Bug</h3>
+  <div class="flow">
+    复现步骤 + 错误堆栈 <span class="arrow">→</span> <span>/diagnose</span> <span class="arrow">→</span> <span>Agent 定位 → 修复 → 验证</span>
+  </div>
+  <div class="tip">用 <span class="inline-code">/diagnose</span> 触发系统化排障流程，比直接说"修一下"效果好得多。</div>
+
+  <h3>7.3 代码审查</h3>
+  <div class="flow">
+    <span>/review</span> <span class="arrow">→</span> <span>Agent 读 diff</span> <span class="arrow">→</span> <span>输出结构化审查意见</span> <span class="arrow">→</span> <span>选择是否应用建议</span>
+  </div>
+
+  <h3>7.4 TDD 开发</h3>
+  <div class="flow">
+    描述功能 <span class="arrow">→</span> <span>/tdd</span> <span class="arrow">→</span> <span>Agent 写测试（Red）</span> <span class="arrow">→</span> <span>写实现（Green）</span> <span class="arrow">→</span> <span>重构（Refactor）</span> <span class="arrow">→</span> <span>循环</span>
+  </div>
+
+  <h3>7.5 大规模重构</h3>
+  <div class="flow">
+    描述目标 + 不变约束 <span class="arrow">→</span> <span>Plan Mode 出方案</span> <span class="arrow">→</span> <span>确认</span> <span class="arrow">→</span> <span>逐模块实施</span> <span class="arrow">→</span> <span>跑全量测试</span> <span class="arrow">→</span> <span>/verify 验证</span>
+  </div>
+
+  <h3>7.6 定时任务</h3>
+  <div class="flow">
+    <span>/loop 5m /verify</span> <span class="arrow">→</span> <span>每 5 分钟自动检查部署状态</span>
+  </div>
+
+  <!-- ==================== 8 ==================== -->
+  <h2 id="s8">8. 常见反模式</h2>
+
+  <div class="principle warn">
+    <strong>❌ 一次给超模糊需求</strong>
+    <p>"帮我做个网站" → Agent 要猜框架、设计、功能、部署方式，大概率翻车。</p>
+    <p class="do">✅ "用 React + Tailwind 做个个人博客，有文章列表和 Markdown 详情页，部署到 GitHub Pages"</p>
+  </div>
+
+  <div class="principle warn">
+    <strong>❌ Agent 工作中插入新需求</strong>
+    <p>Agent 正在编辑多个文件，你突然说"顺便把 XX 也改下"→ 上下文污染 → 两个任务都可能出错。</p>
+    <p class="do">✅ 等当前任务结束，或明确说 "停止当前任务，新需求：……"</p>
+  </div>
+
+  <div class="principle warn">
+    <strong>❌ 用 Agent 做不需要推理的机械操作</strong>
+    <p>"把这 100 个 JSON 文件格式化" → 直接用 Prettier，别用 AI。AI 贵且可能出错。</p>
+    <p class="do">✅ Agent 适合需要理解代码、做决策、跨文件关联分析的任务。纯机械操作用脚本。</p>
+  </div>
+
+  <div class="principle warn">
+    <strong>❌ 让 Agent 自我循环修复超过 3 次</strong>
+    <p>Agent 陷入"改 → 报错 → 再改 → 再错"的死亡循环 → 烧大量 token 但毫无进展。</p>
+    <p class="do">✅ 3 次失败后喊停，自己看一下。"停，我来看看"。你的 30 秒审视可能省下 100k token。</p>
+  </div>
+
+  <div class="principle warn">
+    <strong>❌ 在一个超长会话里做所有事</strong>
+    <p>上下文膨胀 → 早期指令被压缩 → Agent "忘记"最初目标 → 输出质量断崖下降。</p>
+    <p class="do">✅ 一个会话 = 一个完整功能。完成就用 /compact 或开启新会话。用 /handoff 交接上下文。</p>
+  </div>
+
+  <!-- ==================== 9 ==================== -->
+  <h2 id="s9">9. 快速参考卡</h2>
+
+  <h3>场景速查</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>你想要</th><th>就这么说</th></tr>
+    <tr><td>加功能</td><td>"加 [功能]，在 [文件/模块]，用 [技术约束]"</td></tr>
+    <tr><td>修 Bug</td><td>"[现象]，报错 [完整错误信息]，/diagnose"</td></tr>
+    <tr><td>重构</td><td>"重构 [模块]，不改 [接口]，保持 [约束]"</td></tr>
+    <tr><td>查代码</td><td>"[函数/类] 在哪里被调用了？"</td></tr>
+    <tr><td>解释代码</td><td>"解释 [文件:行号] 的逻辑"</td></tr>
+    <tr><td>写测试</td><td>"给 [函数] 写测试，覆盖 [场景]，/tdd"</td></tr>
+    <tr><td>出方案</td><td>"先出方案，Plan Mode"</td></tr>
+    <tr><td>省 Token</td><td>"/caveman" 或 "/compact"</td></tr>
+    <tr><td>审查代码</td><td>"/review" 或 "/code-review"</td></tr>
+    <tr><td>写 PRD</td><td>"/to-prd"</td></tr>
+    <tr><td>拆成 Issue</td><td>"/to-issues"</td></tr>
+    <tr><td>定时执行</td><td>"/loop 5m /verify"</td></tr>
+    <tr><td>初始化项目</td><td>"/init"</td></tr>
+    <tr><td>交接上下文</td><td>"/handoff"</td></tr>
+  </table>
+  </div>
+
+  <h3>Token 优化速查</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>策略</th><th>命令 / 方法</th><th>节省幅度</th></tr>
+    <tr><td>极简回复模式</td><td><span class="inline-code">/caveman</span></td><td class="do">~75%</td></tr>
+    <tr><td>压缩长对话</td><td><span class="inline-code">/compact</span></td><td class="do">30-50%</td></tr>
+    <tr><td>先 Plan 后执行</td><td>"先出方案" 或 "Plan mode"</td><td class="do">40-60%</td></tr>
+    <tr><td>合并需求一次性给</td><td>多需求放一个 prompt</td><td class="do">30-50%</td></tr>
+    <tr><td>给路径不让贴代码</td><td>"看 src/foo.py:42"</td><td class="do">20-40%</td></tr>
+    <tr><td>Workflow 并行处理</td><td>Use Workflow tool</td><td class="do">50-80%</td></tr>
+    <tr><td>3 次失败即暂停</td><td>"停，我来看看"</td><td class="do">避免无限烧 token</td></tr>
+  </table>
+  </div>
+
+  <div class="principle" style="border-color: var(--accent); margin-top: 40px;">
+    <strong style="color: var(--accent); font-size: 1.1rem;">一句话总结</strong><br><br>
+    说清目标、给够上下文、一回合说完、复杂先计划、信任工具调用。<br>
+    <strong>你负责 What & Why，Claude Code 负责 How。</strong><br><br>
+    <span style="color: var(--muted);">把 Agent 当成一个极其聪明但每次对话都会失忆的工程师——CLAUDE.md 是它的笔记本，代码是它的记忆，你的 Prompt 是它的北极星。</span>
+  </div>
+
+</div>
+</body>
+</html>
