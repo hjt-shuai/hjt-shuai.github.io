@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP 完全指南 — Model Context Protocol 详解、配置与 Agent 对比</title>
+<style>
+:root {
+  --bg: #0d1117; --bg2: #161b22; --border: #30363d;
+  --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+  --green: #3fb950; --orange: #d2991d; --red: #f85149;
+  --purple: #a371f7; --cyan: #39d2c0; --code-bg: #1c2128;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+}
+header {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-size: 1rem; font-weight: 600; color: #f0f6fc; }
+header a { color: var(--muted); text-decoration: none; font-size: 0.85rem; }
+header a:hover { color: var(--accent); }
+
+/* ── Layout ── */
+.layout { display: flex; min-height: calc(100vh - 48px); }
+.sidebar {
+  width: 240px; min-width: 200px; background: var(--bg2);
+  border-right: 1px solid var(--border); overflow-y: auto; padding: 8px 0;
+  position: sticky; top: 48px; height: calc(100vh - 48px); flex-shrink: 0;
+}
+.sidebar-item {
+  display: block; padding: 7px 16px; font-size: 0.8rem; color: var(--text);
+  text-decoration: none; border-left: 2px solid transparent;
+  transition: all 0.15s; cursor: pointer; white-space: nowrap;
+}
+.sidebar-item:hover { background: rgba(88,166,255,0.06); color: #f0f6fc; }
+.sidebar-item.active { background: rgba(88,166,255,0.1); border-left-color: var(--accent); color: var(--accent); }
+
+/* ── Content ── */
+.content { flex: 1; overflow-y: auto; padding: 24px 32px; max-width: 960px; }
+.content h2 {
+  font-size: 1.3rem; color: #f0f6fc; margin: 36px 0 12px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.content h2:first-child { margin-top: 0; }
+.content h3 {
+  font-size: 1rem; color: var(--accent); margin: 22px 0 8px;
+}
+.content h4 { font-size: 0.9rem; color: #f0f6fc; margin: 16px 0 6px; }
+.content p { margin: 8px 0; font-size: 0.88rem; color: var(--text); }
+.content ul, .content ol { margin: 8px 0 12px 20px; }
+.content li { margin: 5px 0; font-size: 0.85rem; }
+.content a { color: var(--accent); text-decoration: none; }
+.content a:hover { text-decoration: underline; }
+
+.inline-code {
+  background: var(--code-bg); padding: 1px 6px; border-radius: 3px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.88em; border: 1px solid var(--border);
+}
+
+/* ── Code blocks ── */
+.code-block {
+  background: var(--code-bg); border: 1px solid var(--border);
+  border-radius: 6px; margin: 12px 0; overflow: hidden;
+}
+.code-block .lang {
+  background: var(--bg2); padding: 4px 14px; font-size: 0.7rem;
+  color: var(--muted); font-family: "SF Mono", "Fira Code", monospace;
+  border-bottom: 1px solid var(--border);
+}
+.code-block pre {
+  padding: 14px 16px; overflow-x: auto; font-size: 0.82rem;
+  font-family: "SF Mono", "Fira Code", monospace; line-height: 1.55;
+  color: #e6edf3;
+}
+
+/* ── Cards / Boxes ── */
+.principle {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 18px 22px; margin-bottom: 12px;
+}
+.principle strong { color: var(--green); }
+
+.tip {
+  background: #1b201d; border-left: 3px solid var(--accent);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+  font-size: 0.9rem;
+}
+.tip::before { content: "💡 "; }
+
+.warn-box {
+  background: #2a1f1a; border-left: 3px solid var(--orange);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0;
+  font-size: 0.85rem;
+}
+.warn-box::before { content: "⚠️ "; }
+
+.info-box {
+  border-left: 3px solid var(--accent);
+  background: rgba(88,166,255,0.06);
+  padding: 10px 14px; border-radius: 0 6px 6px 0;
+  margin: 12px 0; font-size: 0.85rem;
+}
+
+.flow {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--bg2); padding: 16px 20px; border-radius: 6px;
+  border: 1px solid var(--border); margin: 12px 0;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.85rem;
+}
+.flow span { color: var(--accent); }
+.flow .arrow { color: var(--muted); }
+
+.table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+.content table {
+  width: 100%; border-collapse: collapse; margin: 12px 0;
+  font-size: 0.82rem;
+}
+.content th, .content td {
+  border: 1px solid var(--border); padding: 8px 12px; text-align: left;
+}
+.content th { background: var(--bg2); color: #f0f6fc; font-weight: 600; }
+.content td { color: var(--text); }
+.content td code { font-size: 0.78rem; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.three-col { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+
+.agent-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 16px 18px; margin: 8px 0;
+  border-top: 3px solid var(--accent);
+}
+.agent-card.claude { border-top-color: var(--orange); }
+.agent-card.cursor { border-top-color: var(--purple); }
+.agent-card.codex { border-top-color: var(--green); }
+.agent-card.hermes { border-top-color: var(--cyan); }
+.agent-card h4 { margin-top: 0; }
+
+.tag {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 0.68rem; font-weight: 600; margin-right: 4px;
+}
+.tag-http { background: #1a2e1a; color: #7ee787; }
+.tag-stdio { background: #2a1a2e; color: #a371f7; }
+.tag-oauth { background: #2a2a1a; color: #d2991d; }
+.tag-free { background: #1a2e2a; color: #39d2c0; }
+
+.do { color: var(--green); }
+.dont { color: var(--red); }
+
+.bad, .good {
+  padding: 10px 16px; border-radius: 4px; margin: 8px 0;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.88rem; white-space: pre-wrap;
+}
+.bad { background: #2d1517; border-left: 3px solid var(--red); color: #fdaeb7; }
+.good { background: #14282c; border-left: 3px solid var(--green); color: #7ee787; }
+
+.cmp-table td:first-child { white-space: nowrap; font-weight: 600; }
+.cmp-table .win { color: var(--green); }
+.cmp-table .lose { color: var(--red); }
+
+.toc-list { list-style: none; margin-left: 0 !important; }
+.toc-list li { margin: 2px 0; }
+.toc-list a { font-size: 0.85rem; }
+
+@media (max-width: 700px) {
+  .sidebar { width: 100px; min-width: 80px; }
+  .sidebar-item { padding: 5px 8px; font-size: 0.7rem; }
+  .content { padding: 16px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔌 MCP 完全指南 — Model Context Protocol</h1>
+  <a href="index.html">← 返回首页</a>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <a class="sidebar-item active" href="#s1">MCP 是什么</a>
+    <a class="sidebar-item" href="#s2">MCP vs Skill 对比</a>
+    <a class="sidebar-item" href="#s3">传输类型</a>
+    <a class="sidebar-item" href="#s4">Claude Code 配置</a>
+    <a class="sidebar-item" href="#s5">Cursor 配置</a>
+    <a class="sidebar-item" href="#s6">Codex (OpenAI) 配置</a>
+    <a class="sidebar-item" href="#s7">Hermes Agent 配置 (WSL)</a>
+    <a class="sidebar-item" href="#s8">已安装 MCP 服务器</a>
+    <a class="sidebar-item" href="#s9">Token 效率分析</a>
+    <a class="sidebar-item" href="#s10">命名空间与冲突</a>
+    <a class="sidebar-item" href="#s11">常见问题 FAQ</a>
+  </nav>
+
+  <main class="content">
+
+    <!-- ═══════════ 1 ═══════════ -->
+    <h2 id="s1">1. MCP 是什么</h2>
+
+    <p><strong>MCP（Model Context Protocol）</strong> 是 Anthropic 于 2024 年 11 月发布的<strong>开放标准协议</strong>，用于 AI Agent 与外部工具/数据源之间的标准化通信。它是 AI Agent 的 "USB-C 接口" — 一次配置，所有兼容 Agent 都能使用。</p>
+
+    <div class="flow">
+      用户指令 <span class="arrow">→</span> <span>Agent</span> <span class="arrow">→</span> <span>MCP Client</span> <span class="arrow">↔</span> <span>MCP Server</span> <span class="arrow">↔</span> <span>外部工具/API/数据</span> <span class="arrow">→</span> 结构化结果返回
+    </div>
+
+    <h3>核心概念</h3>
+
+    <div class="two-col">
+      <div class="principle">
+        <strong>🔌 MCP Server</strong>
+        <p>提供工具（Tools）的一方。可以是本地进程（stdio）、远程 HTTP 服务，或云服务。每个 Server 暴露一组 Tool 定义（名称、描述、参数 JSON Schema）。</p>
+      </div>
+      <div class="principle">
+        <strong>🔗 MCP Client</strong>
+        <p>消费工具的一方。AI Agent（Claude Code、Cursor、Codex、Hermes）内置 MCP Client，在启动时连接所有配置的 Server，将 Tool 列表注入 Agent 上下文。</p>
+      </div>
+      <div class="principle">
+        <strong>🛠️ Tool</strong>
+        <p>一个具体的功能函数。Agent 通过 <code>serverName.toolName(params)</code> 直接调用，无需解析文档、无需构造命令。输入输出均为结构化 JSON。</p>
+      </div>
+      <div class="principle">
+        <strong>📋 Resource</strong>
+        <p>MCP Server 可暴露的数据源（文件、数据库记录、API 响应）。Agent 可以像读本地文件一样读取远程资源。</p>
+      </div>
+    </div>
+
+    <h3>为什么需要 MCP？</h3>
+
+    <p>在 MCP 出现之前，AI Agent 只能通过以下方式与外部工具交互：</p>
+
+    <div class="bad">
+# Skill 方式：Agent 读取 Markdown 文档 → 理解怎么用 → 构造 CLI 命令 → 执行 → 解析文本输出
+# 问题：耗 Token、容易出错、输出解析不稳定、每个 Agent 需要单独配置
+    </div>
+
+    <div class="good">
+# MCP 方式：Agent 直接调用 tool({params}) → 获取结构化 JSON 结果
+# 优势：省 Token（~90%）、类型安全、一次配置所有 Agent 可用
+    </div>
+
+    <div class="info-box">
+      <strong>MCP 是开放标准</strong>，不由任何单一厂商控制。任何 AI Agent 只要实现 MCP Client 协议即可使用所有 MCP Server。
+      协议规范：<a href="https://modelcontextprotocol.io" target="_blank">modelcontextprotocol.io</a>
+    </div>
+
+    <!-- ═══════════ 2 ═══════════ -->
+    <h2 id="s2">2. MCP vs Skill 深度对比</h2>
+
+    <p>Skill 和 MCP 是 AI Agent 工具生态的两种范式。理解差异有助于正确选型。</p>
+
+    <h3>架构对比</h3>
+
+    <div class="table-wrap">
+    <table class="cmp-table">
+      <tr><th>维度</th><th>Skill（技能）</th><th>MCP（协议）</th></tr>
+      <tr>
+        <td>本质</td>
+        <td>Markdown 文档 + CLI 脚本</td>
+        <td>标准化工具协议 + 结构化 Schema</td>
+      </tr>
+      <tr>
+        <td>Agent 调用方式</td>
+        <td>读取 .md 文档 → 理解指令 → 构造命令 → 执行 Bash → 解析文本输出</td>
+        <td>调用 <code>server.tool(params)</code> → 直接获取 JSON 结果</td>
+      </tr>
+      <tr>
+        <td>Token 消耗</td>
+        <td class="lose">高 — 加载完整 Skill 文档（2K-5K tokens），每次调用需上下文</td>
+        <td class="win">低 — 仅 Tool 定义 (~80 tokens/server)，调用不计入文档</td>
+      </tr>
+      <tr>
+        <td>跨 Agent 兼容</td>
+        <td class="lose">Claude Code 专属（Skill 格式为 Claude Code 特有）</td>
+        <td class="win">所有实现 MCP Client 的 Agent 通用</td>
+      </tr>
+      <tr>
+        <td>类型安全</td>
+        <td class="lose">无 — 文本输入输出，需 Agent 自行解析</td>
+        <td class="win">JSON Schema 强类型约束参数和返回值</td>
+      </tr>
+      <tr>
+        <td>错误处理</td>
+        <td class="lose">依赖 Agent 自行判断命令是否成功</td>
+        <td class="win">标准错误码，Agent 可编程处理</td>
+      </tr>
+      <tr>
+        <td>配置方式</td>
+        <td>放入 <code>~/.claude/skills/</code> 目录</td>
+        <td>写入 Agent 配置文件（JSON/TOML/YAML）</td>
+      </tr>
+      <tr>
+        <td>维护成本</td>
+        <td class="lose">每个 Skill 独立维护，格式不统一</td>
+        <td class="win">统一协议，Server 开发者维护一次</td>
+      </tr>
+      <tr>
+        <td>可发现性</td>
+        <td>需手动搜索、下载、安装</td>
+        <td>MCP 注册中心 / 市场逐步建设中</td>
+      </tr>
+      <tr>
+        <td>版本管理</td>
+        <td>手动 git pull 更新</td>
+        <td>远程 Server 自动更新（HTTP 模式）</td>
+      </tr>
+    </table>
+    </div>
+
+    <h3>Token 消耗对比（关键指标）</h3>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>操作</th><th>Skill Token 消耗</th><th>MCP Token 消耗</th><th>节省</th></tr>
+      <tr>
+        <td>注册工具定义</td>
+        <td>~2,500 tokens（加载完整 .md）</td>
+        <td>~80 tokens（Tool Schema）</td>
+        <td class="win">97%</td>
+      </tr>
+      <tr>
+        <td>调用一次工具</td>
+        <td>~200-500 tokens（命令 + 文本解析）</td>
+        <td>~50-100 tokens（JSON in/out）</td>
+        <td class="win">75%</td>
+      </tr>
+      <tr>
+        <td>10 次调用</td>
+        <td>~6,500 tokens</td>
+        <td>~880 tokens</td>
+        <td class="win">86%</td>
+      </tr>
+      <tr>
+        <td>100 次调用（重度使用）</td>
+        <td>~52,500 tokens</td>
+        <td>~5,080 tokens</td>
+        <td class="win">90%</td>
+      </tr>
+    </table>
+    </div>
+
+    <div class="tip">
+      <strong>结论：</strong>对于频繁调用的工具（搜索、设计、部署），MCP 的 Token 效率是 Skill 的 <strong>10 倍以上</strong>。Skill 适合作为一次性参考文档或复杂工作流模板，MCP 适合作为可重复调用的函数接口。
+    </div>
+
+    <h3>何时用 MCP？何时用 Skill？</h3>
+
+    <div class="two-col">
+      <div>
+        <h4>✅ 用 MCP</h4>
+        <ul>
+          <li>API 调用（搜索、数据库、云服务）</li>
+          <li>需要结构化输入输出</li>
+          <li>多个 Agent 共用同一工具</li>
+          <li>频繁调用的操作（>10 次/会话）</li>
+          <li>有现成 MCP Server</li>
+        </ul>
+      </div>
+      <div>
+        <h4>✅ 用 Skill</h4>
+        <ul>
+          <li>复杂多步骤工作流模板</li>
+          <li>需要领域知识文档（非纯 API）</li>
+          <li>Claude Code 专属场景</li>
+          <li>无 MCP Server 可用的工具</li>
+          <li>一次性参考手册</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <strong>不要同时安装 MCP 和同功能 Skill！</strong> 会造成 Agent 同时看到两个工具定义，浪费 Token，且可能因输出不一致导致混淆。优先选 MCP，删除重复 Skill。
+    </div>
+
+    <!-- ═══════════ 3 ═══════════ -->
+    <h2 id="s3">3. MCP 传输类型</h2>
+
+    <p>MCP 支持两种传输方式，适用于不同场景：</p>
+
+    <h3><span class="tag tag-stdio">stdio</span> 本地进程传输</h3>
+
+    <p>MCP Server 作为本地子进程运行，通过标准输入/输出（stdin/stdout）通信。Agent 启动时自动拉起进程。</p>
+
+    <div class="code-block">
+      <div class="lang">~/.mcp.json — stdio 示例（angular-cli）</div>
+      <pre>{
+  "angular-cli": {
+    "command": "npx",
+    "args": ["-y", "@angular/cli", "mcp"]
+  }
+}</pre>
+    </div>
+
+    <p><strong>优点：</strong>无网络依赖、延迟低、数据不出本地。<br>
+    <strong>缺点：</strong>需本地安装 Node.js/npx，进程常驻内存。</p>
+
+    <h3><span class="tag tag-http">streamable-http</span> 远程 HTTP 传输</h3>
+
+    <p>MCP Server 作为远程 HTTP 服务运行，Agent 通过 HTTP 请求调用工具。支持 Bearer Token 或 OAuth 认证。</p>
+
+    <div class="code-block">
+      <div class="lang">~/.mcp.json — HTTP 示例（anysearch）</div>
+      <pre>{
+  "anysearch": {
+    "type": "streamable-http",
+    "url": "https://api.anysearch.com/mcp",
+    "headers": {
+      "Authorization": "Bearer YOUR_API_KEY"
+    }
+  }
+}</pre>
+    </div>
+
+    <p><strong>优点：</strong>无需本地安装、自动更新、跨设备可用。<br>
+    <strong>缺点：</strong>依赖网络、有延迟、API 需认证。</p>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>特性</th><th>stdio</th><th>streamable-http</th></tr>
+      <tr><td>部署位置</td><td>本地机器</td><td>远程服务器</td></tr>
+      <tr><td>启动方式</td><td>Agent 自动拉起子进程</td><td>Agent 发起 HTTP 连接</td></tr>
+      <tr><td>认证方式</td><td>无需认证（本地信任）</td><td>Bearer Token / OAuth 2.1</td></tr>
+      <tr><td>适用场景</td><td>开发工具（CLI、编译器）</td><td>云服务 API（搜索、设计、部署）</td></tr>
+      <tr><td>资源占用</td><td>占用本地内存/CPU</td><td>不占本地资源</td></tr>
+      <tr><td>更新方式</td><td>npm update</td><td>服务端自动更新</td></tr>
+    </table>
+    </div>
+
+    <h3><span class="tag tag-oauth">OAuth 2.1</span> 认证（Linear 示例）</h3>
+
+    <p>对于需要用户授权的服务（如 Linear），MCP 支持 <strong>原生 OAuth 2.1 流程</strong>。Agent 首次连接时自动打开浏览器，用户授权后即可使用。无需手动拷贝 Token。</p>
+
+    <div class="flow">
+      Agent 启动 <span class="arrow">→</span> <span>检测 OAuth Server</span> <span class="arrow">→</span> <span>打开浏览器</span> <span class="arrow">→</span> <span>用户授权</span> <span class="arrow">→</span> <span>自动获取 Token</span> <span class="arrow">→</span> 后续请求自动携带
+    </div>
+
+    <!-- ═══════════ 4 ═══════════ -->
+    <h2 id="s4">4. Claude Code MCP 配置</h2>
+
+    <div class="agent-card claude">
+      <h4>🤖 Claude Code</h4>
+      <p><strong>配置文件：</strong><code>~/.mcp.json</code>（用户级，影响所有项目）</p>
+      <p><strong>配置格式：</strong>JSON</p>
+      <p><strong>MCP 版本：</strong>Streamable HTTP + stdio 双模式</p>
+    </div>
+
+    <h3>配置文件结构</h3>
+
+    <div class="code-block">
+      <div class="lang">~/.mcp.json</div>
+      <pre>{
+  "mcpServers": {
+    "<span style="color:var(--orange)">server-name</span>": {
+      // ── HTTP 模式 ──
+      "type": "streamable-http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+
+      // ── 或 stdio 模式 ──
+      "command": "npx",
+      "args": ["-y", "package-name", "mcp"]
+    }
+  }
+}</pre>
+    </div>
+
+    <h3>CLI 添加命令</h3>
+
+    <div class="code-block">
+      <div class="lang">bash</div>
+      <pre># 添加 HTTP MCP Server（用户级，-s user）
+claude mcp add -s user --transport http &lt;name&gt; &lt;url&gt;
+
+# 示例：添加 Linear（OAuth 认证）
+claude mcp add -s user --transport http linear https://mcp.linear.app/mcp
+
+# 查看已连接的 MCP Server
+claude mcp list
+
+# 查看 Server 提供的工具
+claude mcp tools &lt;server-name&gt;</pre>
+    </div>
+
+    <div class="info-box">
+      <strong>Claude Code 专属：</strong><code>~/.mcp.json</code> 是 Claude Code 的全局 MCP 配置。<code>~/.claude/settings.json</code> 不能配置 MCP（会被 JSON Schema 校验拒绝）。
+    </div>
+
+    <h3>当前 ~/.mcp.json 内容</h3>
+
+    <div class="code-block">
+      <div class="lang">~/.mcp.json（实际配置）</div>
+      <pre>{
+  "mcpServers": {
+    "anysearch": {
+      "type": "streamable-http",
+      "url": "https://api.anysearch.com/mcp",
+      "headers": {
+        "Authorization": "Bearer as_sk_xxx"
+      }
+    },
+    "angular-cli": {
+      "command": "npx",
+      "args": ["-y", "@angular/cli", "mcp"]
+    },
+    "figma": {
+      "type": "streamable-http",
+      "url": "https://mcp.figma.com/mcp",
+      "headers": {
+        "Authorization": "Bearer figd_xxx",
+        "X-Figma-Region": "us-east-1"
+      }
+    },
+    "render": {
+      "type": "streamable-http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer rnd_xxx"
+      }
+    }
+  }
+}</pre>
+    </div>
+
+    <!-- ═══════════ 5 ═══════════ -->
+    <h2 id="s5">5. Cursor MCP 配置</h2>
+
+    <div class="agent-card cursor">
+      <h4>🖱️ Cursor</h4>
+      <p><strong>配置文件：</strong><code>~/.cursor/mcp.json</code></p>
+      <p><strong>配置格式：</strong>JSON（与 Claude Code 相同格式）</p>
+      <p><strong>兼容性：</strong>可直接复制 <code>~/.mcp.json</code></p>
+    </div>
+
+    <div class="code-block">
+      <div class="lang">~/.cursor/mcp.json</div>
+      <pre>{
+  "mcpServers": {
+    "anysearch": {
+      "type": "streamable-http",
+      "url": "https://api.anysearch.com/mcp",
+      "headers": { "Authorization": "Bearer YOUR_KEY" }
+    },
+    "figma": {
+      "type": "streamable-http",
+      "url": "https://mcp.figma.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN",
+        "X-Figma-Region": "us-east-1"
+      }
+    }
+    // ... 与 ~/.mcp.json 格式完全一致
+  }
+}</pre>
+    </div>
+
+    <div class="tip">
+      Cursor 的 MCP 配置格式与 Claude Code <strong>100% 兼容</strong>。可以直接 <code>cp ~/.mcp.json ~/.cursor/mcp.json</code> 同步配置。
+    </div>
+
+    <!-- ═══════════ 6 ═══════════ -->
+    <h2 id="s6">6. Codex (OpenAI) MCP 配置</h2>
+
+    <div class="agent-card codex">
+      <h4>🟢 Codex (OpenAI)</h4>
+      <p><strong>配置文件：</strong><code>~/.codex/config.toml</code></p>
+      <p><strong>配置格式：</strong>TOML</p>
+      <p><strong>前置条件：</strong>需开启 <code>rmcp_client = true</code></p>
+    </div>
+
+    <h3>配置步骤</h3>
+
+    <p><strong>1. 开启 MCP 功能：</strong>在 <code>config.toml</code> 中添加：</p>
+
+    <div class="code-block">
+      <div class="lang">~/.codex/config.toml</div>
+      <pre>[features]
+rmcp_client = true</pre>
+    </div>
+
+    <p><strong>2. 添加 MCP Server：</strong></p>
+
+    <div class="code-block">
+      <div class="lang">~/.codex/config.toml（追加内容）</div>
+      <pre># HTTP 类型（Authorization 放在 http_headers 里）
+[mcp_servers.anysearch]
+url = "https://api.anysearch.com/mcp"
+http_headers = { "Authorization" = "Bearer as_sk_xxx" }
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+http_headers = { "Authorization" = "Bearer figd_xxx", "X-Figma-Region" = "us-east-1" }
+
+[mcp_servers.render]
+url = "https://mcp.render.com/mcp"
+http_headers = { "Authorization" = "Bearer rnd_xxx" }
+
+# OAuth 类型（无需 token）
+[mcp_servers.linear]
+url = "https://mcp.linear.app/mcp"
+
+# stdio 类型
+[mcp_servers.angular-cli]
+command = "npx"
+args = ["-y", "@angular/cli", "mcp"]</pre>
+    </div>
+
+    <div class="warn-box">
+      <strong>Codex TOML 格式注意事项：</strong>
+      <ul>
+        <li>streamable_http 不支持 <code>bearer_token</code>，认证 Header 放在 <code>http_headers</code> 里</li>
+        <li>Header 写法：<code>http_headers = { "Authorization" = "Bearer TOKEN" }</code></li>
+        <li>必须开启 <code>[features] rmcp_client = true</code> 否则 MCP 不加载</li>
+      </ul>
+    </div>
+
+    <!-- ═══════════ 7 ═══════════ -->
+    <h2 id="s7">7. Hermes Agent MCP 配置 (WSL)</h2>
+
+    <div class="agent-card hermes">
+      <h4>🕊️ Hermes Agent (WSL)</h4>
+      <p><strong>配置目录：</strong><code>~/hermes-agent/optional-mcps/&lt;name&gt;/manifest.yaml</code></p>
+      <p><strong>环境变量：</strong><code>~/.hermes/.env</code></p>
+      <p><strong>配置格式：</strong>YAML manifest</p>
+    </div>
+
+    <h3>目录结构</h3>
+
+    <div class="code-block">
+      <div class="lang">bash</div>
+      <pre>~/hermes-agent/optional-mcps/
+├── anysearch/
+│   └── manifest.yaml
+├── figma/
+│   └── manifest.yaml
+├── render/
+│   └── manifest.yaml
+└── angular-cli/
+    └── manifest.yaml</pre>
+    </div>
+
+    <h3>manifest.yaml 示例</h3>
+
+    <div class="code-block">
+      <div class="lang">~/hermes-agent/optional-mcps/anysearch/manifest.yaml</div>
+      <pre>manifest_version: 1
+name: anysearch
+description: Real-time search engine — web search, 22 domains, batch search
+source: https://github.com/anysearch-ai/anysearch-skill
+transport:
+  type: http
+  url: https://api.anysearch.com/mcp
+  headers:
+    Authorization: "Bearer ${ANYSEARCH_API_KEY}"
+auth:
+  type: api_key
+  env:
+    - name: ANYSEARCH_API_KEY
+      prompt: "AnySearch API key"
+      required: false
+      secret: true
+post_install: |
+  Get a free API key at https://anysearch.com/console/api-keys
+  Restart Hermes to load tools.</pre>
+    </div>
+
+    <h3>环境变量配置</h3>
+
+    <div class="code-block">
+      <div class="lang">~/.hermes/.env</div>
+      <pre>ANYSEARCH_API_KEY=as_sk_xxx
+FIGMA_OAUTH_TOKEN=figd_xxx
+RENDER_API_KEY=rnd_xxx</pre>
+    </div>
+
+    <div class="tip">
+      Hermes 使用 <code>${ENV_VAR}</code> 语法引用环境变量，比直接写在配置文件中更安全。API Key 存在 <code>~/.hermes/.env</code> 中，manifest.yaml 只引用变量名。
+    </div>
+
+    <!-- ═══════════ 8 ═══════════ -->
+    <h2 id="s8">8. 已安装 MCP 服务器概览</h2>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>Server</th><th>类型</th><th>功能</th><th>认证</th><th>费用</th><th>已配置 Agent</th></tr>
+      <tr>
+        <td><strong>anysearch</strong></td>
+        <td><span class="tag tag-http">HTTP</span></td>
+        <td>实时搜索引擎 — 网页搜索、22 个垂直领域、批量并行搜索、URL 转 Markdown</td>
+        <td>API Key</td>
+        <td><span class="tag tag-free">免费</span> 1000次/天</td>
+        <td>全部 4 个</td>
+      </tr>
+      <tr>
+        <td><strong>angular-cli</strong></td>
+        <td><span class="tag tag-stdio">stdio</span></td>
+        <td>Angular 开发工具 — 项目分析、迁移、构建、测试、文档搜索</td>
+        <td>无</td>
+        <td><span class="tag tag-free">免费</span></td>
+        <td>全部 4 个</td>
+      </tr>
+      <tr>
+        <td><strong>figma</strong></td>
+        <td><span class="tag tag-http">HTTP</span></td>
+        <td>Figma 设计读取 — 获取设计上下文、元数据、截图</td>
+        <td>OAuth Token</td>
+        <td><span class="tag tag-free">免费</span>（需注册）</td>
+        <td>全部 4 个</td>
+      </tr>
+      <tr>
+        <td><strong>render</strong></td>
+        <td><span class="tag tag-http">HTTP</span></td>
+        <td>Render 部署 — 创建 Web 服务、静态站点、数据库、监控部署</td>
+        <td>API Key</td>
+        <td><span class="tag tag-free">免费</span>（需注册）</td>
+        <td>全部 4 个</td>
+      </tr>
+      <tr>
+        <td><strong>linear</strong></td>
+        <td><span class="tag tag-http">HTTP</span></td>
+        <td>Linear 项目管理 — Issue 管理、Sprint 跟踪、团队协作</td>
+        <td><span class="tag tag-oauth">OAuth 2.1</span></td>
+        <td><span class="tag tag-free">免费</span>（需注册）</td>
+        <td>Claude Code + Codex<br>（Cursor/Hermes 待配置）</td>
+      </tr>
+    </table>
+    </div>
+
+    <h3>各 Server Tool 列表</h3>
+
+    <div class="three-col">
+      <div class="principle">
+        <strong>🔍 anysearch</strong>
+        <ul>
+          <li><code>search</code> — 网页搜索</li>
+          <li><code>search_verticals</code> — 垂直搜索（学术、新闻、图片等）</li>
+          <li><code>batch_search</code> — 批量并行搜索</li>
+          <li><code>fetch_url</code> — URL 转 Markdown</li>
+        </ul>
+      </div>
+      <div class="principle">
+        <strong>🎨 figma</strong>
+        <ul>
+          <li><code>get_design_context</code> — 设计上下文</li>
+          <li><code>get_metadata</code> — 节点元数据</li>
+          <li><code>get_screenshot</code> — 设计截图</li>
+        </ul>
+      </div>
+      <div class="principle">
+        <strong>🚀 render</strong>
+        <ul>
+          <li><code>create_web_service</code> — 创建服务</li>
+          <li><code>create_static_site</code> — 部署静态站</li>
+          <li><code>list_services</code> — 服务列表</li>
+          <li><code>get_deploy_status</code> — 部署状态</li>
+        </ul>
+      </div>
+      <div class="principle">
+        <strong>📐 angular-cli</strong>
+        <ul>
+          <li><code>analyze_project</code> — 项目分析</li>
+          <li><code>generate_component</code> — 生成组件</li>
+          <li><code>migrate</code> — 版本迁移</li>
+          <li><code>search_docs</code> — 文档搜索</li>
+        </ul>
+      </div>
+      <div class="principle">
+        <strong>📋 linear</strong>
+        <ul>
+          <li><code>search_issues</code> — 搜索 Issue</li>
+          <li><code>create_issue</code> — 创建 Issue</li>
+          <li><code>get_sprints</code> — Sprint 列表</li>
+          <li><code>update_issue</code> — 更新 Issue</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══════════ 9 ═══════════ -->
+    <h2 id="s9">9. Token 效率深度分析</h2>
+
+    <h3>原理</h3>
+
+    <p>MCP 省 Token 的根本原因：</p>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>阶段</th><th>Skill</th><th>MCP</th></tr>
+      <tr>
+        <td><strong>工具发现</strong></td>
+        <td>Agent 读取整个 SKILL.md（含描述、用法、示例、限制说明）→ <strong>2,000-5,000 tokens</strong></td>
+        <td>Agent 获取 Tool JSON Schema（仅名称、描述、参数）→ <strong>60-100 tokens/tool</strong></td>
+      </tr>
+      <tr>
+        <td><strong>参数理解</strong></td>
+        <td>Agent 从 Markdown 文本中推断参数格式 → 可能出错</td>
+        <td>JSON Schema 严格定义类型、必填/可选、枚举值 → 绝不会出错</td>
+      </tr>
+      <tr>
+        <td><strong>执行调用</strong></td>
+        <td>构造 CLI 命令字符串 → 执行 Bash → 解析 stdout 文本 → <strong>200-500 tokens/次</strong></td>
+        <td><code>tool_call({json_params})</code> → 返回结构化 JSON → <strong>30-80 tokens/次</strong></td>
+      </tr>
+      <tr>
+        <td><strong>错误处理</strong></td>
+        <td>解析错误信息文本 → 重试构造新命令 → <strong>翻倍 Token 消耗</strong></td>
+        <td>标准错误码 → 直接处理 → <strong>无额外 Token</strong></td>
+      </tr>
+    </table>
+    </div>
+
+    <h3>实际案例：5 个 MCP Server 的 Token 占用</h3>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>场景</th><th>Skill 方案</th><th>MCP 方案</th><th>节省</th></tr>
+      <tr><td>加载 5 个工具集</td><td>~12,500 tokens</td><td>~400 tokens</td><td class="win">96.8%</td></tr>
+      <tr><td>典型会话（30 次工具调用）</td><td>~19,500 tokens</td><td>~1,900 tokens</td><td class="win">90.3%</td></tr>
+      <tr><td>高强度会话（100 次调用）</td><td>~52,500 tokens</td><td>~5,080 tokens</td><td class="win">90.3%</td></tr>
+      <tr><td>月均（30 个会话）</td><td>~585,000 tokens</td><td>~57,000 tokens</td><td class="win">90.3%</td></tr>
+    </table>
+    </div>
+
+    <div class="tip">
+      <strong>实际节省远不止 Token 数量。</strong>MCP 的结构化输出减少 Agent 推理错误，避免重试浪费。实际场景中 MCP 的 Token 效率是 Skill 的 <strong>10-30 倍</strong>（考虑错误重试）。
+    </div>
+
+    <!-- ═══════════ 10 ═══════════ -->
+    <h2 id="s10">10. 命名空间与冲突处理</h2>
+
+    <h3>MCP 命名空间机制</h3>
+
+    <p>MCP 使用 <strong>serverName.toolName</strong> 命名空间，不同 Server 的 Tool 自动隔离，不会冲突。</p>
+
+    <div class="code-block">
+      <div class="lang">Tool 调用格式</div>
+      <pre>anysearch.search("Claude 3.5 release date")     ← anysearch 的 search
+figma.get_design_context("https://figma.com/...") ← figma 的设计读取
+render.create_web_service({...})                  ← render 的部署</pre>
+    </div>
+
+    <p>即使两个 Server 都有同名的 <code>search</code> Tool，Agent 通过 <code>serverName.search</code> 区分，不会混淆。</p>
+
+    <h3>MCP + Skill 共存时的冲突</h3>
+
+    <p>当 MCP 和 Skill 提供相同功能时会有问题：</p>
+
+    <div class="bad">
+# ❌ 反模式：同时安装 MCP figma + Skill figma
+# Agent 看到两套工具描述 → 不确定该用哪个 → 浪费 Token 加载两份定义
+# 输出可能不一致（MCP 返回 JSON，Skill 返回文本）
+    </div>
+
+    <div class="good">
+# ✅ 正确做法：仅保留 MCP，删除同功能 Skill
+# rm -rf ~/.codex/skills/figma*
+# rm -rf ~/.codex/skills/render-deploy/
+# rm -rf ~/.claude/skills/anysearch/
+    </div>
+
+    <div class="warn-box">
+      <strong>已执行的清理：</strong>本项目已删除所有与 MCP 重复的 Skill：
+      <ul>
+        <li><code>~/.claude/skills/anysearch/</code> → 已删除（MCP anysearch 替代）</li>
+        <li><code>~/.codex/skills/figma*/</code>（7 个目录）→ 已删除（MCP figma 替代）</li>
+        <li><code>~/.codex/skills/render-deploy/</code> → 已删除（MCP render 替代）</li>
+        <li><code>~/.codex/skills/linear/</code> → 已删除（MCP linear 替代）</li>
+      </ul>
+    </div>
+
+    <!-- ═══════════ 11 ═══════════ -->
+    <h2 id="s11">11. 常见问题 FAQ</h2>
+
+    <h3>MCP 收费吗？</h3>
+    <p>MCP 协议本身<strong>完全免费开源</strong>。每个 MCP Server 的收费策略由其提供商决定：</p>
+    <ul>
+      <li>✅ anysearch — 免费（1000 次/天，匿名也可用）</li>
+      <li>✅ angular-cli — 免费（Angular 官方维护）</li>
+      <li>✅ figma — 免费（需注册 Figma 账号）</li>
+      <li>✅ render — 免费（需注册 Render 账号）</li>
+      <li>✅ linear — 免费（需注册 Linear 账号）</li>
+    </ul>
+
+    <h3>为什么 Agent 重启后才加载新的 MCP？</h3>
+    <p>MCP Client 在 Agent <strong>启动时</strong>一次性连接所有 Server 并获取 Tool 列表。修改配置文件后需重启 Agent 才能生效。这避免了运行时动态发现的开销。</p>
+
+    <h3>MCP 连接失败怎么办？</h3>
+    <p>MCP Server 不可用时<strong>不会阻断 Agent 启动</strong>。Agent 会标记该 Server 为不可用状态，其余 Server 正常使用。常见原因：</p>
+    <ul>
+      <li>API Key 过期或无效</li>
+      <li>网络不通（HTTP Server 需要科学上网？）</li>
+      <li>OAuth Token 未授权（Linear 需首次浏览器授权）</li>
+      <li>stdio Server 依赖未安装（如 npx 不可用）</li>
+    </ul>
+
+    <h3>如何验证 MCP 是否正常工作？</h3>
+    <div class="code-block">
+      <div class="lang">bash</div>
+      <pre># Claude Code：列出已连接 Server
+claude mcp list
+
+# 查看某 Server 的工具列表
+claude mcp tools anysearch
+
+# 在 Agent 会话中直接让 Agent 调用试试
+"用 anysearch 搜索一下今天的科技新闻"</pre>
+    </div>
+
+    <h3>可以自己写 MCP Server 吗？</h3>
+    <p>可以。MCP 协议是开放的，支持 Python/TypeScript/Go 等多种语言的 SDK。详见 <a href="https://modelcontextprotocol.io/docs" target="_blank">MCP 官方文档</a>。一个最简单的 MCP Server 只需要几十行代码。</p>
+
+    <h3>Skill 会被淘汰吗？</h3>
+    <p><strong>不会完全淘汰</strong>，但角色会转变：</p>
+    <ul>
+      <li>MCP → 标准化 API 调用（未来主流）</li>
+      <li>Skill → 领域知识手册、复杂工作流模板、教育参考</li>
+      <li>两者互补，不是替代关系</li>
+    </ul>
+
+    <hr style="border-color: var(--border); margin: 40px 0 20px;">
+
+    <p style="font-size: 0.78rem; color: var(--muted);">
+      最后更新：2026-06-08 · 基于 MCP 协议 2024-11-25 规范 ·
+      <a href="https://modelcontextprotocol.io" target="_blank">MCP 官方文档</a> ·
+      <a href="index.html">返回首页</a>
+    </p>
+
+  </main>
+</div>
+
+<script>
+// Sidebar active tracking
+const sections = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('.sidebar-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.sidebar-item[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
